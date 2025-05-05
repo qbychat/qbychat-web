@@ -34,8 +34,10 @@ const cmd = [
   ...files,
 ].join(' ');
 
-console.log('Running:', cmd);
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir);
+if (fs.existsSync(outDir)) {
+  // delete files
+  fs.rmSync(outDir, { recursive: true });
 }
+fs.mkdirSync(outDir);
+console.log('Running:', cmd);
 execSync(cmd, { stdio: 'inherit' });
