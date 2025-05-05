@@ -18,22 +18,20 @@
  *
  */
 
-import mitt from 'mitt';
 import { useEffect } from 'react';
+import WebsocketClient from '@/services/websocket/websocket-client.ts';
 
 export interface WebSocketEvent {
   userId: string | null | undefined;
-  payload: Uint8Array
+  payload: Uint8Array;
 }
 
-export const websocketEmitter = mitt<Record<string, WebSocketEvent>>();
-
-export function useWebsocketEvent(eventName: string, handler: () => void) {
+export function useWebsocketEvent(websocket: WebsocketClient, eventName: string, handler: () => void) {
   useEffect(() => {
-    websocketEmitter.on(eventName, handler);
+    websocket.emitter.on(eventName, handler);
 
     return () => {
-      websocketEmitter.off(eventName, handler);
+      websocket.emitter.off(eventName, handler);
     };
   }, []);
 }

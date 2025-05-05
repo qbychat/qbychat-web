@@ -23,6 +23,12 @@ class BinaryUtils {
     const buffer = await new Response(blob).arrayBuffer();
     return new Uint8Array(buffer);
   }
+
+  numberToUint8(num: number): Uint8Array {
+    const arr = new Uint8Array(1);
+    arr[0] = num & 0xFF;
+    return arr;
+  }
 }
 
 const instance = new BinaryUtils();

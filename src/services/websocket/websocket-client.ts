@@ -19,14 +19,27 @@
  */
 
 import {
-  ClientboundHandshake, ClientboundMessage,
+  ClientboundHandshake,
+  ClientboundMessage,
   EncryptedMessage,
+  RequestMethod,
+  RPCResponse,
+  RPCResponse_Status,
   ServerboundHandshake,
+  ServerboundMessage,
 } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
 import CipherUtils, { KeyPair } from '@/utils/cipher-utils.ts';
 import BinaryUtils from '@/utils/binary-utils.ts';
 import SlidingWindow from '@/services/websocket/sliding-window.ts';
-import { websocketEmitter } from '@/services/websocket/websocket-eventbus.ts';
+import { WebSocketEvent } from '@/services/websocket/websocket-eventbus.ts';
+import mitt from 'mitt';
+import { MessageType } from '@protobuf-ts/runtime';
+import { RPCError } from '@/services/websocket/websocket-error.ts';
+
+interface RPCResponsePromiseHandlers {
+  resolve: (value: RPCResponse) => void;
+  reject: (reason: RPCError) => void;
+}
 
 class WebSocketClient {
   private socket: WebSocket | null = null;
@@ -36,7 +49,12 @@ class WebSocketClient {
   private reconnectInterval: number;
   private reconnectAttempts = 0;
 
-  #shouldReconnect = true;
+  public emitter = mitt<Record<string, WebSocketEvent>>();
+
+  #ticketCounter: number = 0;
+
+  #shouldReconnect: boolean = true;
+  #reconnectTimer: NodeJS.Timeout | null = null;
 
   readonly #chacha20KeyInfo = Uint8Array.from('qbychat-web');
   #handshakeState: boolean = false;
@@ -44,6 +62,7 @@ class WebSocketClient {
   #chacha20Key: Uint8Array | null = null;
   #packetCounter: Int32Array | null = null;
   #packetQueue: Uint8Array[] = [];
+  #responseHandlers: Map<Uint8Array, RPCResponsePromiseHandlers> = new Map();
   #window: SlidingWindow | null = null;
 
   constructor(url: string, baseReconnectInterval: number = 5000) {
@@ -107,6 +126,7 @@ class WebSocketClient {
         // free keyPair object
         keyPair = undefined;
         // push packets in the queue
+        // TODO send packet after reconnect
         while (this.#packetQueue.length > 0) {
           const packet = this.#packetQueue.pop();
           if (packet) {
@@ -171,18 +191,68 @@ class WebSocketClient {
     }
   }
 
+  async request<T extends object>(type: MessageType<T>, userId: string | null, method: RequestMethod, payload: Uint8Array | null, timeout: number = 15000): Promise<T> {
+    return new Promise((resolve, reject) => {
+      // create ticket
+      const ticket = BinaryUtils.numberToUint8(++this.#ticketCounter);
+      // build request
+      const message: ServerboundMessage = {
+        userId: userId === null ? undefined : userId,
+        request: {
+          ticket: ticket,
+          method: method,
+          payload: payload === null ? undefined : payload,
+        },
+      };
+
+      // send request
+      this.sendPacket(ServerboundMessage.toBinary(message));
+
+      // Set a timeout to reject the promise after the specified time
+      const timeoutId = setTimeout(() => {
+        // If the timeout occurs, reject the promise
+        console.error(`Request with ticket ${ticket} timed out after ${timeout}ms`);
+        this.#responseHandlers.delete(ticket); // Clean up the ticket from the map
+        reject(new Error(`Request timed out after ${timeout}ms`));
+      }, timeout);
+
+      const callback = (response: RPCResponse) => {
+        // clean timeout
+        clearTimeout(timeoutId);
+        // parse payload
+        resolve(type.fromBinary(response.payload!));
+      };
+
+      this.#responseHandlers.set(ticket, {
+        resolve: callback,
+        reject: reject,
+      });
+    });
+  }
 
   private handlePacket(packet: ClientboundMessage) {
     const userId = packet.userId;
     if (packet.content.oneofKind == 'response') {
       // handle response
-      // const response = packet.content.response;
-      // TODO handle response
+      const response = packet.content.response;
+      const responseHandler = this.#responseHandlers.get(response.ticket!);
+      if (responseHandler) {
+        // invoke handler
+        if (response.status === RPCResponse_Status.SUCCESS) {
+          // success
+          responseHandler.resolve(response);
+        } else {
+          // error
+          responseHandler.reject(new RPCError(response.status, response.message));
+        }
+        // cleanup handler
+        this.#responseHandlers.delete(response.ticket!);
+      }
     } else if (packet.content.oneofKind == 'event') {
       // handle event
       const event = packet.content.event;
       // emit event
-      websocketEmitter.emit(event.typeUrl, {
+      this.emitter.emit(event.typeUrl, {
         userId: userId,
         payload: event.value,
       });
@@ -202,11 +272,15 @@ class WebSocketClient {
       this.maxReconnectInterval,
     );
 
-    setTimeout(() => this.connect(), this.reconnectInterval);
+    this.#reconnectTimer = setTimeout(() => this.connect(), this.reconnectInterval);
   }
 
   close() {
     if (this.socket) {
+      if (this.#reconnectTimer) {
+        // avoid reconnect
+        clearTimeout(this.#reconnectTimer);
+      }
       this.#shouldReconnect = false;
       this.socket.close();
       this.socket = null;
