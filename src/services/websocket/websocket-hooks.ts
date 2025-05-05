@@ -19,9 +19,9 @@
  */
 
 import { useEffect, useState } from 'react';
-import WebsocketClient, { WebSocketStatus } from '@/services/websocket/websocket-client.ts';
+import WebSocketService, { WebSocketStatus } from '@/services/websocket/websocket-service.ts';
 
-export function useWebsocketEvent(websocket: WebsocketClient, eventName: string, handler: () => void) {
+export function useWebsocketEvent(websocket: WebSocketService, eventName: string, handler: () => void) {
   useEffect(() => {
     websocket.emitter.on(eventName, handler);
 
@@ -31,7 +31,7 @@ export function useWebsocketEvent(websocket: WebsocketClient, eventName: string,
   }, []);
 }
 
-export function useWebsocketStatus(websocket: WebsocketClient): WebSocketStatus {
+export function useWebsocketStatus(websocket: WebSocketService): WebSocketStatus {
   const [status, setStatus] = useState<WebSocketStatus>('closed');
 
   useEffect(() => {

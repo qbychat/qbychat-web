@@ -18,16 +18,24 @@
  *
  */
 
-import { HashRouter, Routes } from 'react-router';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import HttpBackend from 'i18next-http-backend';
 
-function App() {
-  return (
-    <HashRouter>
-      <Routes>
-        
-      </Routes>
-    </HashRouter>
-  );
-}
+i18n
+  .use(LanguageDetector)
+  .use(HttpBackend)
+  .use(initReactI18next)
+  .init({
+    fallbackLng: 'en',
+    debug: true,
+    interpolation: {
+      escapeValue: false,
+    },
+    backend: {
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
+    },
+  });
 
-export default App;
+export default i18n;

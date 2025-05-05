@@ -18,16 +18,29 @@
  *
  */
 
-import { HashRouter, Routes } from 'react-router';
+import { motion } from 'framer-motion';
 
-function App() {
+export default function LoadingAnimation() {
   return (
-    <HashRouter>
-      <Routes>
-        
-      </Routes>
-    </HashRouter>
+    <motion.div
+      className="select-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: '#fff',
+        fontSize: '1.5rem',
+        background: 'linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72)',
+        backgroundSize: '600% 600%',
+        animation: 'gradientShift 8s ease infinite',
+      }}
+    >
+      Loading QbyChat...
+    </motion.div>
   );
 }
-
-export default App;

@@ -49,7 +49,7 @@ interface WebSocketEvent {
   payload: Uint8Array;
 }
 
-class WebSocketClient {
+class WebSocketService {
   private socket: WebSocket | null = null;
   private readonly url: string;
   private maxReconnectInterval: number = 30000;
@@ -320,4 +320,4 @@ class WebSocketClient {
   }
 }
 
-export default WebSocketClient;
+export default WebSocketService;

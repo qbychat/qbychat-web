@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import WebsocketClient from '@/services/websocket/websocket-client.ts';
+import WebSocketService from '@/services/websocket/websocket-service.ts';
 
 interface CounterState {
-  client: WebsocketClient | null;
+  service: WebSocketService | null;
 }
 
 const initialState: CounterState = {
-  client: null,
+  service: null,
 };
 
 const websocketSlice = createSlice({
@@ -14,15 +14,15 @@ const websocketSlice = createSlice({
   initialState: initialState,
   reducers: {
     connect: (state, action: PayloadAction<string>) => {
-      state.client = new WebsocketClient(action.payload);
+      state.service = new WebSocketService(action.payload);
       // connect to websocket
-      state.client.connect();
+      state.service.connect();
     },
 
     disconnect: (state) => {
       // close client
-      state.client?.close();
-      state.client = null;
+      state.service?.close();
+      state.service = null;
     }
   },
 });
