@@ -35,6 +35,7 @@ import { WebSocketEvent } from '@/services/websocket/websocket-eventbus.ts';
 import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/services/websocket/websocket-error.ts';
+import Queue from 'queue';
 
 interface RPCResponsePromiseHandlers {
   resolve: (value: RPCResponse) => void;
@@ -61,7 +62,7 @@ class WebSocketClient {
   #sessionId: bigint | null = null;
   #chacha20Key: Uint8Array | null = null;
   #packetCounter: Int32Array | null = null;
-  #packetQueue: Uint8Array[] = [];
+  #packetQueue: Queue = new Queue({ results: [] });
   #responseHandlers: Map<Uint8Array, RPCResponsePromiseHandlers> = new Map();
   #window: SlidingWindow | null = null;
 
@@ -127,13 +128,9 @@ class WebSocketClient {
         keyPair = undefined;
         // push packets in the queue
         // TODO send packet after reconnect
-        while (this.#packetQueue.length > 0) {
-          const packet = this.#packetQueue.pop();
-          if (packet) {
-            // push packet
-            this.sendPacket(packet);
-          }
-        }
+        this.#packetQueue.start().then(() => {
+          console.log(`Successfully send cached packets!`);
+        });
         return;
       }
 
@@ -186,8 +183,17 @@ class WebSocketClient {
         Atomics.add(this.#packetCounter, 0, 1);
       }
     } else {
-      // add to queue
-      this.#packetQueue.push(data);
+      // add task to queue
+      this.#packetQueue.push(() => {
+        return new Promise<void>((resolve, reject) => {
+          try {
+            this.sendPacket(data);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
     }
   }
 
