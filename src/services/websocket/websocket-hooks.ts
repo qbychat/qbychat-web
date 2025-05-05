@@ -18,13 +18,8 @@
  *
  */
 
-import { useEffect } from 'react';
-import WebsocketClient from '@/services/websocket/websocket-client.ts';
-
-export interface WebSocketEvent {
-  userId: string | null | undefined;
-  payload: Uint8Array;
-}
+import { useEffect, useState } from 'react';
+import WebsocketClient, { WebSocketStatus } from '@/services/websocket/websocket-client.ts';
 
 export function useWebsocketEvent(websocket: WebsocketClient, eventName: string, handler: () => void) {
   useEffect(() => {
@@ -34,4 +29,15 @@ export function useWebsocketEvent(websocket: WebsocketClient, eventName: string,
       websocket.emitter.off(eventName, handler);
     };
   }, []);
+}
+
+export function useWebsocketStatus(websocket: WebsocketClient): WebSocketStatus {
+  const [status, setStatus] = useState<WebSocketStatus>('closed');
+
+  useEffect(() => {
+    websocket.addStatusListener((status) => {
+      setStatus(status);
+    });
+  }, []);
+  return status;
 }

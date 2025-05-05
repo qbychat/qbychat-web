@@ -31,15 +31,22 @@ import {
 import CipherUtils, { KeyPair } from '@/utils/cipher-utils.ts';
 import BinaryUtils from '@/utils/binary-utils.ts';
 import SlidingWindow from '@/services/websocket/sliding-window.ts';
-import { WebSocketEvent } from '@/services/websocket/websocket-eventbus.ts';
+import {v4 as uuidv4} from 'uuid';
 import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/services/websocket/websocket-error.ts';
 import Queue from 'queue';
 
+export type WebSocketStatus = 'connecting' | 'open' | 'closed';
+
 interface RPCResponsePromiseHandlers {
   resolve: (value: RPCResponse) => void;
   reject: (reason: RPCError) => void;
+}
+
+interface WebSocketEvent {
+  userId: string | null | undefined;
+  payload: Uint8Array;
 }
 
 class WebSocketClient {
@@ -64,6 +71,7 @@ class WebSocketClient {
   #packetCounter: Int32Array | null = null;
   #packetQueue: Queue = new Queue({ results: [] });
   #responseHandlers: Map<Uint8Array, RPCResponsePromiseHandlers> = new Map();
+  #statusListeners: Map<string, (status: WebSocketStatus) => void> = new Map();
   #window: SlidingWindow | null = null;
 
   constructor(url: string, baseReconnectInterval: number = 5000) {
@@ -79,6 +87,8 @@ class WebSocketClient {
 
     // create socket
     this.socket = new WebSocket(this.url);
+    this.updateStatus('connecting');
+
     // create keypair for key exchange
     let keyPair: KeyPair | undefined = CipherUtils.generateX25519KeyPair();
 
@@ -123,6 +133,7 @@ class WebSocketClient {
           // init window
           this.#window = new SlidingWindow();
         }
+        this.updateStatus('open');
         this.#handshakeState = true;
         // free keyPair object
         keyPair = undefined;
@@ -157,6 +168,7 @@ class WebSocketClient {
 
     this.socket.onclose = () => {
       // do reconnect
+      this.updateStatus('closed');
       this.handleReconnect();
     };
 
@@ -279,6 +291,20 @@ class WebSocketClient {
     );
 
     this.#reconnectTimer = setTimeout(() => this.connect(), this.reconnectInterval);
+  }
+
+  private updateStatus(status: WebSocketStatus) {
+    this.#statusListeners.forEach((listener) => listener(status));
+  }
+
+  addStatusListener(listener: (status: WebSocketStatus) => void): string {
+    const id: string = uuidv4().toString();
+    this.#statusListeners.set(id, listener);
+    return id;
+  }
+
+  removeStatusListener(id: string) {
+    this.#statusListeners.delete(id);
   }
 
   close() {
