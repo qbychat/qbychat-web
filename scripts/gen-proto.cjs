@@ -27,7 +27,7 @@ const pluginPath = './node_modules/.bin/protoc-gen-ts';
 const outDir = 'src/proto';
 
 const cmd = [
-  'npx protoc',
+  'pnpm exec protoc',
   `--plugin=protoc-gen-ts=${pluginPath}`,
   `--ts_out=${outDir}`,
   '--proto_path=proto',
