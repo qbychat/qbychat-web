@@ -140,7 +140,7 @@ class WebSocketClient {
         // push packets in the queue
         // TODO send packet after reconnect
         this.#packetQueue.start().then(() => {
-          console.log(`Successfully send cached packets!`);
+          console.log('Successfully send cached packets!');
         });
         return;
       }
