@@ -31,7 +31,7 @@ import {
 import CipherUtils, { KeyPair } from '@/utils/cipher-utils.ts';
 import BinaryUtils from '@/utils/binary-utils.ts';
 import SlidingWindow from '@/services/websocket/sliding-window.ts';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/services/websocket/websocket-error.ts';
@@ -151,12 +151,23 @@ class WebSocketService {
         // decrypt packet
         const encryptedMessage = EncryptedMessage.fromBinary(bytes);
         // verify packet
-        if (this.#sessionId == encryptedMessage.sessionId && this.#window!.accept(encryptedMessage.sequenceNumber)) {
+        if (encryptedMessage.sessionId != this.#sessionId) {
+          // invalid session id
+          return;
+        }
+        try {
+          // decrypt packet
           const decryptedPayload = CipherUtils.decryptMessage(this.#chacha20Key, encryptedMessage);
           clientboundMessage = ClientboundMessage.fromBinary(decryptedPayload);
-        } else {
+          if (!this.#window!.accept(encryptedMessage.sequenceNumber)) {
+            // bad sequenceNumber
+            // drop packet
+            return;
+          }
+        } catch {
           // invalid packet
-          return; // drop this packet
+          // drop
+          return;
         }
       } else {
         // plaintext
