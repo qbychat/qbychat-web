@@ -11,6 +11,9 @@ importers:
       '@protobuf-ts/runtime':
         specifier: ^2.10.0
         version: 2.10.0
+      '@radix-ui/react-slot':
+        specifier: ^1.2.2
+        version: 1.2.2(@types/react@19.1.2)(react@19.1.0)
       '@reduxjs/toolkit':
         specifier: ^2.7.0
         version: 2.7.0(react-redux@9.2.0(@types/react@19.1.2)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
@@ -496,6 +499,24 @@ packages:
 
   '@protobuf-ts/runtime@2.10.0':
     resolution: {integrity: sha512-ypYwGg9Pn3W/2lZ7/HW60hONGuSdzphvOY8Dq7LeNttymDe0y3LaTUUMRpuGqOT6FfrWEMnfQbyqU8AAreo8wA==}
+
+  '@radix-ui/react-compose-refs@1.1.2':
+    resolution: {integrity: sha512-z4eqJvfiNnFMHIIvXP3CY57y2WJs5g2v3X0zm9mEJkrkNv4rDxu+sg9Jh8EkXyeqBkB7SOcboo9dMVqhyrACIg==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-slot@1.2.2':
+    resolution: {integrity: sha512-y7TBO4xN4Y94FvcWIOIh18fM4R1A8S4q1jhoz4PNzOoHsFcN8pogcFmZrTYAm4F9VRUrWP/Mw7xSKybIeRI+CQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   '@reduxjs/toolkit@2.7.0':
     resolution: {integrity: sha512-XVwolG6eTqwV0N8z/oDlN93ITCIGIop6leXlGJI/4EKy+0POYkR+ABHRSdGXY+0MQvJBP8yAzh+EYFxTuvmBiQ==}
@@ -2320,6 +2341,19 @@ snapshots:
       '@protobuf-ts/runtime': 2.10.0
 
   '@protobuf-ts/runtime@2.10.0': {}
+
+  '@radix-ui/react-compose-refs@1.1.2(@types/react@19.1.2)(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
+    optionalDependencies:
+      '@types/react': 19.1.2
+
+  '@radix-ui/react-slot@1.2.2(@types/react@19.1.2)(react@19.1.0)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.1.2)(react@19.1.0)
+      react: 19.1.0
+    optionalDependencies:
+      '@types/react': 19.1.2
 
   '@reduxjs/toolkit@2.7.0(react-redux@9.2.0(@types/react@19.1.2)(react@19.1.0)(redux@5.0.1))(react@19.1.0)':
     dependencies:

@@ -18,19 +18,10 @@
  *
  */
 
-import { HashRouter, Route, Routes } from 'react-router';
-import SetupServerPage from '@/components/onboarding/SetupServerPage.tsx';
-import IntroPage from '@/components/onboarding/IntroPage.tsx';
+const SetupServerPage = () => {
+  return (<div>
+    WIP
+  </div>);
+};
 
-function App() {
-  return (
-    <HashRouter>
-      <Routes>
-        <Route path='/onboarding' element={<IntroPage/>}/>
-        <Route path='/onboarding/server' element={<SetupServerPage/>}/>
-      </Routes>
-    </HashRouter>
-  );
-}
-
-export default App;
+export default SetupServerPage;
