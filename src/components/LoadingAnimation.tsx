@@ -19,28 +19,20 @@
  */
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function LoadingAnimation() {
+  const { t } = useTranslation();
+
   return (
     <motion.div
-      className="select-none"
+      className="flex select-none justify-center text-center items-center text-cyan-500 dark:text-white dark:bg-[#222] bg-slate-400 text-2xl h-screen animate-pulse"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: '#fff',
-        fontSize: '1.5rem',
-        background: 'linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72)',
-        backgroundSize: '600% 600%',
-        animation: 'gradientShift 8s ease infinite',
-      }}
     >
-      Loading QbyChat...
+      {t('loading.title')}
     </motion.div>
   );
 }

@@ -18,6 +18,7 @@
  *
  */
 
+import './i18n';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
@@ -26,12 +27,15 @@ import { persistor, store } from '@/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
+import { ThemeProvider } from '@/components/theme-provider.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <PersistGate loading={<LoadingAnimation/>} persistor={persistor}>
-        <App />
+      <PersistGate loading={<LoadingAnimation />} persistor={persistor}>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <App />
+        </ThemeProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,
