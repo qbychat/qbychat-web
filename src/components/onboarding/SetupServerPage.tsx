@@ -18,9 +18,41 @@
  *
  */
 
+import React, { useState } from 'react';
+import { Button } from '../../../@/components/ui/button.tsx';
+import { Input } from '../../../@/components/ui/input.tsx';
+import { db } from '@/db.ts';
+import { useDispatch } from 'react-redux';
+import { setCurrentServerId } from '@/store/slices/settings-slice.ts';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 const SetupServerPage = () => {
-  return (<div>
-    WIP
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [address, setAddress] = useState('');
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const id = await db.websocketAddresses.add({
+      url: address,
+    });
+    dispatch(setCurrentServerId(id));
+    navigate('/');
+  };
+
+  return (<div className="h-screen w-full flex flex-col gap-1 items-center justify-center">
+    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.server')}</h1>
+    <form className="mt-5 flex w-full max-w-sm items-center space-x-2" onSubmit={onSubmit}>
+      <Input type="url"
+             value={address}
+             onChange={(e) => setAddress(e.target.value)}
+             placeholder="ws://example.com/ws"
+             required />
+      <Button type="submit">Connect</Button>
+    </form>
   </div>);
 };
 

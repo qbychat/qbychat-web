@@ -28,13 +28,16 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
+import { HashRouter } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={<LoadingAnimation />} persistor={persistor}>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-          <App />
+          <HashRouter>
+            <App />
+          </HashRouter>
         </ThemeProvider>
       </PersistGate>
     </Provider>

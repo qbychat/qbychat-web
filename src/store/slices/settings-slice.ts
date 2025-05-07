@@ -17,27 +17,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { Route, Routes } from 'react-router-dom';
-import { useWebSocketService } from '@/hooks/useWebSocketService.ts';
-import OnboardingRoutes from '@/components/onboarding/onbording-routes.tsx';
-import { RequireOnboarding } from '@/routes/RequireOnboarding.tsx';
 
-function App() {
-  useWebSocketService();
-
-  return (
-    <Routes>
-      <Route
-        path="*"
-        element={
-          <RequireOnboarding>
-            <OnboardingRoutes />
-          </RequireOnboarding>
-        }
-      />
-    </Routes>
-  );
+interface SettingsState {
+  currentServerId: number | null;
 }
 
-export default App;
+const initialState: SettingsState = {
+  currentServerId: null,
+};
+
+const settingsSlice = createSlice({
+  name: 'settings',
+  initialState,
+  reducers: {
+    setCurrentServerId(state, action: PayloadAction<number>) {
+      state.currentServerId = action.payload;
+    },
+  },
+});
+
+export const {
+  setCurrentServerId,
+} = settingsSlice.actions;
+
+export default settingsSlice;

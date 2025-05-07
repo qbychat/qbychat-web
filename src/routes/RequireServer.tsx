@@ -18,26 +18,17 @@
  *
  */
 
-import { Route, Routes } from 'react-router-dom';
-import { useWebSocketService } from '@/hooks/useWebSocketService.ts';
-import OnboardingRoutes from '@/components/onboarding/onbording-routes.tsx';
-import { RequireOnboarding } from '@/routes/RequireOnboarding.tsx';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
+import { RootState } from '@/store';
+import { ReactNode } from 'react';
 
-function App() {
-  useWebSocketService();
+export const RequireServer = ({ children }: { children: ReactNode }) => {
+  const currentServer = useSelector((state: RootState) => state.settings.currentServerId);
 
-  return (
-    <Routes>
-      <Route
-        path="*"
-        element={
-          <RequireOnboarding>
-            <OnboardingRoutes />
-          </RequireOnboarding>
-        }
-      />
-    </Routes>
-  );
-}
+  if (!currentServer) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
-export default App;
+  return children;
+};

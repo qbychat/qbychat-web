@@ -18,26 +18,22 @@
  *
  */
 
-import { Route, Routes } from 'react-router-dom';
-import { useWebSocketService } from '@/hooks/useWebSocketService.ts';
-import OnboardingRoutes from '@/components/onboarding/onbording-routes.tsx';
-import { RequireOnboarding } from '@/routes/RequireOnboarding.tsx';
+import Dexie, { Table } from 'dexie';
 
-function App() {
-  useWebSocketService();
-
-  return (
-    <Routes>
-      <Route
-        path="*"
-        element={
-          <RequireOnboarding>
-            <OnboardingRoutes />
-          </RequireOnboarding>
-        }
-      />
-    </Routes>
-  );
+export interface WebSocketAddress {
+  id?: number;
+  url: string;
 }
 
-export default App;
+export class AppDB extends Dexie {
+  websocketAddresses!: Table<WebSocketAddress>;
+
+  constructor() {
+    super('AppDB');
+    this.version(1).stores({
+      websocketAddresses: '++id,url',
+    });
+  }
+}
+
+export const db = new AppDB();

@@ -18,26 +18,34 @@
  *
  */
 
-import { motion } from 'framer-motion';
+import ColourfulText from '@/components/ui/colourful-text';
 import { Button } from '../../../@/components/ui/button.tsx';
-import { useNavigate } from 'react-router';
+import { Trans, useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const IntroPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
-    <div className="grid place-items-center h-screen">
-      <motion.div
-        className="text-center"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeInOut' }}
-      >
-        <h1 className="text-3xl">Welcome to QbyChat</h1>
-        <p className="text-lg">Fast and secure, open-source that never tracks you</p>
-        <div className="my-2"></div>
-        <Button className="w-1/2" onClick={() => navigate('/onboarding/server')}>Let's Start</Button>
-      </motion.div>
+    <div
+      className="h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-black px-4">
+      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-center text-white z-10 font-sans drop-shadow-xl">
+        <Trans
+          i18nKey="onboarding.intro.welcome"
+          values={{ appName: 'qbychat' }}
+          components={{ colorful: <ColourfulText text="qbychat" /> }}
+        />
+      </h1>
+
+      <p className="mt-3 text-1xl lg:text-2xl md:text-2xl">{t('onboarding.intro.description')}</p>
+
+      <div className="mt-6 z-10">
+        <Button className="text-lg px-6 py-3 shadow-md hover:shadow-lg transition-all duration-200"
+                onClick={() => navigate('/onboarding/server')}>
+          {t('onboarding.intro.start')}
+        </Button>
+      </div>
     </div>
   );
 };

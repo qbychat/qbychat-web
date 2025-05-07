@@ -51,7 +51,7 @@ interface WebSocketEvent {
 
 class WebSocketService {
   private socket: WebSocket | null = null;
-  private readonly url: string;
+  readonly url: string;
   private maxReconnectInterval: number = 30000;
   private readonly baseReconnectInterval: number;
   private reconnectInterval: number;

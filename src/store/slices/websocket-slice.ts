@@ -13,20 +13,24 @@ const websocketSlice = createSlice({
   name: 'websocket',
   initialState: initialState,
   reducers: {
-    connect: (state, action: PayloadAction<string>) => {
+    connectServer: (state, action: PayloadAction<string>) => {
+      if (state.service) {
+        // disconnect current service
+        state.service.close();
+      }
       state.service = new WebSocketService(action.payload);
       // connect to websocket
       state.service.connect();
     },
 
-    disconnect: (state) => {
+    disconnectServer: (state) => {
       // close client
       state.service?.close();
       state.service = null;
-    }
+    },
   },
 });
 
-export const { connect, disconnect } = websocketSlice.actions;
+export const { connectServer, disconnectServer } = websocketSlice.actions;
 
 export default websocketSlice;
