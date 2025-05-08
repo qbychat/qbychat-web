@@ -18,26 +18,21 @@
  *
  */
 
-import { Route, Routes } from 'react-router-dom';
-import { useWebSocketService } from '@/hooks/useWebSocketService.ts';
-import OnboardingRoutes from '@/components/onboarding/onbording-routes.tsx';
-import { RequireOnboarding } from '@/routes/RequireOnboarding.tsx';
+const { execSync } = require('child_process');
+const path = require('path');
 
-function App() {
-  useWebSocketService();
-
-  return (
-    <Routes>
-      <Route
-        path="/onboarding/*"
-        element={
-          <RequireOnboarding>
-            <OnboardingRoutes />
-          </RequireOnboarding>
-        }
-      />
-    </Routes>
-  );
+function runScript(relativePath) {
+  const fullPath = path.resolve(__dirname, relativePath);
+  console.log(`[postinstall] Running ${relativePath}`);
+  execSync(`node ${fullPath}`, { stdio: 'inherit' });
 }
 
-export default App;
+try {
+  runScript('gen-proto.cjs');
+  console.log('[postinstall] Done.');
+} catch (err) {
+  console.error('[postinstall] Failed:', err);
+  process.exit(1);
+}
+
+

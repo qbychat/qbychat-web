@@ -32,15 +32,13 @@ const OnboardingRoutes = () => {
     return <Navigate to="/onboarding" replace />;
   }
   if (currentServer && location.pathname.startsWith('/onboarding')) {
-    return <Navigate to="/chat" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (
     <Routes>
-      <Route path="/onboarding">
-        <Route index element={<IntroPage />}/>
-        <Route path="server" element={<SetupServerPage />}/>
-      </Route>
+      <Route index element={<IntroPage />} />
+      <Route path="server" element={<SetupServerPage />} />
     </Routes>
   );
 };

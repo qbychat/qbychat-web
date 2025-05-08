@@ -19,8 +19,8 @@
  */
 
 import React, { useState } from 'react';
-import { Button } from '../../../@/components/ui/button.tsx';
-import { Input } from '../../../@/components/ui/input.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import { db } from '@/db.ts';
 import { useDispatch } from 'react-redux';
 import { setCurrentServerId } from '@/store/slices/settings-slice.ts';

@@ -19,7 +19,7 @@
  */
 
 import ColourfulText from '@/components/ui/colourful-text';
-import { Button } from '../../../@/components/ui/button.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

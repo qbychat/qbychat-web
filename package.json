@@ -3,13 +3,14 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
-  "license": "BSD-3-Clause",
+  "license": "GPL-3.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "proto": "node scripts/gen-proto.cjs"
+    "proto": "node scripts/gen-proto.cjs",
+    "postinstall": "node scripts/postinstall.cjs"
   },
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
@@ -74,9 +75,9 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@tsparticles/engine",
       "esbuild",
-      "protobufjs",
-      "protoc-gen-js"
+      "protobufjs"
     ]
   }
 }
