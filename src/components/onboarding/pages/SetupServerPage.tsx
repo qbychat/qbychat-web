@@ -22,15 +22,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { db } from '@/db.ts';
-import { useDispatch } from 'react-redux';
-import { setCurrentServerId } from '@/store/slices/settings-slice.ts';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import useSettings from '@/hooks/useSettings.ts';
 
 const SetupServerPage = () => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const settings = useSettings();
   const [address, setAddress] = useState('');
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,7 +38,7 @@ const SetupServerPage = () => {
     const id = await db.websocketAddresses.add({
       url: address,
     });
-    dispatch(setCurrentServerId(id));
+    settings.setCurrentServerId(id);
     navigate('/');
   };
 

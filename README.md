@@ -6,4 +6,3 @@ The web client for QbyChat
 
 - Clone the repository
 - Run `pnpm i`
-- Run `pnpm run proto`

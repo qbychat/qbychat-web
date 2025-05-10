@@ -18,10 +18,9 @@
  *
  */
 
-function App() {
-  return (
-    <></>
-  );
-}
+const ChatList = () => {
+  return (<div className="h-full border-r-1">
+  </div>);
+};
 
-export default App;
+export default ChatList;

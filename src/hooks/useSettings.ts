@@ -17,29 +17,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { create } from 'zustand/react';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-interface SettingsState {
+type SettingsStore = {
   currentServerId: number | null;
+  setCurrentServerId: (serverId: number) => void;
+  clearCurrentServer: () => void;
 }
 
-const initialState: SettingsState = {
-  currentServerId: null,
-};
-
-const settingsSlice = createSlice({
-  name: 'settings',
-  initialState,
-  reducers: {
-    setCurrentServerId(state, action: PayloadAction<number>) {
-      state.currentServerId = action.payload;
+const useSettings = create<SettingsStore>()(
+  persist(
+    (set) => ({
+      currentServerId: null,
+      setCurrentServerId: (serverId: number) => {
+        set({ currentServerId: serverId });
+      },
+      clearCurrentServer: () => set({ currentServerId: null }),
+    }),
+    {
+      name: 'settings-storage',
+      storage: createJSONStorage(() => localStorage),
     },
-  },
-});
+  ),
+);
 
-export const {
-  setCurrentServerId,
-} = settingsSlice.actions;
-
-export default settingsSlice;
+export default useSettings;

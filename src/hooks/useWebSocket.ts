@@ -18,17 +18,18 @@
  *
  */
 
-import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import { RootState } from '@/store';
-import { ReactNode } from 'react';
+import { create } from 'zustand';
+import WebSocketService from '@/services/websocket/websocket-service.ts';
 
-export const RequireServer = ({ children }: { children: ReactNode }) => {
-  const currentServer = useSelector((state: RootState) => state.settings.currentServerId);
+type WebSocketState = {
+  socket: WebSocketService | null;
 
-  if (!currentServer) {
-    return <Navigate to="/onboarding" replace />;
-  }
+  setSocket: (socket: WebSocketService) => void,
+}
 
-  return children;
-};
+const useWebSocket = create<WebSocketState>((set) => ({
+  socket: null,
+  setSocket: (socket: WebSocketService) => set({ socket }),
+}));
+
+export default useWebSocket;

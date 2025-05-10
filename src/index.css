@@ -140,14 +140,16 @@
   }
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
+.fade-enter {
+  @apply opacity-0 translate-x-[-100%];
 }
+.fade-enter-active {
+  @apply opacity-100 translate-x-0 transition-all duration-300 ease-in-out;
+}
+.fade-exit {
+  @apply opacity-100 translate-x-0;
+}
+.fade-exit-active {
+  @apply opacity-0 translate-x-[100%] transition-all duration-300 ease-in-out;
+}
+

@@ -129,11 +129,14 @@ class WebSocketService {
           this.#sessionId = encryptionInfo.sessionId;
 
           // init packet counter
-          this.#packetCounter = new Int32Array(new SharedArrayBuffer(1024));
+          this.#packetCounter = new Int32Array();
           // init window
           this.#window = new SlidingWindow();
         }
         this.updateStatus('open');
+        // TODO register/restore client
+        this.registerClient();
+
         this.#handshakeState = true;
         // free keyPair object
         keyPair = undefined;
@@ -285,6 +288,27 @@ class WebSocketService {
         userId: userId,
         payload: event.value,
       });
+    }
+  }
+
+  private registerClient() {
+    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
+    if (isBrowser) {
+      // parse User-Agent
+      // const ua = UAParser(navigator.userAgent);
+
+      // TODO platform details
+      // const request: RegisterClientRequest = {
+      //   clientMetadata: {
+      //     clientName: __APP_NAME__,
+      //     clientVersion: __APP_VERSION__,
+      //     platform: Platform.BROWSER,
+      //     platformDetails: 'QbyChat WEB',
+      //   },
+      // };
+    } else {
+      // TODO nodejs support
     }
   }
 

@@ -18,19 +18,5 @@
  *
  */
 
-import { useSelector } from 'react-redux';
-import { Navigate, useLocation } from 'react-router-dom';
-import { RootState } from '@/store';
-import { ReactNode } from 'react';
-
-export const RequireOnboarding = ({ children }: { children: ReactNode }) => {
-  const currentServer = useSelector((state: RootState) => state.settings.currentServerId);
-  const location = useLocation();
-
-  if (currentServer && location.pathname.startsWith('/onboarding')) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
-
+declare const __APP_VERSION__: string;
+declare const __APP_NAME__: string;
