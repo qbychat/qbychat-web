@@ -21,23 +21,58 @@
 const { execSync } = require('child_process');
 const glob = require('glob');
 const fs = require('fs');
+const crypto = require('crypto');
 
-const files = glob.sync('proto/**/*.proto');
-const pluginPath = './node_modules/.bin/protoc-gen-ts';
+const protoDir = 'proto';
 const outDir = 'src/proto';
+const pluginPath = './node_modules/.bin/protoc-gen-ts';
+const hashCachePath = './node_modules/.protohashes.json';
+
+const files = glob.sync(`${protoDir}/**/*.proto`);
+
+let lastHashes = {};
+if (fs.existsSync(hashCachePath)) {
+  try {
+    lastHashes = JSON.parse(fs.readFileSync(hashCachePath, 'utf8'));
+  } catch {
+    console.warn('Warning: failed to parse existing proto hash cache.');
+  }
+}
+
+const hashFile = filePath => {
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash('sha1').update(content).digest('hex');
+};
+
+const changedFiles = files.filter(file => {
+  const hash = hashFile(file);
+  return lastHashes[file] !== hash;
+});
+
+if (changedFiles.length === 0) {
+  console.log('No .proto file changes detected. Skipping generation.');
+  process.exit(0);
+}
+
+if (fs.existsSync(outDir)) {
+  fs.rmSync(outDir, { recursive: true });
+}
+fs.mkdirSync(outDir, { recursive: true });
 
 const cmd = [
   'pnpm exec protoc',
   `--plugin=protoc-gen-ts=${pluginPath}`,
   `--ts_out=${outDir}`,
-  '--proto_path=proto',
+  `--proto_path=${protoDir}`,
   ...files,
 ].join(' ');
 
-if (fs.existsSync(outDir)) {
-  // delete files
-  fs.rmSync(outDir, { recursive: true });
-}
-fs.mkdirSync(outDir);
+console.log('Changes detected in:', changedFiles.join(', '));
 console.log('Running:', cmd);
 execSync(cmd, { stdio: 'inherit' });
+
+const newHashes = {};
+for (const file of files) {
+  newHashes[file] = hashFile(file);
+}
+fs.writeFileSync(hashCachePath, JSON.stringify(newHashes, null, 2));
