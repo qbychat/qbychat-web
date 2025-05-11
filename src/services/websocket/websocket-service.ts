@@ -36,6 +36,13 @@ import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/services/websocket/websocket-error.ts';
 import Queue from 'queue';
+import { Platform } from '@/proto/qbychat/common/v1/platform.ts';
+import { UAParser } from 'ua-parser-js';
+import {
+  RegisterClientRequest,
+  RegisterClientResponse,
+  ResumeClientRequest, ResumeClientResponse,
+} from '@/proto/qbychat/websocket/session/v1/service.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'closed';
 
@@ -52,6 +59,7 @@ interface WebSocketEvent {
 class WebSocketService {
   private socket: WebSocket | null = null;
   readonly url: string;
+  private readonly authToken: string | null;
   private maxReconnectInterval: number = 30000;
   private readonly baseReconnectInterval: number;
   private reconnectInterval: number;
@@ -74,8 +82,9 @@ class WebSocketService {
   #statusListeners: Map<string, (status: WebSocketStatus) => void> = new Map();
   #window: SlidingWindow | null = null;
 
-  constructor(url: string, baseReconnectInterval: number = 5000) {
+  constructor(url: string, authToken: string | null, baseReconnectInterval: number = 5000) {
     this.url = url;
+    this.authToken = authToken;
     this.baseReconnectInterval = baseReconnectInterval;
     this.reconnectInterval = baseReconnectInterval;
   }
@@ -134,8 +143,12 @@ class WebSocketService {
           this.#window = new SlidingWindow();
         }
         this.updateStatus('open');
-        // TODO register/restore client
-        this.registerClient();
+        // register/restore session
+        if (this.authToken) {
+          await this.resumeSession();
+        } else {
+          await this.registerClient();
+        }
 
         this.#handshakeState = true;
         // free keyPair object
@@ -291,25 +304,37 @@ class WebSocketService {
     }
   }
 
-  private registerClient() {
+  private async resumeSession() {
+    if (!this.authToken) throw new Error('Auth token is missing');
+    const request: ResumeClientRequest = {
+      token: this.authToken
+    };
+    await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
+  }
+
+  private async registerClient() {
     const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+    let request: RegisterClientRequest;
 
     if (isBrowser) {
       // parse User-Agent
-      // const ua = UAParser(navigator.userAgent);
+      const ua = UAParser(navigator.userAgent);
 
-      // TODO platform details
-      // const request: RegisterClientRequest = {
-      //   clientMetadata: {
-      //     clientName: __APP_NAME__,
-      //     clientVersion: __APP_VERSION__,
-      //     platform: Platform.BROWSER,
-      //     platformDetails: 'QbyChat WEB',
-      //   },
-      // };
+      request = {
+        clientMetadata: {
+          clientName: __APP_NAME__,
+          clientVersion: __APP_VERSION__,
+          platform: Platform.BROWSER,
+          platformDetails: `${ua.browser.name} v${ua.browser.version} on ${ua.os.name}`,
+        },
+      };
     } else {
-      // TODO nodejs support
+      throw new Error('Nodejs is current unsupported');
     }
+    // send request
+    const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
+    // TODO save token
+    console.log(response.token);
   }
 
   private handleReconnect() {
