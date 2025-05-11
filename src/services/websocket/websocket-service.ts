@@ -44,7 +44,7 @@ import {
   ResumeClientResponse,
 } from '@/proto/qbychat/websocket/session/v1/service.ts';
 
-export type WebSocketStatus = 'connecting' | 'open' | 'closed';
+export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
 interface RPCResponsePromiseHandlers {
   resolve: (value: RPCResponse) => void;
@@ -76,7 +76,7 @@ class WebSocketService {
   #handshakeState: boolean = false;
   #sessionId: bigint | null = null;
   #chacha20Key: Uint8Array | null = null;
-  #packetCounter: Int32Array | null = null;
+  #packetCounter: bigint = BigInt(0);
   #packetQueue: Queue = new Queue({ results: [] });
   #responseHandlers: Map<Uint8Array, RPCResponsePromiseHandlers> = new Map();
   #statusListeners: Map<string, (status: WebSocketStatus) => void> = new Map();
@@ -166,16 +166,16 @@ class WebSocketService {
           // do key exchange
           const sharedSecret = CipherUtils.performKeyExchange(keyPair!.privateKey, serverPublicKey);
           // calculate ChaCha20 key
-          this.#chacha20Key = CipherUtils.deriveChaCha20Key(sharedSecret, this.#chacha20KeyInfo);
+          this.#chacha20Key = await CipherUtils.deriveChaCha20Key(sharedSecret, this.#chacha20KeyInfo);
           // save session id
           this.#sessionId = encryptionInfo.sessionId;
 
           // init packet counter
-          this.#packetCounter = new Int32Array();
+          this.#packetCounter = BigInt(0);
           // init window
           this.#window = new SlidingWindow();
         }
-        this.updateStatus('open');
+        this.updateStatus('authenticating');
         // register/restore session
         if (this.authToken) {
           await this.resumeSession();
@@ -186,11 +186,12 @@ class WebSocketService {
         this.#handshakeState = true;
         // free keyPair object
         keyPair = undefined;
+        // TODO send sync requests
+        this.updateStatus('updating');
         // push packets in the queue
-        // TODO send packet after reconnect
-        this.#packetQueue.start().then(() => {
-          console.log('Successfully send cached packets!');
-        });
+        // send packet after reconnect
+        await this.#packetQueue.start();
+        this.updateStatus('open'); // now the websocket is ready
         return;
       }
 
@@ -242,7 +243,7 @@ class WebSocketService {
       let payload: Uint8Array;
       if (this.#chacha20Key && this.#sessionId) {
         // encrypt payload
-        const packetId = BigInt(Atomics.load(this.#packetCounter!, 0));
+        const packetId = this.#packetCounter;
         payload = EncryptedMessage.toBinary(CipherUtils.encryptMessage(this.#chacha20Key, data, this.#sessionId, packetId));
       } else {
         // not encrypted
@@ -252,7 +253,7 @@ class WebSocketService {
       this.socket.send(payload);
       if (this.#packetCounter) {
         // move packet counter
-        Atomics.add(this.#packetCounter, 0, 1);
+        ++this.#packetCounter;
       }
     } else {
       // add task to queue
@@ -366,6 +367,7 @@ class WebSocketService {
     }
     // send request
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
+    console.log(response.token);
     // fire event
     this.emitter.emit('updateToken', {
       userId: null,
@@ -389,6 +391,8 @@ class WebSocketService {
       this.maxReconnectInterval,
     );
 
+    // update status
+    this.updateStatus('waiting');
     this.#reconnectTimer = setTimeout(() => this.connect(), this.reconnectInterval);
   }
 

@@ -20,9 +20,17 @@
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
+import useWebSocket from '@/store/useWebSocket.ts';
+import { useEffect } from 'react';
 
 function App() {
   const currentScreen = useAppStore((state) => state.screen);
+  const { socket } = useWebSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.connect();
+    }, [socket]);
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -36,7 +44,7 @@ function App() {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden m-0" style={{backgroundImage: `url("${backgroundImage}")`}}>
+    <div className="w-full h-screen overflow-hidden m-0" style={{ backgroundImage: `url("${backgroundImage}")` }}>
       {/*todo add settings for the border*/}
       <div
         className="sm:p-0 h-full lg:m-auto lg:scale-90 lg:rounded-3xl shadow-xl backdrop-blur-sm">

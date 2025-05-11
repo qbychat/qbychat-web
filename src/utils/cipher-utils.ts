@@ -16,8 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-import sodium from 'libsodium-wrappers';
+import sodium from 'libsodium-wrappers-sumo';
 import { EncryptedMessage } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
+
+await sodium.ready; // Ensure sodium is initialized
 
 export interface KeyPair {
   publicKey: Uint8Array;
@@ -41,27 +43,38 @@ class CipherUtils {
     return sodium.crypto_scalarmult(privateKey, remotePublicKey);
   }
 
-  private hkdfExpand(prk: Uint8Array, info: Uint8Array, length: number): Uint8Array {
-    const BLOCK_SIZE = 32; // SHA256 block size
-    let result = new Uint8Array();
-    let previous = new Uint8Array(0);
-    let counter = 1;
+  async hkdfExpand(prk: Uint8Array, info: Uint8Array, length: number) {
+    // Initialize the result as an empty Uint8Array
+    let result = new Uint8Array(0);
+    let block = new Uint8Array(32); // SHA-256 block size
+    let i = 1;
 
+    // While the result is smaller than the requested length, keep expanding
     while (result.length < length) {
-      const input = new Uint8Array([...previous, ...info, counter]);
-      const block = sodium.crypto_generichash(BLOCK_SIZE, input, prk);
+      // Concatenate the previous block, info, and counter (i)
+      const input = new Uint8Array(block.length + info.length + 1);
+      input.set(block);
+      input.set(info, block.length);
+      input[block.length + info.length] = i;
 
-      const needed = Math.min(block.length, length - result.length);
-      result = this.concatUint8Arrays(result, block.subarray(0, needed));
-      previous = block;
-      counter++;
+      // Perform HMAC-SHA256
+      const hmac = sodium.crypto_auth_hmacsha256;
+      block = hmac(input, prk);
+
+      // Append the block to the result, considering the remaining length
+      const remainingLength = length - result.length;
+      result = new Uint8Array(result.length + Math.min(block.length, remainingLength));
+      result.set(block.subarray(0, Math.min(block.length, remainingLength)), result.length - Math.min(block.length, remainingLength));
+
+      i++;
     }
 
     return result;
   }
 
-  deriveChaCha20Key(sharedSecret: Uint8Array, info: Uint8Array): Uint8Array {
-    return this.hkdfExpand(sharedSecret, info, 32);
+
+  async deriveChaCha20Key(sharedSecret: Uint8Array, info: Uint8Array): Promise<Uint8Array> {
+    return await this.hkdfExpand(sharedSecret, info, 32);
   }
 
   encryptMessage(
@@ -80,6 +93,17 @@ class CipherUtils {
       nonce,
       chachaKey,
     );
+
+    const debug = sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached(
+      message,
+      aad,
+      null, // secret nonce (not needed)
+      nonce,
+      chachaKey,
+    );
+
+    console.debug(`chachakey: ${chachaKey}`);
+    console.debug(`mac: ${debug.mac}`);
 
     return {
       sessionId: sessionId,
@@ -113,13 +137,6 @@ class CipherUtils {
     view.setBigUint64(0, sessionId, false); // big-endian
     view.setBigUint64(8, sequenceNumber, false);
     return new Uint8Array(buffer);
-  }
-
-  private concatUint8Arrays(a: Uint8Array, b: Uint8Array): Uint8Array {
-    const result = new Uint8Array(a.length + b.length);
-    result.set(a);
-    result.set(b, a.length);
-    return result;
   }
 }
 
