@@ -44,6 +44,7 @@ import {
   ResumeClientResponse,
 } from '@/proto/qbychat/websocket/session/v1/service.ts';
 import { sha256 } from 'js-sha256';
+import log from 'loglevel';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -132,8 +133,11 @@ class WebSocketService {
     this.socket = new WebSocket(this.url);
     this.updateStatus('connecting');
 
+    log.info(`🚀 Start connecting to websocket ${this.url}`);
+
     // create keypair for key exchange
     let keyPair: KeyPair | undefined = CipherUtils.generateX25519KeyPair();
+    log.debug('✅ Created X25519 keypair');
 
     this.socket.onopen = () => {
       // socket opened
@@ -142,6 +146,8 @@ class WebSocketService {
       this.reconnectInterval = this.baseReconnectInterval;
       this.#handshakeState = false;
       this.#shouldReconnect = true;
+
+      log.info(`✅ Success connect to websocket ${this.url}, start handshake`);
 
       // do handshake
       // create X25519KeyPair
@@ -152,6 +158,7 @@ class WebSocketService {
         },
       };
       // send handshake packet
+      log.debug('📦 Send handshake packet:', serverboundHandshake);
       this.socket!.send(ServerboundHandshake.toBinary(serverboundHandshake));
     };
 
@@ -161,6 +168,7 @@ class WebSocketService {
       if (!this.#handshakeState) {
         // process handshake
         const clientboundHandshake = ClientboundHandshake.fromBinary(bytes);
+        log.debug('📥 Received handshake packet:', clientboundHandshake);
         const encryptionInfo = clientboundHandshake.encryptionInfo;
         if (encryptionInfo) {
           const serverPublicKey = encryptionInfo.publicKey;
@@ -176,6 +184,7 @@ class WebSocketService {
           // init window
           this.#window = new SlidingWindow();
         }
+        log.info('✅ Handshake finished');
         this.#handshakeState = true;
         // authorize
         this.updateStatus('authenticating');
@@ -189,10 +198,15 @@ class WebSocketService {
         // free keyPair object
         keyPair = undefined;
         // TODO send sync requests
+        log.info('🚀 Begin updating data');
         this.updateStatus('updating');
         // push packets in the queue
         // send packet after reconnect
-        await this.#packetQueue.start();
+        log.info('🚀 Begin sending queued packets');
+        await this.#packetQueue.start().then(() => {
+          log.info('✅ Success send all queued packets');
+        });
+        log.info('✅ Websocket is ready');
         this.updateStatus('open'); // now the websocket is ready
         return;
       }
@@ -214,6 +228,7 @@ class WebSocketService {
           if (!this.#window!.accept(encryptedMessage.sequenceNumber)) {
             // bad sequenceNumber
             // drop packet
+            log.error('❌ Bad packet received (bad sequenceNumber)', encryptedMessage);
             return;
           }
         } catch {
@@ -236,7 +251,7 @@ class WebSocketService {
     };
 
     this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      log.error('WebSocket error:', error);
     };
   }
 
@@ -290,7 +305,7 @@ class WebSocketService {
       // Set a timeout to reject the promise after the specified time
       const timeoutId = setTimeout(() => {
         // If the timeout occurs, reject the promise
-        console.error(`Request with ticket ${ticketHash} timed out after ${timeout}ms`);
+        log.error(`❌ Request with ticket ${ticketHash} timed out after ${timeout}ms`);
         this.#responseHandlers.delete(ticketHash); // Clean up the ticket from the map
         reject(new Error(`Request timed out after ${timeout}ms`));
       }, timeout);
@@ -308,6 +323,9 @@ class WebSocketService {
       });
 
       // send request
+      log.info(`📦 Request: method ${method}`, { ticketHash });
+      log.debug(`📦 Payload for method ${method}`, { ticketHash, payload });
+
       this.sendPacket(ServerboundMessage.toBinary(message));
     });
   }
@@ -318,6 +336,8 @@ class WebSocketService {
       // handle response
       const response = packet.content.response;
       const ticketHash = sha256(response.ticket!);
+      log.info(`📥 Received response with ticket ${ticketHash}`);
+      log.debug('📥 Received response', response);
       const responseHandler = this.#responseHandlers.get(ticketHash);
       if (responseHandler) {
         // invoke handler
@@ -334,6 +354,7 @@ class WebSocketService {
     } else if (packet.content.oneofKind == 'event') {
       // handle event
       const event = packet.content.event;
+      log.info(`Received event ${event.typeUrl}`);
       // emit event
       this.emitter.emit(event.typeUrl, {
         userId: userId,
@@ -344,9 +365,11 @@ class WebSocketService {
 
   private async resumeSession() {
     if (!this.authToken) throw new Error('Auth token is missing');
+    log.info('🚀 Start to resume session');
     const request: ResumeClientRequest = {
       token: this.authToken,
     };
+    log.debug(`📦 ResumeClientRequest: ${request}`);
     await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
   }
 
@@ -370,7 +393,10 @@ class WebSocketService {
       throw new Error('Nodejs is current unsupported');
     }
     // send request
+    log.info('🚀 Begin Registering client', request);
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
+    log.info('📥 Successfully registered client');
+    log.debug(`📥 Client authToken: ${response.token}`);
     // fire event
     this.emitter.emit('updateToken', {
       userId: null,

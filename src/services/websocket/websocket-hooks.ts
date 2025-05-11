@@ -34,9 +34,13 @@ export function useWebsocketStatus(websocket: WebSocketService): WebSocketStatus
   const [status, setStatus] = useState<WebSocketStatus>('closed');
 
   useEffect(() => {
-    websocket.addStatusListener((status) => {
+    const id = websocket.addStatusListener((status) => {
       setStatus(status);
     });
+
+    return () => {
+      websocket.removeStatusListener(id);
+    }
   }, []);
   return status;
 }

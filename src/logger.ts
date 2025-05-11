@@ -17,18 +17,7 @@
  *
  */
 
-import './logger.ts';
-import './i18n.ts';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';
-import App from './components/App.tsx';
-import { ThemeProvider } from '@/components/theme-provider.tsx';
+import log from 'loglevel';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <App/>
-    </ThemeProvider>
-  </StrictMode>,
-);
+const isProd = import.meta.env.MODE === 'production';
+log.setLevel(isProd ? 'warn' : 'debug');
