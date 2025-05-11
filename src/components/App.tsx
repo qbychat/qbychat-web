@@ -30,7 +30,11 @@ function App() {
   useEffect(() => {
     if (!socket) return;
     socket.connect();
-    }, [socket]);
+
+    return () => {
+      socket.close();
+    };
+  }, [socket]);
 
   const renderScreen = () => {
     switch (currentScreen) {
