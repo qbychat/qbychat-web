@@ -43,6 +43,7 @@ import {
   ResumeClientRequest,
   ResumeClientResponse,
 } from '@/proto/qbychat/websocket/session/v1/service.ts';
+import { sha256 } from 'js-sha256';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -78,7 +79,7 @@ class WebSocketService {
   #chacha20Key: Uint8Array | null = null;
   #packetCounter: bigint = BigInt(0);
   #packetQueue: Queue = new Queue({ results: [] });
-  #responseHandlers: Map<Uint8Array, RPCResponsePromiseHandlers> = new Map();
+  #responseHandlers: Map<string, RPCResponsePromiseHandlers> = new Map();
   #statusListeners: Map<string, (status: WebSocketStatus) => void> = new Map();
   #window: SlidingWindow | null = null;
 
@@ -274,7 +275,9 @@ class WebSocketService {
   async request<T extends object>(type: MessageType<T>, userId: string | null, method: RequestMethod, payload: Uint8Array | null, timeout: number = 15000): Promise<T> {
     return new Promise((resolve, reject) => {
       // create ticket
-      const ticket = BinaryUtils.numberToUint8(++this.#ticketCounter);
+      const ticket = BinaryUtils.numToUint8Array(++this.#ticketCounter);
+      const ticketHash = sha256(ticket);
+      console.log(`Ticket from request: ${ticket} (hash: ${ticketHash})`);
       // build request
       const message: ServerboundMessage = {
         userId: userId === null ? undefined : userId,
@@ -285,14 +288,11 @@ class WebSocketService {
         },
       };
 
-      // send request
-      this.sendPacket(ServerboundMessage.toBinary(message));
-
       // Set a timeout to reject the promise after the specified time
       const timeoutId = setTimeout(() => {
         // If the timeout occurs, reject the promise
-        console.error(`Request with ticket ${ticket} timed out after ${timeout}ms`);
-        this.#responseHandlers.delete(ticket); // Clean up the ticket from the map
+        console.error(`Request with ticket ${ticketHash} timed out after ${timeout}ms`);
+        this.#responseHandlers.delete(ticketHash); // Clean up the ticket from the map
         reject(new Error(`Request timed out after ${timeout}ms`));
       }, timeout);
 
@@ -303,10 +303,13 @@ class WebSocketService {
         resolve(type.fromBinary(response.payload!));
       };
 
-      this.#responseHandlers.set(ticket, {
+      this.#responseHandlers.set(ticketHash, {
         resolve: callback,
         reject: reject,
       });
+
+      // send request
+      this.sendPacket(ServerboundMessage.toBinary(message));
     });
   }
 
@@ -315,7 +318,9 @@ class WebSocketService {
     if (packet.content.oneofKind == 'response') {
       // handle response
       const response = packet.content.response;
-      const responseHandler = this.#responseHandlers.get(response.ticket!);
+      const ticketHash = sha256(response.ticket!);
+      console.log(`Ticket from response: ${response.ticket!} (hash: ${ticketHash})`);
+      const responseHandler = this.#responseHandlers.get(ticketHash);
       if (responseHandler) {
         // invoke handler
         if (response.status === RPCResponse_Status.SUCCESS) {
@@ -326,7 +331,7 @@ class WebSocketService {
           responseHandler.reject(new RPCError(response.status, response.message));
         }
         // cleanup handler
-        this.#responseHandlers.delete(response.ticket!);
+        this.#responseHandlers.delete(ticketHash);
       }
     } else if (packet.content.oneofKind == 'event') {
       // handle event
@@ -368,7 +373,7 @@ class WebSocketService {
     }
     // send request
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
-    console.log(response.token);
+    console.log(response);
     // fire event
     this.emitter.emit('updateToken', {
       userId: null,
