@@ -94,17 +94,6 @@ class CipherUtils {
       chachaKey,
     );
 
-    const debug = sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached(
-      message,
-      aad,
-      null, // secret nonce (not needed)
-      nonce,
-      chachaKey,
-    );
-
-    console.debug(`chachakey: ${chachaKey}`);
-    console.debug(`mac: ${debug.mac}`);
-
     return {
       sessionId: sessionId,
       sequenceNumber: sequenceNumber,
