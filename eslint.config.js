@@ -9,7 +9,7 @@ export default tseslint.config(
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
-    ignores: ["src/components/ui/**/*.{ts,tsx}"],
+    ignores: ["src/components/ui/**/*.{ts,tsx}", "src/proto/**/*.{ts}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -28,4 +28,8 @@ export default tseslint.config(
       'semi': [2, 'always'],
     },
   },
+  {
+    files: ['src/proto/**/*.ts'],
+    rules: {}
+  }
 );

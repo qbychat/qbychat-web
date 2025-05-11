@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "noCheck": true,
+  },
+  "include": ["src/proto"]
+}
