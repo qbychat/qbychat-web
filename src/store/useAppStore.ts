@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +17,28 @@
  *
  */
 
+// store.ts
 import { create } from 'zustand';
-import WebSocketService from '@/services/websocket/websocket-service.ts';
 
-type WebSocketState = {
-  socket: WebSocketService | null;
-
-  setSocket: (socket: WebSocketService) => void,
+export enum AppScreen {
+  setup,
+  auth,
+  main
 }
 
-const useWebSocket = create<WebSocketState>((set) => ({
-  socket: null,
-  setSocket: (socket: WebSocketService) => set({ socket }),
-}));
+interface AppState {
+  screen: AppScreen;
+  prevScreen: AppScreen | null;
+  setScreen: (screen: AppScreen) => void;
+}
 
-export default useWebSocket;
+export const useAppStore = create<AppState>((set, get) => ({
+  screen: AppScreen.setup,
+  prevScreen: null,
+  setScreen: (newScreen) => {
+    const { screen } = get();
+    if (newScreen !== screen) {
+      set({ prevScreen: screen, screen: newScreen });
+    }
+  },
+}));

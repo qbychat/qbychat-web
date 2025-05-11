@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +17,9 @@
  *
  */
 
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }

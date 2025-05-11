@@ -1,7 +1,5 @@
 {
   "loading.title": "正在加载QbyChat网页客户端...",
-  "onboarding.intro.welcome": "<colorful></colorful>",
-  "onboarding.intro.description": "开放源代码的聊天软件",
-  "onboarding.intro.start": "让我们开始吧!",
-  "onboarding.server": "连接到QbyChat服务器"
+  "onboarding.server": "连接到QbyChat服务器",
+  "onboarding.server.connection.error": "连不上Websocket"
 }

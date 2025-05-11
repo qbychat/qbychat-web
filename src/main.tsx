@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +27,7 @@ import { ThemeProvider } from '@/components/theme-provider.tsx';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <App />
+      <App/>
     </ThemeProvider>
   </StrictMode>,
 );

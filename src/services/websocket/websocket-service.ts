@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +40,8 @@ import { UAParser } from 'ua-parser-js';
 import {
   RegisterClientRequest,
   RegisterClientResponse,
-  ResumeClientRequest, ResumeClientResponse,
+  ResumeClientRequest,
+  ResumeClientResponse,
 } from '@/proto/qbychat/websocket/session/v1/service.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'closed';
@@ -51,9 +51,9 @@ interface RPCResponsePromiseHandlers {
   reject: (reason: RPCError) => void;
 }
 
-interface WebSocketEvent {
+interface WebSocketEvent<T> {
   userId: string | null | undefined;
-  payload: Uint8Array;
+  payload: T;
 }
 
 class WebSocketService {
@@ -65,7 +65,7 @@ class WebSocketService {
   private reconnectInterval: number;
   private reconnectAttempts = 0;
 
-  public emitter = mitt<Record<string, WebSocketEvent>>();
+  public emitter = mitt<Record<string, WebSocketEvent<unknown>>>();
 
   #ticketCounter: number = 0;
 
@@ -88,6 +88,39 @@ class WebSocketService {
     this.baseReconnectInterval = baseReconnectInterval;
     this.reconnectInterval = baseReconnectInterval;
   }
+
+  testConnection(): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      if (this.socket !== null && this.socket.readyState === WebSocket.OPEN) {
+        resolve(true); // already connected
+        return;
+      }
+
+      const socket = new WebSocket(this.url);
+
+      const timeoutId = setTimeout(() => {
+        socket.close();
+        resolve(false);
+      }, 5000);
+
+      socket.onopen = () => {
+        clearTimeout(timeoutId);
+        socket.close();
+        resolve(true); // connection successful
+      };
+
+      socket.onerror = () => {
+        clearTimeout(timeoutId);
+        resolve(false);
+      };
+
+      socket.onclose = () => {
+        clearTimeout(timeoutId);
+        resolve(false);
+      };
+    });
+  }
+
 
   connect() {
     if (this.socket !== null) {
@@ -307,7 +340,7 @@ class WebSocketService {
   private async resumeSession() {
     if (!this.authToken) throw new Error('Auth token is missing');
     const request: ResumeClientRequest = {
-      token: this.authToken
+      token: this.authToken,
     };
     await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
   }
@@ -333,8 +366,14 @@ class WebSocketService {
     }
     // send request
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
-    // TODO save token
-    console.log(response.token);
+    // fire event
+    this.emitter.emit('updateToken', {
+      userId: null,
+      payload: {
+        websocketUrl: this.url,
+        token: response.token,
+      },
+    });
   }
 
   private handleReconnect() {

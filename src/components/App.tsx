@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +17,32 @@
  *
  */
 
+import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
+import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
+import backgroundImage from '@/assets/background.svg';
+
 function App() {
+  const currentScreen = useAppStore((state) => state.screen);
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case AppScreen.setup:
+        return <SetupServerPage/>;
+      case AppScreen.auth:
+        return <h1>auth</h1>;
+      case AppScreen.main:
+        return <h1>main</h1>;
+    }
+  };
+
   return (
-    <></>
+    <div className="w-full h-screen overflow-hidden m-0" style={{backgroundImage: `url("${backgroundImage}")`}}>
+      {/*todo add settings for the border*/}
+      <div
+        className="sm:p-0 h-full lg:m-auto lg:scale-90 lg:rounded-3xl shadow-xl backdrop-blur-sm">
+        {renderScreen()}
+      </div>
+    </div>
   );
 }
 

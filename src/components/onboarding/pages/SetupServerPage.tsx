@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,35 +21,57 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { db } from '@/db.ts';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import useSettings from '@/hooks/useSettings.ts';
+import useSettings from '@/store/useSettings.ts';
+import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
+import useWebSocket from '@/store/useWebSocket.ts';
+import WebsocketService from '@/services/websocket/websocket-service.ts';
+import { Loader2 } from 'lucide-react';
 
 const SetupServerPage = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const settings = useSettings();
+  const setSocket = useWebSocket((state) => state.setSocket);
+  const setScreen = useAppStore((state) => state.setScreen);
   const [address, setAddress] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    // create websocketService
+    const service = new WebsocketService(address, null);
+    // test connect
+    setLoading(true);
+    if (!await service.testConnection()) {
+      setLoading(false);
+      setError(t('onboarding.server.connection.error'));
+      return;
+    }
+    // register the socket
     const id = await db.websocketAddresses.add({
       url: address,
+      authToken: null,
     });
+    // trigger connect in App.tsx
     settings.setCurrentServerId(id);
-    navigate('/');
+    setSocket(service);
+    setScreen(AppScreen.auth);
   };
 
-  return (<div className="h-screen w-full flex flex-col gap-1 items-center justify-center">
+  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
     <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.server')}</h1>
+    {error && <p className="text-red-500 mt-1">{error}</p>}
     <form className="mt-5 flex w-full max-w-sm items-center space-x-2" onSubmit={onSubmit}>
       <Input type="url"
              value={address}
              onChange={(e) => setAddress(e.target.value)}
              placeholder="ws://example.com/ws"
-             required />
-      <Button type="submit">Connect</Button>
+             required/>
+      <Button type="submit" disabled={loading}>
+        {loading && <Loader2 className="animate-spin"/>}
+        Connect
+      </Button>
     </form>
   </div>);
 };

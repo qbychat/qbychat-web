@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,6 +22,7 @@ import Dexie, { Table } from 'dexie';
 export interface WebSocketAddress {
   id?: number;
   url: string;
+  authToken: string | null;
 }
 
 export class AppDB extends Dexie {
@@ -31,7 +31,7 @@ export class AppDB extends Dexie {
   constructor() {
     super('AppDB');
     this.version(1).stores({
-      websocketAddresses: '++id,url',
+      websocketAddresses: '++id,url,authToken',
     });
   }
 }

@@ -1,6 +1,5 @@
 /*
  * Copyright (c) 2025. All rights reserved.
- *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,29 +17,18 @@
  *
  */
 
-import { create } from 'zustand/react';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { create } from 'zustand';
+import WebSocketService from '@/services/websocket/websocket-service.ts';
 
-type SettingsStore = {
-  currentServerId: number | null;
-  setCurrentServerId: (serverId: number) => void;
-  clearCurrentServer: () => void;
+type WebSocketState = {
+  socket: WebSocketService | null;
+
+  setSocket: (socket: WebSocketService) => void,
 }
 
-const useSettings = create<SettingsStore>()(
-  persist(
-    (set) => ({
-      currentServerId: null,
-      setCurrentServerId: (serverId: number) => {
-        set({ currentServerId: serverId });
-      },
-      clearCurrentServer: () => set({ currentServerId: null }),
-    }),
-    {
-      name: 'settings-storage',
-      storage: createJSONStorage(() => localStorage),
-    },
-  ),
-);
+const useWebSocket = create<WebSocketState>((set) => ({
+  socket: null,
+  setSocket: (socket: WebSocketService) => set({ socket }),
+}));
 
-export default useSettings;
+export default useWebSocket;

@@ -17,14 +17,29 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
+import { create } from 'zustand/react';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-export class RPCError extends Error {
-  status: RPCResponse_Status;
-
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(message);
-    this.name = 'RPCError';
-    this.status = status;
-  }
+type SettingsStore = {
+  currentServerId: number | null;
+  setCurrentServerId: (serverId: number) => void;
+  clearCurrentServer: () => void;
 }
+
+const useSettings = create<SettingsStore>()(
+  persist(
+    (set) => ({
+      currentServerId: null,
+      setCurrentServerId: (serverId: number) => {
+        set({ currentServerId: serverId });
+      },
+      clearCurrentServer: () => set({ currentServerId: null }),
+    }),
+    {
+      name: 'settings-storage',
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);
+
+export default useSettings;

@@ -1,7 +1,5 @@
 {
   "loading.title": "Loading QbyChat client for the browsers...",
-  "onboarding.intro.welcome": "Welcome to <colorful></colorful>",
-  "onboarding.intro.description": "An opensource messenger app.",
-  "onboarding.intro.start": "Let's start",
-  "onboarding.server": "Setup a QbyChat server"
+  "onboarding.server": "Setup a QbyChat server",
+  "onboarding.server.connection.error": "Failed to establish connection to the websocket"
 }
