@@ -277,7 +277,6 @@ class WebSocketService {
       // create ticket
       const ticket = BinaryUtils.numToUint8Array(++this.#ticketCounter);
       const ticketHash = sha256(ticket);
-      console.log(`Ticket from request: ${ticket} (hash: ${ticketHash})`);
       // build request
       const message: ServerboundMessage = {
         userId: userId === null ? undefined : userId,
@@ -319,7 +318,6 @@ class WebSocketService {
       // handle response
       const response = packet.content.response;
       const ticketHash = sha256(response.ticket!);
-      console.log(`Ticket from response: ${response.ticket!} (hash: ${ticketHash})`);
       const responseHandler = this.#responseHandlers.get(ticketHash);
       if (responseHandler) {
         // invoke handler
@@ -373,7 +371,6 @@ class WebSocketService {
     }
     // send request
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
-    console.log(response);
     // fire event
     this.emitter.emit('updateToken', {
       userId: null,
