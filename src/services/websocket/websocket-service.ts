@@ -175,6 +175,8 @@ class WebSocketService {
           // init window
           this.#window = new SlidingWindow();
         }
+        this.#handshakeState = true;
+        // authorize
         this.updateStatus('authenticating');
         // register/restore session
         if (this.authToken) {
@@ -183,7 +185,6 @@ class WebSocketService {
           await this.registerClient();
         }
 
-        this.#handshakeState = true;
         // free keyPair object
         keyPair = undefined;
         // TODO send sync requests
