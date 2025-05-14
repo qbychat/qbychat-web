@@ -18,13 +18,14 @@
  */
 
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
-import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
+import SetupServerPage from '@/components/onboarding/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
 import useWebSocket from '@/store/useWebSocket.ts';
 import { useEffect } from 'react';
 import { db } from '@/db.ts';
 import useSettings from '@/store/useSettings.ts';
-import WebsocketService from '@/services/websocket/websocket-service.ts';
+import WebsocketService from '@/services/websocket/WebsocketService.ts';
+import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 
 function App() {
   const currentServer = useSettings((state) => state.currentServerId);
@@ -44,15 +45,7 @@ function App() {
     })();
   }, [currentServer, setSocket]);
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.connect();
-    setScreen(AppScreen.auth);
-
-    return () => {
-      socket.close();
-    };
-  }, [setScreen, socket]);
+  useWebSocketLifecycle();
 
   const renderScreen = () => {
     switch (screen) {

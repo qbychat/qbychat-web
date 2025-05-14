@@ -27,13 +27,10 @@ import {
   ServerboundHandshake,
   ServerboundMessage,
 } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
-import CipherUtils, { KeyPair } from '@/utils/cipher-utils.ts';
-import BinaryUtils from '@/utils/binary-utils.ts';
-import SlidingWindow from '@/services/websocket/sliding-window.ts';
-import { v4 as uuidv4 } from 'uuid';
+import SlidingWindow from '@/services/websocket/SlidingWindow.ts';
 import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
-import { RPCError } from '@/services/websocket/websocket-error.ts';
+import { RPCError } from '@/services/websocket/errors/RPCError.ts';
 import Queue from 'queue';
 import { Platform } from '@/proto/qbychat/common/v1/platform.ts';
 import { UAParser } from 'ua-parser-js';
@@ -45,6 +42,15 @@ import {
 } from '@/proto/qbychat/websocket/session/v1/service.ts';
 import { sha256 } from 'js-sha256';
 import log from 'loglevel';
+import {
+  decryptMessage,
+  deriveChaCha20Key,
+  encryptMessage,
+  generateX25519KeyPair,
+  KeyPair,
+  performKeyExchange,
+} from '@/utils/cipherUtils.ts';
+import { blobToByteArray, numToUint8Array } from '@/utils/binaryUtils.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -53,12 +59,19 @@ interface RPCResponsePromiseHandlers {
   reject: (reason: RPCError) => void;
 }
 
-interface WebSocketEvent<T> {
+interface SSEPayload<T> {
   userId: string | null | undefined;
+  eventType: string;
   payload: T;
 }
 
-class WebSocketService {
+export type WebsocketEvents = {
+  sse: SSEPayload<unknown>;
+  updateStatus: WebSocketStatus;
+  updateToken: { token: string };
+}
+
+class WebsocketService {
   private socket: WebSocket | null = null;
   readonly url: string;
   private readonly authToken: string | null;
@@ -67,7 +80,7 @@ class WebSocketService {
   private reconnectInterval: number;
   private reconnectAttempts = 0;
 
-  public emitter = mitt<Record<string, WebSocketEvent<unknown>>>();
+  private emitter = mitt<WebsocketEvents>();
 
   #ticketCounter: number = 0;
 
@@ -81,7 +94,6 @@ class WebSocketService {
   #packetCounter: bigint = BigInt(0);
   #packetQueue: Queue = new Queue({ results: [] });
   #responseHandlers: Map<string, RPCResponsePromiseHandlers> = new Map();
-  #statusListeners: Map<string, (status: WebSocketStatus) => void> = new Map();
   #window: SlidingWindow | null = null;
 
   constructor(url: string, authToken: string | null, baseReconnectInterval: number = 5000) {
@@ -136,7 +148,7 @@ class WebSocketService {
     log.info(`🚀 Start connecting to websocket ${this.url}`);
 
     // create keypair for key exchange
-    let keyPair: KeyPair | undefined = CipherUtils.generateX25519KeyPair();
+    let keyPair: KeyPair | undefined = generateX25519KeyPair();
     log.debug('✅ Created X25519 keypair');
 
     this.socket.onopen = () => {
@@ -164,7 +176,7 @@ class WebSocketService {
 
     this.socket.onmessage = async (e: MessageEvent) => {
       // read buffer
-      const bytes = await BinaryUtils.blobToByteArray(e.data);
+      const bytes = await blobToByteArray(e.data);
       if (!this.#handshakeState) {
         // process handshake
         const clientboundHandshake = ClientboundHandshake.fromBinary(bytes);
@@ -173,9 +185,9 @@ class WebSocketService {
         if (encryptionInfo) {
           const serverPublicKey = encryptionInfo.publicKey;
           // do key exchange
-          const sharedSecret = CipherUtils.performKeyExchange(keyPair!.privateKey, serverPublicKey);
+          const sharedSecret = performKeyExchange(keyPair!.privateKey, serverPublicKey);
           // calculate ChaCha20 key
-          this.#chacha20Key = await CipherUtils.deriveChaCha20Key(sharedSecret, this.#chacha20KeyInfo);
+          this.#chacha20Key = await deriveChaCha20Key(sharedSecret, this.#chacha20KeyInfo);
           // save session id
           this.#sessionId = encryptionInfo.sessionId;
 
@@ -223,7 +235,7 @@ class WebSocketService {
         }
         try {
           // decrypt packet
-          const decryptedPayload = CipherUtils.decryptMessage(this.#chacha20Key, encryptedMessage);
+          const decryptedPayload = decryptMessage(this.#chacha20Key, encryptedMessage);
           clientboundMessage = ClientboundMessage.fromBinary(decryptedPayload);
           if (!this.#window!.accept(encryptedMessage.sequenceNumber)) {
             // bad sequenceNumber
@@ -261,7 +273,7 @@ class WebSocketService {
       if (this.#chacha20Key && this.#sessionId) {
         // encrypt payload
         const packetId = this.#packetCounter;
-        payload = EncryptedMessage.toBinary(CipherUtils.encryptMessage(this.#chacha20Key, data, this.#sessionId, packetId));
+        payload = EncryptedMessage.toBinary(encryptMessage(this.#chacha20Key, data, this.#sessionId, packetId));
       } else {
         // not encrypted
         payload = data;
@@ -290,7 +302,7 @@ class WebSocketService {
   async request<T extends object>(type: MessageType<T>, userId: string | null, method: RequestMethod, payload: Uint8Array | null, timeout: number = 15000): Promise<T> {
     return new Promise((resolve, reject) => {
       // create ticket
-      const ticket = BinaryUtils.numToUint8Array(++this.#ticketCounter);
+      const ticket = numToUint8Array(++this.#ticketCounter);
       const ticketHash = sha256(ticket);
       // build request
       const message: ServerboundMessage = {
@@ -356,10 +368,7 @@ class WebSocketService {
       const event = packet.content.event;
       log.info(`Received event ${event.typeUrl}`);
       // emit event
-      this.emitter.emit(event.typeUrl, {
-        userId: userId,
-        payload: event.value,
-      });
+      this.sendSseEvent(userId, event.typeUrl, event.value);
     }
   }
 
@@ -397,13 +406,9 @@ class WebSocketService {
     const response = await this.request(RegisterClientResponse, null, RequestMethod.REGISTER_CLIENT_V1, RegisterClientRequest.toBinary(request));
     log.info('📥 Successfully registered client');
     log.debug(`📥 Client authToken: ${response.token}`);
-    // fire event
-    this.emitter.emit('updateToken', {
-      userId: null,
-      payload: {
-        websocketUrl: this.url,
-        token: response.token,
-      },
+    // send event
+    this.sendEvent('updateToken', {
+      token: response.token,
     });
   }
 
@@ -426,17 +431,28 @@ class WebSocketService {
   }
 
   private updateStatus(status: WebSocketStatus) {
-    this.#statusListeners.forEach((listener) => listener(status));
+    this.sendEvent('updateStatus', status);
   }
 
-  addStatusListener(listener: (status: WebSocketStatus) => void): string {
-    const id: string = uuidv4().toString();
-    this.#statusListeners.set(id, listener);
-    return id;
+  registerEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void) {
+    this.emitter.on(eventName, handler);
   }
 
-  removeStatusListener(id: string) {
-    this.#statusListeners.delete(id);
+  unregisterEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void) {
+    this.emitter.off(eventName, handler);
+  }
+
+  private sendEvent<T extends keyof WebsocketEvents>(eventName: T, data: WebsocketEvents[T]) {
+    this.emitter.emit(eventName, data);
+  }
+
+  private sendSseEvent<T>(userId: string | null | undefined, eventType: string, payload: T) {
+    const ssePayload: SSEPayload<T> = {
+      userId,
+      eventType,
+      payload,
+    };
+    this.sendEvent('sse', ssePayload);
   }
 
   close() {
@@ -448,8 +464,11 @@ class WebSocketService {
       this.#shouldReconnect = false;
       this.socket.close();
       this.socket = null;
+
+      // unregister all events
+      this.emitter.all.clear();
     }
   }
 }
 
-export default WebSocketService;
+export default WebsocketService;

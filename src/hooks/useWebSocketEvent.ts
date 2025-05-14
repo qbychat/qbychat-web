@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2025. All rights reserved.
+ *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +18,22 @@
  *
  */
 
-class BinaryUtils {
-  async blobToByteArray(blob: Blob) {
-    const buffer = await new Response(blob).arrayBuffer();
-    return new Uint8Array(buffer);
-  }
+import { useEffect } from 'react';
+import useWebSocket from '@/store/useWebSocket.ts';
+import { WebsocketEvents } from '@/services/websocket/WebsocketService.ts';
 
-  numToUint8Array(num: number) {
-    const arr = new Uint8Array(8);
+export function useWebSocketEvent<T extends keyof WebsocketEvents>(
+  eventName: T,
+  handler: (data: WebsocketEvents[T]) => void,
+) {
+  const socket = useWebSocket((state) => state.socket);
 
-    for (let i = 0; i < 8; i++) {
-      arr[i] = num % 256;
-      num = Math.floor(num / 256);
-    }
+  useEffect(() => {
+    if (!socket) return;
+    socket.registerEvent(eventName, handler);
 
-    return arr;
-  }
+    return () => {
+      socket.unregisterEvent(eventName, handler);
+    };
+  }, [eventName, handler, socket]);
 }
-
-const instance = new BinaryUtils();
-
-export default instance;

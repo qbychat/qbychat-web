@@ -12,7 +12,7 @@
     "proto": "node scripts/gen-proto.cjs",
     "postinstall": "node scripts/postinstall.cjs"
   },
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.11.0",
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@protobuf-ts/runtime": "^2.10.0",

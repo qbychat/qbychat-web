@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2025. All rights reserved.
+ *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,9 +18,31 @@
  *
  */
 
-const ChatList = () => {
-  return (<div className="h-full border-r-1">
-  </div>);
-};
+import { useEffect } from 'react';
+import { useAppStore } from '@/store/useAppStore.ts';
+import useWebSocket from '@/store/useWebSocket.ts';
+import { db } from '@/db.ts';
 
-export default ChatList;
+export function useWebSocketLifecycle() {
+  const { setScreen } = useAppStore();
+  const { socket } = useWebSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.registerEvent('updateToken', async (data) => {
+      const entity = await db.websocketAddresses
+        .filter(server => server.url === socket.url)
+        .first();
+      if (!entity) return;
+      entity.authToken = data.token;
+      await db.websocketAddresses.put(entity);
+    });
+
+    socket.connect();
+
+    return () => {
+      socket.close();
+    };
+  }, [socket, setScreen]);
+}

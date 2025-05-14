@@ -62,6 +62,8 @@ fs.mkdirSync(outDir, { recursive: true });
 const cmd = [
   'pnpm exec protoc',
   `--plugin=protoc-gen-ts=${pluginPath}`,
+  '--ts_opt ts_nocheck',
+  '--ts_opt eslint_disable',
   `--ts_out=${outDir}`,
   `--proto_path=${protoDir}`,
   ...files,

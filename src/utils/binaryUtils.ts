@@ -17,14 +17,18 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
+export async function blobToByteArray(blob: Blob) {
+  const buffer = await new Response(blob).arrayBuffer();
+  return new Uint8Array(buffer);
+}
 
-export class RPCError extends Error {
-  status: RPCResponse_Status;
+export function numToUint8Array(num: number) {
+  const arr = new Uint8Array(8);
 
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(message);
-    this.name = 'RPCError';
-    this.status = status;
+  for (let i = 0; i < 8; i++) {
+    arr[i] = num % 256;
+    num = Math.floor(num / 256);
   }
+
+  return arr;
 }

@@ -27,9 +27,5 @@ export default tseslint.config(
       'quotes': ['error', 'single'],
       'semi': [2, 'always'],
     },
-  },
-  {
-    files: ['src/proto/**/*.ts'],
-    rules: {}
   }
 );

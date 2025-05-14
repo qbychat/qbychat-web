@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import useSettings from '@/store/useSettings.ts';
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
-import WebsocketService from '@/services/websocket/websocket-service.ts';
+import WebsocketService from '@/services/websocket/WebsocketService.ts';
 import { Loader2 } from 'lucide-react';
 
 const SetupServerPage = () => {
