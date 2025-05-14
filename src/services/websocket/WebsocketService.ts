@@ -69,6 +69,9 @@ export type WebsocketEvents = {
   sse: SSEPayload<unknown>;
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
+
+  requireLogin: null;
+  loginSuccess: { mainAccountId: string; LoggedInAccountIds: string[]}
 }
 
 class WebsocketService {
@@ -379,7 +382,15 @@ class WebsocketService {
       token: this.authToken,
     };
     log.debug(`📦 ResumeClientRequest: ${request}`);
-    await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
+    const response = await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
+    if (response.accountIds.length === 0) {
+      this.sendEvent('requireLogin', null);
+    } else {
+      this.sendEvent('loginSuccess', {
+        mainAccountId: response.currentAccountId,
+        LoggedInAccountIds: response.accountIds
+      });
+    }
   }
 
   private async registerClient() {
@@ -410,6 +421,7 @@ class WebsocketService {
     this.sendEvent('updateToken', {
       token: response.token,
     });
+    this.sendEvent('requireLogin', null);
   }
 
   private handleReconnect() {

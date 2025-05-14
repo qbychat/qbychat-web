@@ -26,13 +26,23 @@ import WebsocketService from '@/services/websocket/WebsocketService.ts';
 import useSettings from '@/store/useSettings.ts';
 
 function registerEvents(service: WebsocketService) {
+
   service.registerEvent('updateToken', async (data) => {
     const entity = await db.websocketAddresses
       .filter(server => server.url === service.url)
       .first();
     if (!entity) return;
     entity.authToken = data.token;
+    // FIXME cannot save websocket address
     await db.websocketAddresses.put(entity);
+  });
+
+  service.registerEvent('loginSuccess', async () => {
+    // TODO setScreen for main
+  });
+
+  service.registerEvent('requireLogin', async () => {
+    // TODO setScreen for auth
   });
 }
 
