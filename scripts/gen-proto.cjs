@@ -64,6 +64,7 @@ const cmd = [
   `--plugin=protoc-gen-ts=${pluginPath}`,
   '--ts_opt ts_nocheck',
   '--ts_opt eslint_disable',
+  '--ts_opt output_javascript',
   `--ts_out=${outDir}`,
   `--proto_path=${protoDir}`,
   ...files,

@@ -26,20 +26,20 @@ import {
   RPCResponse_Status,
   ServerboundHandshake,
   ServerboundMessage,
-} from '@/proto/qbychat/websocket/protocol/v1/common.ts';
+} from '@/proto/qbychat/websocket/protocol/v1/common';
 import SlidingWindow from '@/services/websocket/SlidingWindow.ts';
 import mitt from 'mitt';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/services/websocket/errors/RPCError.ts';
 import Queue from 'queue';
-import { Platform } from '@/proto/qbychat/common/v1/platform.ts';
+import { Platform } from '@/proto/qbychat/common/v1/platform';
 import { UAParser } from 'ua-parser-js';
 import {
   RegisterClientRequest,
   RegisterClientResponse,
   ResumeClientRequest,
   ResumeClientResponse,
-} from '@/proto/qbychat/websocket/session/v1/service.ts';
+} from '@/proto/qbychat/websocket/session/v1/service';
 import { sha256 } from 'js-sha256';
 import log from 'loglevel';
 import {
