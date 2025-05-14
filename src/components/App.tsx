@@ -22,26 +22,44 @@ import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
 import useWebSocket from '@/store/useWebSocket.ts';
 import { useEffect } from 'react';
+import { db } from '@/db.ts';
+import useSettings from '@/store/useSettings.ts';
+import WebsocketService from '@/services/websocket/websocket-service.ts';
 
 function App() {
-  const currentScreen = useAppStore((state) => state.screen);
-  const { socket } = useWebSocket();
+  const currentServer = useSettings((state) => state.currentServerId);
+  const { screen, setScreen } = useAppStore();
+  const { socket, setSocket } = useWebSocket();
+
+
+  useEffect(() => {
+    // autoconnect
+    if (!currentServer) return;
+
+    (async function() {
+      const websocketAddress = await db.websocketAddresses.get(currentServer);
+      if (!websocketAddress) return;
+      const service = new WebsocketService(websocketAddress.url, websocketAddress.authToken);
+      setSocket(service);
+    })();
+  }, [currentServer, setSocket]);
 
   useEffect(() => {
     if (!socket) return;
     socket.connect();
+    setScreen(AppScreen.auth);
 
     return () => {
       socket.close();
     };
-  }, [socket]);
+  }, [setScreen, socket]);
 
   const renderScreen = () => {
-    switch (currentScreen) {
+    switch (screen) {
       case AppScreen.setup:
-        return <SetupServerPage/>;
+        return <SetupServerPage />;
       case AppScreen.auth:
-        return <h1>auth</h1>;
+        return <div className="text-white">123</div>;
       case AppScreen.main:
         return <h1>main</h1>;
     }
