@@ -31,7 +31,7 @@ import { Loader2 } from 'lucide-react';
 const SetupServerPage = () => {
   const { t } = useTranslation();
   const settings = useSettings();
-  const setSocket = useWebSocket((state) => state.setSocket);
+  const setSocket = useWebSocket((state) => state.setService);
   const setScreen = useAppStore((state) => state.setScreen);
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');

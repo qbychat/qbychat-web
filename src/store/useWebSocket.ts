@@ -21,14 +21,14 @@ import { create } from 'zustand';
 import WebsocketService from '@/services/websocket/WebsocketService.ts';
 
 type WebSocketState = {
-  socket: WebsocketService | null;
+  service: WebsocketService | null;
 
-  setSocket: (socket: WebsocketService) => void,
+  setService: (socket: WebsocketService) => void,
 }
 
 const useWebSocket = create<WebSocketState>((set) => ({
-  socket: null,
-  setSocket: (socket: WebsocketService) => set({ socket }),
+  service: null,
+  setService: (socket: WebsocketService) => set({ service: socket }),
 }));
 
 export default useWebSocket;

@@ -20,30 +20,10 @@
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import SetupServerPage from '@/components/onboarding/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
-import useWebSocket from '@/store/useWebSocket.ts';
-import { useEffect } from 'react';
-import { db } from '@/db.ts';
-import useSettings from '@/store/useSettings.ts';
-import WebsocketService from '@/services/websocket/WebsocketService.ts';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 
 function App() {
-  const currentServer = useSettings((state) => state.currentServerId);
   const screen = useAppStore(state => state.screen);
-  const setSocket = useWebSocket(state => state.setSocket);
-
-
-  useEffect(() => {
-    // autoconnect
-    if (!currentServer) return;
-
-    (async function() {
-      const websocketAddress = await db.websocketAddresses.get(currentServer);
-      if (!websocketAddress) return;
-      const service = new WebsocketService(websocketAddress.url, websocketAddress.authToken);
-      setSocket(service);
-    })();
-  }, [currentServer, setSocket]);
 
   useWebSocketLifecycle();
 

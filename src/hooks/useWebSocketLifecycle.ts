@@ -22,27 +22,46 @@ import { useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
 import { db } from '@/db.ts';
+import WebsocketService from '@/services/websocket/WebsocketService.ts';
+import useSettings from '@/store/useSettings.ts';
+
+function registerEvents(service: WebsocketService) {
+  service.registerEvent('updateToken', async (data) => {
+    const entity = await db.websocketAddresses
+      .filter(server => server.url === service.url)
+      .first();
+    if (!entity) return;
+    entity.authToken = data.token;
+    await db.websocketAddresses.put(entity);
+  });
+}
 
 export function useWebSocketLifecycle() {
   const { setScreen } = useAppStore();
-  const { socket } = useWebSocket();
+  const { service, setService } = useWebSocket();
+  const currentServer = useSettings((state) => state.currentServerId);
 
   useEffect(() => {
-    if (!socket) return;
+    // autoconnect
+    if (!currentServer) return;
 
-    socket.registerEvent('updateToken', async (data) => {
-      const entity = await db.websocketAddresses
-        .filter(server => server.url === socket.url)
-        .first();
-      if (!entity) return;
-      entity.authToken = data.token;
-      await db.websocketAddresses.put(entity);
-    });
+    (async function() {
+      const websocketAddress = await db.websocketAddresses.get(currentServer);
+      if (!websocketAddress) return;
+      const service = new WebsocketService(websocketAddress.url, websocketAddress.authToken);
+      setService(service);
+    })();
+  }, [currentServer, setService]);
 
-    socket.connect();
+  useEffect(() => {
+    if (!service) return;
+    // register events
+    registerEvents(service);
+    // connect to websocket
+    service.connect();
 
     return () => {
-      socket.close();
+      service.close();
     };
-  }, [socket, setScreen]);
+  }, [service, setScreen]);
 }

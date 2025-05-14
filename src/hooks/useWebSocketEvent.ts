@@ -26,7 +26,7 @@ export function useWebSocketEvent<T extends keyof WebsocketEvents>(
   eventName: T,
   handler: (data: WebsocketEvents[T]) => void,
 ) {
-  const socket = useWebSocket((state) => state.socket);
+  const socket = useWebSocket((state) => state.service);
 
   useEffect(() => {
     if (!socket) return;
