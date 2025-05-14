@@ -29,8 +29,8 @@ import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 
 function App() {
   const currentServer = useSettings((state) => state.currentServerId);
-  const { screen, setScreen } = useAppStore();
-  const { socket, setSocket } = useWebSocket();
+  const screen = useAppStore(state => state.screen);
+  const setSocket = useWebSocket(state => state.setSocket);
 
 
   useEffect(() => {
