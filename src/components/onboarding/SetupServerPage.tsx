@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
 import useSettings from '@/store/useSettings.ts';
-import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
+import { useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
 import WebsocketService from '@/services/websocket/WebsocketService.ts';
 import { Loader2 } from 'lucide-react';
@@ -56,7 +56,7 @@ const SetupServerPage = () => {
     // trigger connect in App.tsx
     settings.setCurrentServerId(id);
     setSocket(service);
-    setScreen(AppScreen.auth);
+    setScreen('auth');
   };
 
   return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">

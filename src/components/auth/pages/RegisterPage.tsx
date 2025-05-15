@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2025. All rights reserved.
+ *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +18,10 @@
  *
  */
 
-// store.ts
-import { create } from 'zustand';
+const RegisterPage = () => {
+  return (<div className="m-auto flex flex-col items-center justify-center pt-10 gap-1 w-1/5">
+    <h1 className="text-2xl lg:text-3xl">Register</h1>
+  </div>);
+};
 
-export type AppScreen = 'loading' | 'onboarding' | 'auth' | 'main'
-
-interface AppState {
-  screen: AppScreen;
-  prevScreen: AppScreen | null;
-  setScreen: (screen: AppScreen) => void;
-}
-
-export const useAppStore = create<AppState>((set, get) => ({
-  screen: 'loading',
-  prevScreen: null,
-  setScreen: (newScreen) => {
-    const { screen } = get();
-    if (newScreen !== screen) {
-      set({ prevScreen: screen, screen: newScreen });
-    }
-  },
-}));
+export default RegisterPage;

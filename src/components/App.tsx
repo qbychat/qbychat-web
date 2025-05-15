@@ -17,10 +17,12 @@
  *
  */
 
-import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
+import { useAppStore } from '@/store/useAppStore.ts';
 import SetupServerPage from '@/components/onboarding/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
+import LoadingAnimation from '@/components/LoadingAnimation.tsx';
+import AuthController from '@/components/auth/AuthController.tsx';
 
 function App() {
   const screen = useAppStore(state => state.screen);
@@ -29,11 +31,14 @@ function App() {
 
   const renderScreen = () => {
     switch (screen) {
-      case AppScreen.setup:
+      case 'loading':
+        return <LoadingAnimation />;
+      case 'onboarding':
+        // TODO use onboarding controller
         return <SetupServerPage />;
-      case AppScreen.auth:
-        return <div className="text-white">123</div>;
-      case AppScreen.main:
+      case 'auth':
+        return <AuthController />;
+      case 'main':
         return <h1>main</h1>;
     }
   };

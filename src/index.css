@@ -60,10 +60,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-* {
-  @apply transition-all;
-}
-
 :root {
   --radius: 0.625rem;
   background: linear-gradient(to bottom right, rgb(170, 215, 160), #feb47b);

@@ -19,30 +19,30 @@
  */
 
 import { useEffect } from 'react';
-import { useAppStore } from '@/store/useAppStore.ts';
+import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
 import { db } from '@/db.ts';
 import WebsocketService from '@/services/websocket/WebsocketService.ts';
 import useSettings from '@/store/useSettings.ts';
 
-function registerEvents(service: WebsocketService) {
+function registerEvents(
+  service: WebsocketService,
+  setScreen: (screen: AppScreen) => void,
+) {
 
   service.registerEvent('updateToken', async (data) => {
-    const entity = await db.websocketAddresses
-      .filter(server => server.url === service.url)
-      .first();
-    if (!entity) return;
-    entity.authToken = data.token;
-    // FIXME cannot save websocket address
-    await db.websocketAddresses.put(entity);
+    await db.websocketAddresses
+      .where('url')
+      .equals(service.url)
+      .modify({ authToken: data.token });
   });
 
   service.registerEvent('loginSuccess', async () => {
-    // TODO setScreen for main
+    setScreen('main');
   });
 
   service.registerEvent('requireLogin', async () => {
-    // TODO setScreen for auth
+    setScreen('auth');
   });
 }
 
@@ -53,7 +53,11 @@ export function useWebSocketLifecycle() {
 
   useEffect(() => {
     // autoconnect
-    if (!currentServer) return;
+    if (!currentServer) {
+      // first run
+      setScreen('onboarding');
+      return;
+    }
 
     (async function() {
       const websocketAddress = await db.websocketAddresses.get(currentServer);
@@ -61,12 +65,15 @@ export function useWebSocketLifecycle() {
       const service = new WebsocketService(websocketAddress.url, websocketAddress.authToken);
       setService(service);
     })();
-  }, [currentServer, setService]);
+  }, [currentServer, setScreen, setService]);
 
   useEffect(() => {
     if (!service) return;
     // register events
-    registerEvents(service);
+    registerEvents(
+      service,
+      setScreen,
+    );
     // connect to websocket
     service.connect();
 

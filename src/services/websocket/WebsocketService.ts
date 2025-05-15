@@ -71,7 +71,7 @@ export type WebsocketEvents = {
   updateToken: { token: string };
 
   requireLogin: null;
-  loginSuccess: { mainAccountId: string; LoggedInAccountIds: string[]}
+  loginSuccess: { mainAccountId: string; LoggedInAccountIds: string[] }
 }
 
 class WebsocketService {
@@ -381,14 +381,16 @@ class WebsocketService {
     const request: ResumeClientRequest = {
       token: this.authToken,
     };
-    log.debug(`📦 ResumeClientRequest: ${request}`);
+    log.debug('📦 ResumeClientRequest:', request);
     const response = await this.request(ResumeClientResponse, null, RequestMethod.RESUME_CLIENT_V1, ResumeClientRequest.toBinary(request));
     if (response.accountIds.length === 0) {
+      log.info('💡 No account available, login requires.');
       this.sendEvent('requireLogin', null);
     } else {
+      log.info(`✅ Account ${response.currentAccountId} is available (${response.accountIds.length} account(s) available)`);
       this.sendEvent('loginSuccess', {
         mainAccountId: response.currentAccountId,
-        LoggedInAccountIds: response.accountIds
+        LoggedInAccountIds: response.accountIds,
       });
     }
   }
@@ -446,11 +448,11 @@ class WebsocketService {
     this.sendEvent('updateStatus', status);
   }
 
-  registerEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void) {
+  registerEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void | Promise<void>) {
     this.emitter.on(eventName, handler);
   }
 
-  unregisterEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void) {
+  unregisterEvent<T extends keyof WebsocketEvents>(eventName: T, handler: (data: WebsocketEvents[T]) => void | Promise<void>) {
     this.emitter.off(eventName, handler);
   }
 

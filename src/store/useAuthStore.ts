@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2025. All rights reserved.
+ *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +18,24 @@
  *
  */
 
-// store.ts
 import { create } from 'zustand';
 
-export type AppScreen = 'loading' | 'onboarding' | 'auth' | 'main'
+export type AuthPage = 'login' | 'register' | 'qrcode'
 
-interface AppState {
-  screen: AppScreen;
-  prevScreen: AppScreen | null;
-  setScreen: (screen: AppScreen) => void;
+
+interface AuthState {
+  page: AuthPage;
+  prevPage: AuthPage | null;
+  navigateAuthPage: (page: AuthPage) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
-  screen: 'loading',
-  prevScreen: null,
-  setScreen: (newScreen) => {
-    const { screen } = get();
-    if (newScreen !== screen) {
-      set({ prevScreen: screen, screen: newScreen });
+export const useAuthStore = create<AuthState>((set, get) => ({
+  page: 'login',
+  prevPage: null,
+  navigateAuthPage: (newPage) => {
+    const { page } = get();
+    if (newPage !== page) {
+      set({ prevPage: page, page: newPage });
     }
   },
 }));
