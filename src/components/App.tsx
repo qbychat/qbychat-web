@@ -47,7 +47,7 @@ function App() {
     <div className="w-full h-screen overflow-hidden m-0" style={{ backgroundImage: `url("${backgroundImage}")` }}>
       {/*todo add settings for the border*/}
       <div
-        className="sm:p-0 h-full lg:m-auto lg:scale-90 lg:rounded-3xl shadow-xl backdrop-blur-sm">
+        className="sm:p-0 h-full lg:m-auto lg:scale-90 lg:rounded-3xl shadow-xl backdrop-blur-sm transition-all">
         {renderScreen()}
       </div>
     </div>

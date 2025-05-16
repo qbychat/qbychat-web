@@ -1,5 +1,19 @@
 {
   "loading.title": "正在加载QbyChat网页客户端...",
   "onboarding.server": "连接到QbyChat服务器",
-  "onboarding.server.connection.error": "连不上Websocket"
+  "onboarding.server.connection.error": "连不上Websocket",
+
+  "auth.title": "欢迎使用QbyChat",
+  "auth.continue": "继续",
+  "auth.login.tip": "请输入你的凭证以继续",
+  "auth.login.username": "用户名",
+  "auth.login.password": "密码",
+  "auth.login.go-to-register": "去注册",
+  "auth.login.qr": "二维码登录",
+
+  "auth.register.tip": "输入账户信息来注册",
+  "auth.register.username": "用户名",
+  "auth.register.password": "密码",
+  "auth.register.password.verify": "密码 (再输入一次)",
+  "auth.register.go-to-login": "去登录"
 }

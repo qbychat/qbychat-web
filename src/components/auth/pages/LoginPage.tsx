@@ -25,9 +25,15 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '@/store/useAuthStore.ts';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
 
 const LoginPage = () => {
+  const { t } = useTranslation();
+
   const navigate = useAuthStore(state => state.navigateAuthPage);
+  const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
     username: z.string().min(5).max(16),
@@ -44,13 +50,13 @@ const LoginPage = () => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // TODO login
-    console.log(values);
+    setLoading(true);
   }
 
   return (<div className="m-auto flex flex-col items-center justify-center pt-10 gap-1 w-1/5">
     <img src="/qbychat.svg" alt="QbyChat Logo" />
-    <h1 className="text-2xl lg:text-3xl">Welcome to QbyChat</h1>
-    <p>Please enter your credentials to continue</p>
+    <h1 className="text-2xl lg:text-3xl">{t('auth.title')}</h1>
+    <p className="text-[#707579] dark:text-[#aaaaaa]">{t('auth.login.tip')}</p>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full">
         <FormField
@@ -58,9 +64,9 @@ const LoginPage = () => {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>{t('auth.login.username')}</FormLabel>
               <FormControl>
-                <Input placeholder="qby" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,9 +78,9 @@ const LoginPage = () => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t('auth.login.password')}</FormLabel>
               <FormControl>
-                <Input placeholder="*****" type="password" {...field} />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -82,8 +88,12 @@ const LoginPage = () => {
         />
 
         <div className="flex flex-row justify-between mt-5">
-          <Button type="button" variant="secondary" onClick={() => navigate('register')}>Register</Button>
-          <Button type="submit">Continue</Button>
+          <Button type="button" variant="secondary" onClick={() => navigate('register')}
+                  disabled={loading}>{t('auth.login.go-to-register')}</Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Loader2 className="animate-spin" />}
+            {t('auth.continue')}
+          </Button>
         </div>
       </form>
     </Form>

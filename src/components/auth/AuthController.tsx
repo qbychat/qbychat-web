@@ -20,17 +20,19 @@
 
 import { useAuthStore } from '@/store/useAuthStore.ts';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import LoginPage from '@/components/auth/pages/LoginPage.tsx';
 import RegisterPage from '@/components/auth/pages/RegisterPage.tsx';
 
-const pageMap: Record<string, React.ReactNode> = {
-  login: <LoginPage />,
-  register: <RegisterPage />,
-  qrcode: <>QR Code Login</>,
-};
 
 const AuthController = () => {
+  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
+    login: <LoginPage />,
+    register: <RegisterPage />,
+    qrcode: <>QR Code Login</>,
+  }), []);
+
+
   const targetPage = useAuthStore(state => state.page);
   const [activePage, setActivePage] = useState(targetPage);
   const [isExiting, setIsExiting] = useState(false);
@@ -41,7 +43,7 @@ const AuthController = () => {
       const timeout = setTimeout(() => {
         setActivePage(targetPage);
         setIsExiting(false);
-      }, 300);
+      }, 200);
 
       return () => clearTimeout(timeout);
     }
@@ -55,11 +57,11 @@ const AuthController = () => {
         {!isExiting && activePage && (
           <motion.div
             key={activePage}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ position: 'absolute', width: '100%' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ width: '100%' }}
           >
             {Page}
           </motion.div>
