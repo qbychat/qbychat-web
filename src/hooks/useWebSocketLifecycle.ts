@@ -20,24 +20,25 @@
 
 import { useEffect } from 'react';
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
-import useWebSocket from '@/store/useWebSocket.ts';
+import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import useSettings from '@/store/useSettings.ts';
 
 function registerEvents(
+  serverId: number,
   service: WebsocketLifecycleService,
   setScreen: (screen: AppScreen) => void,
 ) {
 
   service.registerEvent('updateToken', async (data) => {
     await db.websocketAddresses
-      .where('url')
-      .equals(service.url)
+      .where('id')
+      .equals(serverId)
       .modify({ authToken: data.token });
   });
 
-  service.registerEvent('loginSuccess', async () => {
+  service.registerEvent('loginStateSynced', async () => {
     setScreen('main');
   });
 
@@ -48,29 +49,30 @@ function registerEvents(
 
 export function useWebSocketLifecycle() {
   const { setScreen } = useAppStore();
-  const { service, setService } = useWebSocket();
-  const currentServer = useSettings((state) => state.currentServerId);
+  const { service, setService } = useWebsocketLifecycleService();
+  const currentServerId = useSettings((state) => state.currentServerId);
 
   useEffect(() => {
     // autoconnect
-    if (!currentServer) {
+    if (!currentServerId) {
       // first run
       setScreen('onboarding');
       return;
     }
 
     (async function() {
-      const websocketAddress = await db.websocketAddresses.get(currentServer);
+      const websocketAddress = await db.websocketAddresses.get(currentServerId);
       if (!websocketAddress) return;
       const service = new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken);
       setService(service);
     })();
-  }, [currentServer, setScreen, setService]);
+  }, [currentServerId, setScreen, setService]);
 
   useEffect(() => {
-    if (!service) return;
+    if (!service || !currentServerId) return;
     // register events
     registerEvents(
+      currentServerId,
       service,
       setScreen,
     );

@@ -19,7 +19,7 @@
  */
 
 interface IWebsocketService {
-  sync: () => Promise<void>;
+  sync: (accountId: string) => Promise<void>;
 }
 
 export default IWebsocketService;

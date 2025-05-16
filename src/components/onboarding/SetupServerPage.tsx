@@ -24,14 +24,14 @@ import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
 import useSettings from '@/store/useSettings.ts';
 import { useAppStore } from '@/store/useAppStore.ts';
-import useWebSocket from '@/store/useWebSocket.ts';
+import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import { Loader2 } from 'lucide-react';
 
 const SetupServerPage = () => {
   const { t } = useTranslation();
   const settings = useSettings();
-  const setSocket = useWebSocket((state) => state.setService);
+  const setSocket = useWebsocketLifecycleService((state) => state.setService);
   const setScreen = useAppStore((state) => state.setScreen);
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');

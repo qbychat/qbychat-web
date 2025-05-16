@@ -41,7 +41,8 @@ export type WebsocketEvents = {
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
   requireLogin: null;
-  loginSuccess: { mainAccountId: string; LoggedInAccountIds: string[] };
+  loginStateSynced: { mainAccountId: string; loggedInAccountIds: string[] };
+  triggerSync: { accountId: string };
 }
 
 export interface EncryptionState {
@@ -60,7 +61,7 @@ export interface ConnectionConfig {
   maxReconnectInterval: number;
 }
 
-export interface PacketServiceInterface {
+export interface IPacketService {
   sendPacket(data: Uint8Array): void;
   request<T extends object>(
     type: MessageType<T>,

@@ -29,12 +29,12 @@ import log from 'loglevel';
 import { RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
 import { UAParser } from 'ua-parser-js';
 import { Platform } from '@/proto/qbychat/common/v1/platform';
-import { PacketServiceInterface } from '@/websocket/types.ts';
+import { IPacketService } from '@/websocket/types.ts';
 
 class ClientService implements IWebsocketService {
-  private readonly packetService: PacketServiceInterface;
+  private readonly packetService: IPacketService;
 
-  constructor(lifecycleService: PacketServiceInterface) {
+  constructor(lifecycleService: IPacketService) {
     this.packetService = lifecycleService;
   }
 

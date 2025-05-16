@@ -20,7 +20,7 @@
 import { MessageType } from '@protobuf-ts/runtime';
 import { ClientboundMessage, RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
 import log from 'loglevel';
-import { ConnectionConfig, PacketServiceInterface, WebsocketEvents } from './types';
+import { ConnectionConfig, IPacketService, WebsocketEvents } from './types';
 import WebsocketConnectionManager from './WebsocketConnectionManager.ts';
 import WebsocketEncryptionService from './WebsocketEncryptionService.ts';
 import WebsocketEventEmitter from './WebsocketEventEmitter.ts';
@@ -30,8 +30,9 @@ import WebsocketAuthService from './WebsocketAuthService.ts';
 import { KeyPair } from '@/utils/cipherUtils.ts';
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import ClientService from '@/websocket/services/ClientService.ts';
+import UserService from '@/websocket/services/UserService.ts';
 
-class WebsocketLifecycleService implements PacketServiceInterface {
+class WebsocketLifecycleService implements IPacketService {
   // Configuration
   private readonly config: ConnectionConfig;
 
@@ -43,7 +44,7 @@ class WebsocketLifecycleService implements PacketServiceInterface {
   private queueManager: WebsocketQueueManager;
   private authService: WebsocketAuthService;
 
-  private services: IWebsocketService[] = [];
+  private serviceMap = new Map<string, IWebsocketService>();
 
   private keyPair: KeyPair | undefined;
 
@@ -65,15 +66,23 @@ class WebsocketLifecycleService implements PacketServiceInterface {
       this.eventEmitter,
       this.sendPacket.bind(this),
     );
+
+    // Initialize services
+    this.registerService(new UserService(this, this.eventEmitter));
+    const clientService = this.registerService(new ClientService(this));
+
     this.authService = new WebsocketAuthService(
       this.eventEmitter,
-      this.registerService(new ClientService(this)),
+      clientService,
       authToken,
     );
 
     // Set up connection callbacks
     this.connectionManager.setOnOpenCallback(this.handleConnectionOpen.bind(this));
     this.connectionManager.setOnMessageCallback(this.handleMessage.bind(this));
+
+    // Register internal events
+    this.eventEmitter.registerEvent('triggerSync', (data) => this.sync(data.accountId));
   }
 
   /**
@@ -158,6 +167,15 @@ class WebsocketLifecycleService implements PacketServiceInterface {
   }
 
   /**
+   * Sync data from the remote
+   * */
+  private async sync(accountId: string): Promise<void> {
+    for (const service of this.serviceMap.values()) {
+      await service.sync(accountId);
+    }
+  }
+
+  /**
    * Send a packet
    */
   sendPacket(data: Uint8Array): void {
@@ -227,9 +245,22 @@ class WebsocketLifecycleService implements PacketServiceInterface {
   /**
    * Register a rpc service
    * */
-  registerService<T extends IWebsocketService>(service: T): T {
-    this.services.push(service);
-    return service;
+  registerService<T extends IWebsocketService>(instance: T): T {
+    const key = instance.constructor.name;
+    this.serviceMap.set(key, instance);
+    return instance;
+  }
+
+  /**
+   * Get a rpc service
+   * */
+  getService<T extends IWebsocketService>(ctor: { new(...args: any[]): T } | Function): T {
+    const key = typeof ctor === 'function' ? ctor.name : '';
+    const instance = this.serviceMap.get(key);
+    if (!instance) {
+      throw new Error(`Service not registered: ${key}`);
+    }
+    return instance as T;
   }
 }
 

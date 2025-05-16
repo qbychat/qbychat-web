@@ -22,13 +22,15 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
+const isProd = import.meta.env.MODE === 'production';
+
 await i18n
   .use(LanguageDetector)
   .use(HttpBackend)
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    debug: true,
+    debug: !isProd,
     interpolation: {
       escapeValue: false,
     },

@@ -19,14 +19,14 @@
  */
 
 import { useEffect } from 'react';
-import useWebSocket from '@/store/useWebSocket.ts';
+import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import { WebsocketEvents } from '@/websocket/WebsocketLifecycleService.ts';
 
 export function useWebSocketEvent<T extends keyof WebsocketEvents>(
   eventName: T,
   handler: (data: WebsocketEvents[T]) => void,
 ) {
-  const socket = useWebSocket((state) => state.service);
+  const socket = useWebsocketLifecycleService((state) => state.service);
 
   useEffect(() => {
     if (!socket) return;

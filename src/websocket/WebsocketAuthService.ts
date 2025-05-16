@@ -62,9 +62,12 @@ export class WebsocketAuthService {
       this.eventEmitter.sendEvent('requireLogin', null);
     } else {
       log.info(`✅ Account ${response.currentAccountId} is available (${response.accountIds.length} account(s) available)`);
-      this.eventEmitter.sendEvent('loginSuccess', {
+      this.eventEmitter.sendEvent('loginStateSynced', {
         mainAccountId: response.currentAccountId,
-        LoggedInAccountIds: response.accountIds,
+        loggedInAccountIds: response.accountIds,
+      });
+      this.eventEmitter.sendEvent('triggerSync', {
+        accountId: response.currentAccountId,
       });
     }
   }
