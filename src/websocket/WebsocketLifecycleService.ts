@@ -17,7 +17,6 @@
  *
  */
 
-// src/websocket/WebsocketLifecycleService.ts
 import { MessageType } from '@protobuf-ts/runtime';
 import { ClientboundMessage, RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
 import log from 'loglevel';
