@@ -17,18 +17,14 @@
  *
  */
 
-import { create } from 'zustand';
-import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
+import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common.d.ts';
 
-type WebSocketState = {
-  service: WebsocketLifecycleService | null;
+export class RPCError extends Error {
+  status: RPCResponse_Status;
 
-  setService: (socket: WebsocketLifecycleService) => void,
+  constructor(status: RPCResponse_Status, message: string | undefined) {
+    super(`${status} ${message}`);
+    this.name = 'RPCError';
+    this.status = status;
+  }
 }
-
-const useWebSocket = create<WebSocketState>((set) => ({
-  service: null,
-  setService: (socket: WebsocketLifecycleService) => set({ service: socket }),
-}));
-
-export default useWebSocket;

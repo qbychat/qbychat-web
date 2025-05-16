@@ -1,0 +1,225 @@
+/*
+ * Copyright (c) 2025. All rights reserved.
+ * This file is a part of the QbyChat project
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+// src/websocket/WebsocketLifecycleService.ts
+import { MessageType } from '@protobuf-ts/runtime';
+import { ClientboundMessage, RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
+import log from 'loglevel';
+import { ConnectionConfig, PacketServiceInterface, WebsocketEvents } from './types';
+import WebsocketConnectionManager from './WebsocketConnectionManager.ts';
+import WebsocketEncryptionService from './WebsocketEncryptionService.ts';
+import WebsocketEventEmitter from './WebsocketEventEmitter.ts';
+import WebsocketMessageHandler from './WebsocketMessageHandler.ts';
+import WebsocketQueueManager from './WebsocketQueueManager.ts';
+import WebsocketAuthService from './WebsocketAuthService.ts';
+import { KeyPair } from '@/utils/cipherUtils.ts';
+
+class WebsocketLifecycleService implements PacketServiceInterface {
+  // Configuration
+  private readonly config: ConnectionConfig;
+
+  // Service components
+  private connectionManager: WebsocketConnectionManager;
+  private encryptionService: WebsocketEncryptionService;
+  private eventEmitter: WebsocketEventEmitter;
+  private messageHandler: WebsocketMessageHandler;
+  private queueManager: WebsocketQueueManager;
+  private authService: WebsocketAuthService;
+
+  private keyPair: KeyPair | undefined;
+
+  constructor(url: string, authToken: string | null, baseReconnectInterval: number = 5000) {
+    // Create configuration
+    this.config = {
+      url,
+      authToken,
+      baseReconnectInterval,
+      maxReconnectInterval: 30000,
+    };
+
+    // Initialize components
+    this.eventEmitter = new WebsocketEventEmitter();
+    this.encryptionService = new WebsocketEncryptionService();
+    this.connectionManager = new WebsocketConnectionManager(this.config, this.eventEmitter);
+    this.queueManager = new WebsocketQueueManager();
+    this.messageHandler = new WebsocketMessageHandler(
+      this.eventEmitter,
+      this.sendPacket.bind(this),
+    );
+    this.authService = new WebsocketAuthService(
+      this.eventEmitter,
+      this,
+      authToken,
+    );
+
+    // Set up connection callbacks
+    this.connectionManager.setOnOpenCallback(this.handleConnectionOpen.bind(this));
+    this.connectionManager.setOnMessageCallback(this.handleMessage.bind(this));
+  }
+
+  /**
+   * Test the WebSocket connection
+   */
+  testConnection(): Promise<boolean> {
+    return this.connectionManager.testConnection();
+  }
+
+  /**
+   * Connect to the WebSocket server
+   */
+  connect(): void {
+    this.connectionManager.connect();
+  }
+
+  /**
+   * Close the WebSocket connection
+   */
+  close(): void {
+    this.connectionManager.close();
+    this.eventEmitter.clearAllEvents();
+  }
+
+  /**
+   * Handle WebSocket connection open event
+   */
+  private async handleConnectionOpen(): Promise<void> {
+    // Generate keypair for handshake
+    this.keyPair = this.encryptionService.generateKeyPair();
+    log.debug('✅ Created X25519 keypair');
+
+    // Create and send handshake message
+    const handshakeMessage = this.encryptionService.createHandshakeMessage(this.keyPair);
+    this.connectionManager.sendData(handshakeMessage);
+  }
+
+  /**
+   * Handle incoming WebSocket message
+   */
+  private async handleMessage(data: Uint8Array): Promise<void> {
+    // Check if handshake is completed
+    if (!this.encryptionService.isHandshakeCompleted()) {
+      // Process handshake
+      await this.encryptionService.handleHandshakeResponse(data, this.keyPair!);
+
+      // After handshake, proceed with authentication
+      if (this.encryptionService.isHandshakeCompleted()) {
+        this.eventEmitter.updateStatus('authenticating');
+        await this.authService.authenticate();
+
+        // Process queued packets
+        log.info('🚀 Begin updating data');
+        this.eventEmitter.updateStatus('updating');
+        await this.queueManager.processQueue();
+
+        // Now ready
+        log.info('✅ Websocket is ready');
+        this.eventEmitter.updateStatus('open');
+      }
+      return;
+    }
+
+    // Process regular message
+    let decryptedData: Uint8Array;
+    const isEncrypted = !!this.encryptionService.getState().chacha20Key;
+
+    if (isEncrypted) {
+      const result = this.encryptionService.decryptIncomingMessage(data);
+      if (!result.success || !result.data) {
+        log.error('❌ Failed to decrypt message');
+        return;
+      }
+      decryptedData = result.data;
+    } else {
+      decryptedData = data;
+    }
+
+    // Parse clientbound message
+    const clientboundMessage = ClientboundMessage.fromBinary(decryptedData);
+    this.messageHandler.handlePacket(clientboundMessage);
+  }
+
+  /**
+   * Send a packet
+   */
+  sendPacket(data: Uint8Array): void {
+    // Check if connected
+    if (this.connectionManager.isConnected()) {
+      let payload: Uint8Array;
+
+      if (this.encryptionService.isHandshakeCompleted()) {
+        // Encrypt payload
+        payload = this.encryptionService.encryptOutgoingMessage(data);
+      } else {
+        // Not encrypted
+        payload = data;
+      }
+
+      // Send payload
+      this.connectionManager.sendData(payload);
+    } else {
+      // Add task to queue
+      log.debug('WebSocket not connected, adding packet to queue');
+      this.queueManager.enqueueTask(() => {
+        return new Promise<void>((resolve, reject) => {
+          try {
+            this.sendPacket(data);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    }
+  }
+
+  /**
+   * Send a request and wait for response
+   */
+  async request<T extends object>(
+    type: MessageType<T>,
+    userId: string | null,
+    method: RequestMethod,
+    payload: Uint8Array | null,
+    timeout: number = 15000,
+  ): Promise<T> {
+    return this.messageHandler.request(type, userId, method, payload, timeout);
+  }
+
+  /**
+   * Register an event handler
+   */
+  registerEvent<T extends keyof WebsocketEvents>(
+    eventName: T,
+    handler: (data: WebsocketEvents[T]) => void | Promise<void>,
+  ): void {
+    this.eventEmitter.registerEvent(eventName, handler);
+  }
+
+  /**
+   * Unregister an event handler
+   */
+  unregisterEvent<T extends keyof WebsocketEvents>(
+    eventName: T,
+    handler: (data: WebsocketEvents[T]) => void | Promise<void>,
+  ): void {
+    this.eventEmitter.unregisterEvent(eventName, handler);
+  }
+}
+
+export default WebsocketLifecycleService;

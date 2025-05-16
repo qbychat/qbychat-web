@@ -22,11 +22,11 @@ import { useEffect } from 'react';
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
 import { db } from '@/db.ts';
-import WebsocketService from '@/services/websocket/WebsocketService.ts';
+import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import useSettings from '@/store/useSettings.ts';
 
 function registerEvents(
-  service: WebsocketService,
+  service: WebsocketLifecycleService,
   setScreen: (screen: AppScreen) => void,
 ) {
 
@@ -62,7 +62,7 @@ export function useWebSocketLifecycle() {
     (async function() {
       const websocketAddress = await db.websocketAddresses.get(currentServer);
       if (!websocketAddress) return;
-      const service = new WebsocketService(websocketAddress.url, websocketAddress.authToken);
+      const service = new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken);
       setService(service);
     })();
   }, [currentServer, setScreen, setService]);

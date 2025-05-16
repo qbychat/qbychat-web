@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2025. All rights reserved.
+ *
  * This file is a part of the QbyChat project
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,15 +17,3 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
-
-export class RPCError extends Error {
-  status: RPCResponse_Status;
-
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(`${status} ${message}`);
-    this.name = 'RPCError';
-    this.status = status;
-  }
-}

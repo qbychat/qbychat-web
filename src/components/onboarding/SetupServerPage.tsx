@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import useSettings from '@/store/useSettings.ts';
 import { useAppStore } from '@/store/useAppStore.ts';
 import useWebSocket from '@/store/useWebSocket.ts';
-import WebsocketService from '@/services/websocket/WebsocketService.ts';
+import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import { Loader2 } from 'lucide-react';
 
 const SetupServerPage = () => {
@@ -40,7 +40,7 @@ const SetupServerPage = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // create websocketService
-    const service = new WebsocketService(address, null);
+    const service = new WebsocketLifecycleService(address, null);
     // test connect
     setLoading(true);
     if (!await service.testConnection()) {

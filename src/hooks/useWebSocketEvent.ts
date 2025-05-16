@@ -20,7 +20,7 @@
 
 import { useEffect } from 'react';
 import useWebSocket from '@/store/useWebSocket.ts';
-import { WebsocketEvents } from '@/services/websocket/WebsocketService.ts';
+import { WebsocketEvents } from '@/websocket/WebsocketLifecycleService.ts';
 
 export function useWebSocketEvent<T extends keyof WebsocketEvents>(
   eventName: T,
