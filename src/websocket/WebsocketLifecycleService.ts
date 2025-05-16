@@ -28,6 +28,8 @@ import WebsocketMessageHandler from './WebsocketMessageHandler.ts';
 import WebsocketQueueManager from './WebsocketQueueManager.ts';
 import WebsocketAuthService from './WebsocketAuthService.ts';
 import { KeyPair } from '@/utils/cipherUtils.ts';
+import IWebsocketService from '@/websocket/IWebsocketService.ts';
+import ClientService from '@/websocket/services/ClientService.ts';
 
 class WebsocketLifecycleService implements PacketServiceInterface {
   // Configuration
@@ -36,10 +38,12 @@ class WebsocketLifecycleService implements PacketServiceInterface {
   // Service components
   private connectionManager: WebsocketConnectionManager;
   private encryptionService: WebsocketEncryptionService;
-  private eventEmitter: WebsocketEventEmitter;
+  private readonly eventEmitter: WebsocketEventEmitter;
   private messageHandler: WebsocketMessageHandler;
   private queueManager: WebsocketQueueManager;
   private authService: WebsocketAuthService;
+
+  private services: IWebsocketService[] = [];
 
   private keyPair: KeyPair | undefined;
 
@@ -63,7 +67,7 @@ class WebsocketLifecycleService implements PacketServiceInterface {
     );
     this.authService = new WebsocketAuthService(
       this.eventEmitter,
-      this,
+      this.registerService(new ClientService(this)),
       authToken,
     );
 
@@ -218,6 +222,14 @@ class WebsocketLifecycleService implements PacketServiceInterface {
     handler: (data: WebsocketEvents[T]) => void | Promise<void>,
   ): void {
     this.eventEmitter.unregisterEvent(eventName, handler);
+  }
+
+  /**
+   * Register a rpc service
+   * */
+  registerService<T extends IWebsocketService>(service: T): T {
+    this.services.push(service);
+    return service;
   }
 }
 

@@ -18,31 +18,22 @@
  *
  */
 
-import {
-  RegisterClientRequest,
-  RegisterClientResponse,
-  ResumeClientRequest,
-  ResumeClientResponse,
-} from '@/proto/qbychat/websocket/session/v1/service';
-import { RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
-import { Platform } from '@/proto/qbychat/common/v1/platform';
-import { UAParser } from 'ua-parser-js';
 import log from 'loglevel';
-import { PacketServiceInterface } from './types';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
+import ClientService from '@/websocket/services/ClientService.ts';
 
 export class WebsocketAuthService {
   private eventEmitter: WebsocketEventEmitter;
-  private packetService: PacketServiceInterface;
+  private clientService: ClientService;
   private authToken: string | null;
 
   constructor(
     eventEmitter: WebsocketEventEmitter,
-    packetService: PacketServiceInterface,
-    authToken: string | null
+    clientService: ClientService,
+    authToken: string | null,
   ) {
     this.eventEmitter = eventEmitter;
-    this.packetService = packetService;
+    this.clientService = clientService;
     this.authToken = authToken;
   }
 
@@ -64,17 +55,7 @@ export class WebsocketAuthService {
     if (!this.authToken) throw new Error('Auth token is missing');
 
     log.info('🚀 Start to resume session');
-    const request: ResumeClientRequest = {
-      token: this.authToken,
-    };
-
-    log.debug('📦 ResumeClientRequest:', request);
-    const response = await this.packetService.request<ResumeClientResponse>(
-      ResumeClientResponse,
-      null,
-      RequestMethod.RESUME_CLIENT_V1,
-      ResumeClientRequest.toBinary(request)
-    );
+    const response = await this.clientService.resumeClient(this.authToken);
 
     if (response.accountIds.length === 0) {
       log.info('💡 No account available, login requires.');
@@ -92,32 +73,7 @@ export class WebsocketAuthService {
    * Register a new client
    */
   private async registerClient(): Promise<void> {
-    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-
-    if (!isBrowser) {
-      throw new Error('Nodejs is currently unsupported');
-    }
-
-    // parse User-Agent
-    const ua = UAParser(navigator.userAgent);
-
-    const request: RegisterClientRequest = {
-      clientMetadata: {
-        clientName: __APP_NAME__,
-        clientVersion: __APP_VERSION__,
-        platform: Platform.BROWSER,
-        platformDetails: `${ua.browser.name} v${ua.browser.version} on ${ua.os.name}`,
-      },
-    };
-
-    // send request
-    log.info('🚀 Begin Registering client', request);
-    const response = await this.packetService.request<RegisterClientResponse>(
-      RegisterClientResponse,
-      null,
-      RequestMethod.REGISTER_CLIENT_V1,
-      RegisterClientRequest.toBinary(request)
-    );
+    const response = await this.clientService.registerClient();
 
     log.info('📥 Successfully registered client');
     log.debug(`📥 Client authToken: ${response.token}`);
@@ -130,20 +86,6 @@ export class WebsocketAuthService {
 
     // Update the auth token for future use
     this.authToken = response.token;
-  }
-
-  /**
-   * Get current auth token
-   */
-  getAuthToken(): string | null {
-    return this.authToken;
-  }
-
-  /**
-   * Set auth token
-   */
-  setAuthToken(token: string | null): void {
-    this.authToken = token;
   }
 }
 

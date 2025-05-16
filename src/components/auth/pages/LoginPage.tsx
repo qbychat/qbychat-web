@@ -51,6 +51,7 @@ const LoginPage = () => {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // TODO login
     setLoading(true);
+    console.log(values);
   }
 
   return (<div className="m-auto flex flex-col items-center justify-center pt-10 gap-1 w-1/5">
