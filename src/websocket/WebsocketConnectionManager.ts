@@ -22,6 +22,8 @@ import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
 import { ConnectionConfig } from './types';
 import { blobToByteArray } from '@/utils/binaryUtils';
+import { ClientDiscoveryConfig, fetchClientDiscovery } from '@/well-known/discovery.ts';
+import axios from 'axios';
 
 export class WebsocketConnectionManager {
   private socket: WebSocket | null = null;
@@ -31,6 +33,7 @@ export class WebsocketConnectionManager {
   private reconnectInterval: number;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private shouldReconnect: boolean = true;
+  private discoveryConfig: ClientDiscoveryConfig | null = null;
 
   // Callbacks that will be injected from the main service
   private onOpenCallback: (() => void) | null = null;
@@ -59,14 +62,16 @@ export class WebsocketConnectionManager {
   /**
    * Test connection to the WebSocket server
    */
-  testConnection(): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
+  async testConnection(): Promise<boolean> {
+    // receive config
+    const discoveryConfig = await this.receiveConfig();
+    return await new Promise<boolean>((resolve) => {
       if (this.socket !== null && this.socket.readyState === WebSocket.OPEN) {
         resolve(true); // already connected
         return;
       }
 
-      const socket = new WebSocket(this.config.url);
+      const socket = new WebSocket(discoveryConfig.websocketAddress);
 
       const timeoutId = setTimeout(() => {
         socket.close();
@@ -94,13 +99,14 @@ export class WebsocketConnectionManager {
   /**
    * Connect to the WebSocket server
    */
-  connect(): void {
+  async connect(): Promise<void> {
     if (this.socket !== null) {
       return; // already connected
     }
+    const discoveryConfig = await this.receiveConfig();
 
     // create socket
-    this.socket = new WebSocket(this.config.url);
+    this.socket = new WebSocket(discoveryConfig.websocketAddress);
     this.eventEmitter.updateStatus('connecting');
 
     log.info(`🚀 Start connecting to websocket ${this.config.url}`);
@@ -174,6 +180,16 @@ export class WebsocketConnectionManager {
     // update status
     this.eventEmitter.updateStatus('waiting');
     this.reconnectTimer = setTimeout(() => this.connect(), this.reconnectInterval);
+  }
+
+  private async receiveConfig() {
+    if (this.discoveryConfig === null) {
+      const axiosInstance = axios.create({
+        baseURL: this.config.url,
+      });
+      this.discoveryConfig = await fetchClientDiscovery(axiosInstance);
+    }
+    return this.discoveryConfig;
   }
 
   /**

@@ -40,38 +40,43 @@ const SetupServerPage = () => {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // create websocketService
-    const service = new WebsocketLifecycleService(address, null);
-    // test connect
     setLoading(true);
     setError('');
-    if (!await service.testConnection()) {
+    try {
+      // create websocketService
+      const service = new WebsocketLifecycleService(address, null);
+      // test connect
+      if (!await service.testConnection()) {
+        setLoading(false);
+        setError(t('onboarding.server.connection.error.ws'));
+        return;
+      }
+      // register the socket
+      const id = await db.remoteServer.add({
+        url: address,
+        authToken: null,
+      });
+      // trigger connect in App.tsx
+      settings.setCurrentServerId(id);
+      setSocket(service);
+      setScreen('auth');
+    } catch {
       setLoading(false);
-      setError(t('onboarding.server.connection.error'));
-      return;
+      setError(t('onboarding.server.connection.error.discovery'));
     }
-    // register the socket
-    const id = await db.websocketAddresses.add({
-      url: address,
-      authToken: null,
-    });
-    // trigger connect in App.tsx
-    settings.setCurrentServerId(id);
-    setSocket(service);
-    setScreen('auth');
   };
 
   return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
     <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.server')}</h1>
-    <AnimatedErrorMessage error={error}/>
+    <AnimatedErrorMessage error={error} />
     <form className="mt-5 flex w-full max-w-sm items-center space-x-2" onSubmit={onSubmit}>
       <Input type="url"
              value={address}
              onChange={(e) => setAddress(e.target.value)}
-             placeholder="ws://example.com/ws"
-             required/>
+             placeholder="https://cubewhy.org"
+             required />
       <Button type="submit" disabled={loading}>
-        {loading && <Loader2 className="animate-spin"/>}
+        {loading && <Loader2 className="animate-spin" />}
         {t('onboarding.server.connect')}
       </Button>
     </form>

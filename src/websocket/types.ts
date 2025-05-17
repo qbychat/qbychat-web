@@ -22,6 +22,7 @@ import { RPCResponse } from '@/proto/qbychat/websocket/protocol/v1/common';
 import SlidingWindow from '@/websocket/SlidingWindow';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/websocket/errors/RPCError';
+import { ClientDiscoveryConfig } from '@/well-known/discovery.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -64,11 +65,12 @@ export interface ConnectionConfig {
 
 export interface IPacketService {
   sendPacket(data: Uint8Array): void;
+
   request<T extends object>(
     type: MessageType<T>,
     userId: string | null,
     method: number,
     payload: Uint8Array | null,
-    timeout?: number
+    timeout?: number,
   ): Promise<T>;
 }

@@ -95,8 +95,8 @@ class WebsocketLifecycleService implements IPacketService {
   /**
    * Connect to the WebSocket server
    */
-  connect(): void {
-    this.connectionManager.connect();
+  async connect(): Promise<void> {
+    await this.connectionManager.connect();
   }
 
   /**
@@ -256,7 +256,7 @@ class WebsocketLifecycleService implements IPacketService {
   /**
    * Get a rpc service
    * */
-  getService<T extends IWebsocketService>(ctor: { new(...args: any[]): T } | Function): T {
+  getService<T extends IWebsocketService>(ctor: { new(...args: never[]): T }): T {
     const key = typeof ctor === 'function' ? ctor.name : '';
     const instance = this.serviceMap.get(key);
     if (!instance) {

@@ -19,19 +19,19 @@
 
 import Dexie, { Table } from 'dexie';
 
-export interface WebSocketAddress {
+export interface RemoteServer {
   id?: number;
   url: string;
   authToken: string | null;
 }
 
 export class AppDB extends Dexie {
-  websocketAddresses!: Table<WebSocketAddress>;
+  remoteServer!: Table<RemoteServer>;
 
   constructor() {
     super('AppDB');
     this.version(1).stores({
-      websocketAddresses: '++id,url,authToken',
+      remoteServer: '++id,url,authToken',
     });
   }
 }

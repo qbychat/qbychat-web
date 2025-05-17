@@ -18,7 +18,7 @@
  *
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
 import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import { db } from '@/db.ts';
@@ -33,7 +33,7 @@ function registerEvents(
 ) {
 
   service.registerEvent('updateToken', async (data) => {
-    await db.websocketAddresses
+    await db.remoteServer
       .where('id')
       .equals(serverId)
       .modify({ authToken: data.token });
@@ -52,24 +52,39 @@ function registerEvents(
 
 export function useWebSocketLifecycle() {
   const { setScreen, screen } = useAppStore();
-  const { service, setService } = useWebsocketLifecycleService();
+  const setService = useWebsocketLifecycleService(state => state.setService);
   const currentServerId = useSettings((state) => state.currentServerId);
 
+  const [websocketAddress, setWebsocketAddress] = useState<{ url: string; authToken: string | null } | null>(null);
+
   useEffect(() => {
-    // autoconnect
     if (!currentServerId) {
-      // first run
       setScreen('onboarding');
+      setWebsocketAddress(null);
       return;
     }
 
-    (async function() {
-      const websocketAddress = await db.websocketAddresses.get(currentServerId);
-      if (!websocketAddress) return;
-      const service = new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken);
-      setService(service);
+    (async () => {
+      const addr = await db.remoteServer.get(currentServerId);
+      if (!addr) {
+        setScreen('onboarding');
+        setWebsocketAddress(null);
+        return;
+      }
+      setWebsocketAddress(addr);
     })();
-  }, [currentServerId, setScreen, setService]);
+  }, [currentServerId, setScreen]);
+
+  const service = useMemo(() => {
+    if (!websocketAddress) return null;
+    return new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken);
+  }, [websocketAddress]);
+
+  useEffect(() => {
+    if (service) {
+      setService(service);
+    }
+  }, [service, setService]);
 
   useEffect(() => {
     if (!service || !currentServerId) return;
@@ -81,10 +96,12 @@ export function useWebSocketLifecycle() {
       setScreen,
     );
     // connect to websocket
-    service.connect();
+    (async function() {
+      await service.connect();
+    })();
 
     return () => {
       service.close();
     };
-  }, [service, setScreen]);
+  }, [service]);
 }

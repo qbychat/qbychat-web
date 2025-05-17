@@ -1,7 +1,8 @@
 {
   "loading.title": "Loading QbyChat client for the browsers...",
   "onboarding.server": "Setup a QbyChat server",
-  "onboarding.server.connection.error": "Failed to establish connection to the websocket",
+  "onboarding.server.connection.error.ws": "Failed to establish connection to the websocket",
+  "onboarding.server.connection.error.discovery": "Cannot fetch the websocket address",
   "onboarding.server.connect": "Connect",
 
   "auth.title": "Welcome to QbyChat",
