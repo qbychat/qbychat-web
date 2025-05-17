@@ -25,7 +25,7 @@ export default function LoadingAnimation() {
 
   return (
     <motion.div
-      className="flex select-none justify-center text-center items-center text-2xl h-screen animate-pulse"
+      className="flex select-none justify-center text-center items-center text-2xl h-full animate-pulse"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

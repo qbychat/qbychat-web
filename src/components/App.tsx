@@ -47,7 +47,7 @@ function App() {
   if (isElectron) {
     // remove container for the desktop client
     return (
-      <div className="w-full min-h-screen overflow-hidden m-0">
+      <div className="w-full h-screen overflow-hidden m-0">
         {renderScreen()}
       </div>
     );
