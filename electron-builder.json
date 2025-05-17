@@ -1,0 +1,32 @@
+{
+  "appId": "org.cubewhy.qbychat",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "extraMetadata": {
+    "main": "main.js"
+  },
+  "files": [
+    "dist/**",
+    {
+      "from": ".tmp/dist-electron",
+      "to": "./",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ],
+  "mac": {
+    "target": "dmg"
+  },
+  "linux": {
+    "target": "AppImage",
+    "category": "Utility"
+  },
+  "win": {
+    "target": [
+      "portable",
+      "msi"
+    ]
+  }
+}

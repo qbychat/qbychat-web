@@ -18,8 +18,11 @@
  */
 import sodium from 'libsodium-wrappers-sumo';
 import { EncryptedMessage } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
+import log from 'loglevel';
 
-await sodium.ready; // Ensure sodium is initialized
+sodium.ready.then(() => {
+  log.info('Loaded sodium');
+}); // Ensure sodium is initialized
 
 export interface KeyPair {
   publicKey: Uint8Array;

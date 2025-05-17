@@ -1,5 +1,4 @@
 /src/proto
-/out
 # Logs
 logs
 *.log
@@ -9,8 +8,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+/.tmp
+
 node_modules
 dist
+dist-electron
 dist-ssr
 *.local
 

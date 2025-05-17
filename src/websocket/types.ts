@@ -43,6 +43,7 @@ export type WebsocketEvents = {
   requireLogin: null;
   loginStateSynced: { mainAccountId: string; loggedInAccountIds: string[] };
   triggerSync: { accountId: string };
+  syncCompleted: { accountId: string };
 }
 
 export interface EncryptionState {

@@ -18,6 +18,6 @@
  */
 
 import log from 'loglevel';
+import { isProd } from '@/env.ts';
 
-const isProd = import.meta.env.MODE === 'production';
 log.setLevel(isProd ? 'warn' : 'debug');

@@ -17,14 +17,29 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common';
+import { AnimatePresence, motion } from 'framer-motion';
 
-export class RPCError extends Error {
-  status: RPCResponse_Status;
-
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(`${status} ${message}`);
-    this.name = 'RPCError';
-    this.status = status;
-  }
+type Props = {
+  error: string;
 }
+
+const AnimatedErrorMessage = ({ error }: Props) => {
+  return (
+    <AnimatePresence>
+      {error && (
+        <motion.p
+          key="error"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{ duration: 0.2 }}
+          className="text-red-500"
+        >
+          {error}
+        </motion.p>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default AnimatedErrorMessage;

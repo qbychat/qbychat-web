@@ -2,6 +2,7 @@
   "loading.title": "正在加载QbyChat网页客户端...",
   "onboarding.server": "连接到QbyChat服务器",
   "onboarding.server.connection.error": "连不上Websocket",
+  "onboarding.server.connect": "Connect",
 
   "auth.title": "欢迎使用QbyChat",
   "auth.continue": "继续",

@@ -170,9 +170,11 @@ class WebsocketLifecycleService implements IPacketService {
    * Sync data from the remote
    * */
   private async sync(accountId: string): Promise<void> {
+    log.info(`🚀 Start sync data for account ${accountId}`);
     for (const service of this.serviceMap.values()) {
       await service.sync(accountId);
     }
+    this.eventEmitter.sendEvent('syncCompleted', { accountId });
   }
 
   /**

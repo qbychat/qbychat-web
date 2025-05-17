@@ -17,14 +17,27 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common';
+import React from 'react';
 
-export class RPCError extends Error {
-  status: RPCResponse_Status;
-
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(`${status} ${message}`);
-    this.name = 'RPCError';
-    this.status = status;
-  }
+type Props = {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
 }
+
+const AuthLayout = ({ title, subtitle, children }: Props) => {
+  return (
+    <div className="mx-auto flex flex-col items-center justify-center pt-10 px-4 sm:px-6 lg:px-8 w-full max-w-xl">
+      <img src="/qbychat.svg" alt="QbyChat Logo" className="size-50 mb-4"/>
+      <h1 className="text-2xl lg:text-3xl font-semibold text-center">{title}</h1>
+      {subtitle && (
+        <p className="text-[#707579] dark:text-[#aaaaaa] text-center text-sm">
+          {subtitle}
+        </p>
+      )}
+      <div className="w-full mt-6">{children}</div>
+    </div>
+  );
+};
+
+export default AuthLayout;

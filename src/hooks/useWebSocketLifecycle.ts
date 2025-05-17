@@ -28,6 +28,7 @@ import useSettings from '@/store/useSettings.ts';
 function registerEvents(
   serverId: number,
   service: WebsocketLifecycleService,
+  screen: AppScreen,
   setScreen: (screen: AppScreen) => void,
 ) {
 
@@ -38,8 +39,10 @@ function registerEvents(
       .modify({ authToken: data.token });
   });
 
-  service.registerEvent('loginStateSynced', async () => {
-    setScreen('main');
+  service.registerEvent('syncCompleted', async () => {
+    if (screen === 'auth' || screen === 'loading') {
+      setScreen('main');
+    }
   });
 
   service.registerEvent('requireLogin', async () => {
@@ -48,7 +51,7 @@ function registerEvents(
 }
 
 export function useWebSocketLifecycle() {
-  const { setScreen } = useAppStore();
+  const { setScreen, screen } = useAppStore();
   const { service, setService } = useWebsocketLifecycleService();
   const currentServerId = useSettings((state) => state.currentServerId);
 
@@ -74,6 +77,7 @@ export function useWebSocketLifecycle() {
     registerEvents(
       currentServerId,
       service,
+      screen,
       setScreen,
     );
     // connect to websocket

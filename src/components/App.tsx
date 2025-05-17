@@ -23,6 +23,7 @@ import backgroundImage from '@/assets/background.svg';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import AuthController from '@/components/auth/AuthController.tsx';
+import { isElectron } from '@/env.ts';
 
 function App() {
   const screen = useAppStore(state => state.screen);
@@ -32,16 +33,25 @@ function App() {
   const renderScreen = () => {
     switch (screen) {
       case 'loading':
-        return <LoadingAnimation />;
+        return <LoadingAnimation/>;
       case 'onboarding':
         // TODO use onboarding controller
-        return <SetupServerPage />;
+        return <SetupServerPage/>;
       case 'auth':
-        return <AuthController />;
+        return <AuthController/>;
       case 'main':
         return <h1>main</h1>;
     }
   };
+
+  if (isElectron) {
+    // remove container for the desktop client
+    return (
+      <div className="w-full min-h-screen overflow-hidden m-0">
+        {renderScreen()}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen overflow-hidden m-0" style={{ backgroundImage: `url("${backgroundImage}")` }}>

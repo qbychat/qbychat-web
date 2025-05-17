@@ -21,10 +21,11 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
+import log from 'loglevel';
 
 const isProd = import.meta.env.MODE === 'production';
 
-await i18n
+i18n
   .use(LanguageDetector)
   .use(HttpBackend)
   .use(initReactI18next)
@@ -37,6 +38,8 @@ await i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-  });
+  }).then(() => {
+    log.info('Loaded i18n');
+});
 
 export default i18n;

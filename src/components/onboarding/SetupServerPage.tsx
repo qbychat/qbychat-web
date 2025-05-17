@@ -27,6 +27,7 @@ import { useAppStore } from '@/store/useAppStore.ts';
 import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import { Loader2 } from 'lucide-react';
+import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 
 const SetupServerPage = () => {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ const SetupServerPage = () => {
     const service = new WebsocketLifecycleService(address, null);
     // test connect
     setLoading(true);
+    setError('');
     if (!await service.testConnection()) {
       setLoading(false);
       setError(t('onboarding.server.connection.error'));
@@ -61,7 +63,7 @@ const SetupServerPage = () => {
 
   return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
     <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.server')}</h1>
-    {error && <p className="text-red-500 mt-1">{error}</p>}
+    <AnimatedErrorMessage error={error}/>
     <form className="mt-5 flex w-full max-w-sm items-center space-x-2" onSubmit={onSubmit}>
       <Input type="url"
              value={address}
@@ -70,7 +72,7 @@ const SetupServerPage = () => {
              required/>
       <Button type="submit" disabled={loading}>
         {loading && <Loader2 className="animate-spin"/>}
-        Connect
+        {t('onboarding.server.connect')}
       </Button>
     </form>
   </div>);

@@ -31,7 +31,8 @@ import { Loader2 } from 'lucide-react';
 import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service';
-import { AnimatePresence, motion } from 'framer-motion';
+import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
+import AuthLayout from '@/components/auth/AuthLayout.tsx';
 
 const RegisterPage = () => {
   const { t } = useTranslation();
@@ -86,26 +87,14 @@ const RegisterPage = () => {
     }
   }
 
-  return (<div className="m-auto flex flex-col items-center justify-center pt-10 gap-1 w-1/2 md:w-1/3 lg:w-1/5">
-    <img src="/qbychat.svg" alt="QbyChat Logo" />
-    <h1 className="text-2xl lg:text-3xl">{t('auth.title')}</h1>
-    <p className="text-[#707579] dark:text-[#aaaaaa]">{t('auth.register.tip')}</p>
+  return (<AuthLayout title={t('auth.title')} subtitle={t('auth.register.tip')}>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full">
-        <AnimatePresence>
-          {error && (
-            <motion.p
-              key="error"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.2 }}
-              className="text-red-500"
-            >
-              {error}
-            </motion.p>
-          )}
-        </AnimatePresence>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-6 w-full space-y-3"
+      >
+        <AnimatedErrorMessage error={error}/>
+
         <FormField
           control={form.control}
           name="username"
@@ -115,7 +104,7 @@ const RegisterPage = () => {
               <FormControl>
                 <Input {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -129,7 +118,7 @@ const RegisterPage = () => {
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -143,22 +132,34 @@ const RegisterPage = () => {
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
 
-        <div className="flex flex-row justify-between mt-5">
-          <Button type="button" variant="secondary" onClick={() => navigate('login')}
-                  disabled={loading}>{t('auth.register.go-to-login')}</Button>
-          <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => navigate('login')}
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
+            {t('auth.register.go-to-login')}
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
+            {loading && <Loader2 className="animate-spin mr-2"/>}
             {t('auth.continue')}
           </Button>
         </div>
       </form>
     </Form>
-  </div>);
+  </AuthLayout>);
+
 };
 
 export default RegisterPage;

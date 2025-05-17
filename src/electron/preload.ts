@@ -17,14 +17,4 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common';
-
-export class RPCError extends Error {
-  status: RPCResponse_Status;
-
-  constructor(status: RPCResponse_Status, message: string | undefined) {
-    super(`${status} ${message}`);
-    this.name = 'RPCError';
-    this.status = status;
-  }
-}
+console.log('welcome to electron!');

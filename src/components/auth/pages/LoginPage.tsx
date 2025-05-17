@@ -28,6 +28,7 @@ import { useAuthStore } from '@/store/useAuthStore.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
+import AuthLayout from '@/components/auth/AuthLayout.tsx';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -54,12 +55,9 @@ const LoginPage = () => {
     console.log(values);
   }
 
-  return (<div className="m-auto flex flex-col items-center justify-center pt-10 gap-1 w-1/5">
-    <img src="/qbychat.svg" alt="QbyChat Logo" />
-    <h1 className="text-2xl lg:text-3xl">{t('auth.title')}</h1>
-    <p className="text-[#707579] dark:text-[#aaaaaa]">{t('auth.login.tip')}</p>
+  return (<AuthLayout title={t('auth.title')} subtitle={t('auth.login.tip')}>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full space-y-3">
         <FormField
           control={form.control}
           name="username"
@@ -69,7 +67,7 @@ const LoginPage = () => {
               <FormControl>
                 <Input {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -83,7 +81,7 @@ const LoginPage = () => {
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
-              <FormMessage />
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -92,13 +90,13 @@ const LoginPage = () => {
           <Button type="button" variant="secondary" onClick={() => navigate('register')}
                   disabled={loading}>{t('auth.login.go-to-register')}</Button>
           <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />}
+            {loading && <Loader2 className="animate-spin"/>}
             {t('auth.continue')}
           </Button>
         </div>
       </form>
     </Form>
-  </div>);
+  </AuthLayout>);
 };
 
 export default LoginPage;
