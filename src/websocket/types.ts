@@ -22,7 +22,6 @@ import { RPCResponse } from '@/proto/qbychat/websocket/protocol/v1/common';
 import SlidingWindow from '@/websocket/SlidingWindow';
 import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/websocket/errors/RPCError';
-import { ClientDiscoveryConfig } from '@/well-known/discovery.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
