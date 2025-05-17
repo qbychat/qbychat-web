@@ -6,6 +6,9 @@
   "extraMetadata": {
     "main": "main.js"
   },
+  "extraResources": [
+    "resources/**"
+  ],
   "files": [
     "dist/**",
     {

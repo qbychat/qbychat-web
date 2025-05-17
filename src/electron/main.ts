@@ -21,20 +21,24 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 
 function createWindow() {
-  let preload: string;
+  let preloadPath: string;
+  let iconPath: string;
   if (!app.isPackaged) {
-    preload = path.resolve(app.getAppPath(), '.tmp/dist-electron/preload.js');
+    preloadPath = path.resolve(app.getAppPath(), '.tmp/dist-electron/preload.js');
+    iconPath = path.resolve(app.getAppPath(), 'resources/icon.png');
   } else {
-    preload = path.resolve(app.getAppPath(), 'preload.js');
+    preloadPath = path.resolve(app.getAppPath(), 'preload.js');
+    iconPath = path.resolve(app.getAppPath(), 'icon.png');
   }
 
   const win = new BrowserWindow({
     webPreferences: {
-      preload: preload,
+      preload: preloadPath,
       devTools: true,
       sandbox: false,
       contextIsolation: true,
     },
+    icon: iconPath,
     autoHideMenuBar: true,
     width: 1200,
     height: 650,
