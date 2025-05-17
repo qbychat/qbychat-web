@@ -20,9 +20,6 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
-const fs = require('node:fs');
-
-const electronDistPath = path.resolve(__dirname, '../node_modules/electron/dist');
 
 function runScript(relativePath) {
   const fullPath = path.resolve(__dirname, relativePath);
@@ -33,9 +30,7 @@ function runScript(relativePath) {
 
 try {
   runScript('gen-proto.cjs');
-  if (!fs.existsSync(electronDistPath)) {
-    runScript('../node_modules/electron/install.js');
-  }
+  runScript('../node_modules/electron/install.js');
   console.log('[postinstall] Done.');
 } catch (err) {
   console.error('[postinstall] Failed:', err);

@@ -11,7 +11,6 @@
     "electron:dist:mac": "pnpm run transpile:electron && npm run build && electron-builder --mac --arm64",
     "electron:dist:win": "pnpm run transpile:electron && npm run build && electron-builder --win --x64",
     "electron:dist:linux": "pnpm run transpile:electron && npm run build && electron-builder --linux --x64",
-
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -87,8 +86,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "electron",
-      "electron-winstaller",
+      "@tsparticles/engine",
       "esbuild",
       "protobufjs"
     ]
