@@ -174,6 +174,7 @@ class WebsocketLifecycleService implements IPacketService {
     for (const service of this.serviceMap.values()) {
       await service.sync(accountId);
     }
+    log.info(`✅ Sync completed (account: ${accountId})`);
     this.eventEmitter.sendEvent('syncCompleted', { accountId });
   }
 
