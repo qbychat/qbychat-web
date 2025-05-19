@@ -1,0 +1,10 @@
+version: v2
+clean: true
+
+plugins:
+  - remote: buf.build/bufbuild/es:v2.4.0
+    out: src/proto
+
+inputs:
+  - git_repo: https://github.com/qbychat/qbychat-proto.git
+    branch: main

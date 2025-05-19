@@ -18,10 +18,11 @@
  *
  */
 
-import { RPCResponse } from '@/proto/qbychat/websocket/protocol/v1/common';
 import SlidingWindow from '@/websocket/SlidingWindow';
-import { MessageType } from '@protobuf-ts/runtime';
 import { RPCError } from '@/websocket/errors/RPCError';
+import { Message } from '@bufbuild/protobuf';
+import { GenMessage } from '@bufbuild/protobuf/codegenv1';
+import { RPCResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -65,8 +66,8 @@ export interface ConnectionConfig {
 export interface IPacketService {
   sendPacket(data: Uint8Array): void;
 
-  request<T extends object>(
-    type: MessageType<T>,
+  request<T extends Message>(
+    type: GenMessage<T>,
     userId: string | null,
     method: number,
     payload: Uint8Array | null,

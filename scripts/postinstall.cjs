@@ -29,7 +29,6 @@ function runScript(relativePath) {
 
 
 try {
-  runScript('gen-proto.cjs');
   runScript('../node_modules/electron/install.js');
   console.log('[postinstall] Done.');
 } catch (err) {

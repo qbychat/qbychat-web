@@ -18,11 +18,6 @@
  *
  */
 
-import {
-  EncryptedMessage,
-  ClientboundHandshake,
-  ServerboundHandshake,
-} from '@/proto/qbychat/websocket/protocol/v1/common';
 import { EncryptionState } from './types';
 import SlidingWindow from '@/websocket/SlidingWindow';
 import log from 'loglevel';
@@ -34,6 +29,12 @@ import {
   KeyPair,
   performKeyExchange,
 } from '@/utils/cipherUtils';
+import {
+  ClientboundHandshakeSchema,
+  EncryptedMessageSchema,
+  ServerboundHandshakeSchema,
+} from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
 
 export class WebsocketEncryptionService {
   private readonly state: EncryptionState;
@@ -60,20 +61,20 @@ export class WebsocketEncryptionService {
    * Create handshake message
    */
   createHandshakeMessage(keyPair: KeyPair): Uint8Array {
-    const handshake: ServerboundHandshake = {
+    const handshake = create(ServerboundHandshakeSchema, {
       encryptionInfo: {
         publicKey: keyPair.publicKey,
         chacha20KeyInfo: this.state.chacha20KeyInfo,
       },
-    };
-    return ServerboundHandshake.toBinary(handshake);
+    });
+    return toBinary(ServerboundHandshakeSchema, handshake);
   }
 
   /**
    * Handle handshake response
    */
   async handleHandshakeResponse(bytes: Uint8Array, keyPair: KeyPair): Promise<void> {
-    const clientboundHandshake = ClientboundHandshake.fromBinary(bytes);
+    const clientboundHandshake = fromBinary(ClientboundHandshakeSchema, bytes);
     log.debug('📥 Received handshake packet:', clientboundHandshake);
 
     const encryptionInfo = clientboundHandshake.encryptionInfo;
@@ -85,7 +86,7 @@ export class WebsocketEncryptionService {
       // calculate ChaCha20 key
       this.state.chacha20Key = await deriveChaCha20Key(
         sharedSecret,
-        this.state.chacha20KeyInfo
+        this.state.chacha20KeyInfo,
       );
 
       // save session id
@@ -114,9 +115,9 @@ export class WebsocketEncryptionService {
         this.state.chacha20Key,
         data,
         this.state.sessionId,
-        packetId
+        packetId,
       );
-      const payload = EncryptedMessage.toBinary(encrypted);
+      const payload = toBinary(EncryptedMessageSchema, encrypted);
 
       // increment packet counter
       this.state.packetCounter = this.state.packetCounter + BigInt(1);
@@ -138,7 +139,7 @@ export class WebsocketEncryptionService {
 
     try {
       // decrypt packet
-      const encryptedMessage = EncryptedMessage.fromBinary(bytes);
+      const encryptedMessage = fromBinary(EncryptedMessageSchema, bytes);
 
       // verify session id
       if (encryptedMessage.sessionId !== this.state.sessionId) {

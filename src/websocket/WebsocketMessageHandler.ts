@@ -18,20 +18,21 @@
  *
  */
 
-import {
-  ClientboundMessage,
-  RequestMethod,
-  RPCResponse,
-  RPCResponse_Status,
-  ServerboundMessage,
-} from '@/proto/qbychat/websocket/protocol/v1/common';
 import { RPCResponsePromiseHandlers } from './types';
 import { RPCError } from '@/websocket/errors/RPCError';
-import { MessageType } from '@protobuf-ts/runtime';
 import { sha256 } from 'js-sha256';
 import { numToUint8Array } from '@/utils/binaryUtils';
 import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
+import {
+  ClientboundMessage,
+  RPCRequestMethod,
+  RPCResponse,
+  RPCResponse_Status,
+  ServerboundMessageSchema,
+} from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { GenMessage } from '@bufbuild/protobuf/codegenv1';
+import { create, fromBinary, Message, toBinary } from '@bufbuild/protobuf';
 
 export class WebsocketMessageHandler {
   private responseHandlers: Map<string, RPCResponsePromiseHandlers> = new Map();
@@ -50,10 +51,10 @@ export class WebsocketMessageHandler {
   handlePacket(packet: ClientboundMessage): void {
     const userId = packet.userId;
 
-    if (packet.content.oneofKind === 'response') {
-      this.handleResponse(packet.content.response);
-    } else if (packet.content.oneofKind === 'event') {
-      this.handleEvent(userId, packet.content.event);
+    if (packet.content.case === 'response') {
+      this.handleResponse(packet.content.value);
+    } else if (packet.content.case === 'event') {
+      this.handleEvent(userId, packet.content.value);
     }
   }
 
@@ -92,10 +93,10 @@ export class WebsocketMessageHandler {
   /**
    * Send a request and wait for response
    */
-  async request<T extends object>(
-    type: MessageType<T>,
+  async request<T extends Message>(
+    type: GenMessage<T>,
     userId: string | null,
-    method: RequestMethod,
+    method: RPCRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,
   ): Promise<T> {
@@ -105,14 +106,14 @@ export class WebsocketMessageHandler {
       const ticketHash = sha256(ticket);
 
       // build request
-      const message: ServerboundMessage = {
+      const message = create(ServerboundMessageSchema, {
         userId: userId === null ? undefined : userId,
         request: {
           ticket: ticket,
           method: method,
           payload: payload === null ? undefined : payload,
         },
-      };
+      });
 
       // Set a timeout to reject the promise after the specified time
       const timeoutId = setTimeout(() => {
@@ -126,7 +127,7 @@ export class WebsocketMessageHandler {
         // clean timeout
         clearTimeout(timeoutId);
         // parse payload
-        resolve(type.fromBinary(response.payload!));
+        resolve(fromBinary(type, response.payload!));
       };
 
       this.responseHandlers.set(ticketHash, {
@@ -138,7 +139,7 @@ export class WebsocketMessageHandler {
       log.info(`📦 Request: method ${method}`, { ticketHash });
       log.debug(`📦 Payload for method ${method}`, { ticketHash, payload });
 
-      this.sendPacketFn(ServerboundMessage.toBinary(message));
+      this.sendPacketFn(toBinary(ServerboundMessageSchema, message));
     });
   }
 

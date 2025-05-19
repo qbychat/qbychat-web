@@ -21,12 +21,14 @@
 import { IPacketService } from '@/websocket/types.ts';
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
+import { create, toBinary } from '@bufbuild/protobuf';
 import {
-  RegisterAccountRequest,
+  RegisterAccountRequestSchema,
   RegisterAccountResponse,
   RegisterAccountResponse_Status,
-} from '@/proto/qbychat/websocket/user/v1/service';
-import { RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
+  RegisterAccountResponseSchema,
+} from '@/proto/qbychat/websocket/user/v1/service_pb';
+import { RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 class UserService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -42,12 +44,12 @@ class UserService implements IWebsocketService {
   }
 
   async registerAccount(username: string, password: string): Promise<RegisterAccountResponse> {
-    const request: RegisterAccountRequest = {
+    const request = create(RegisterAccountRequestSchema, {
       username: username,
       password: password,
-    };
+    });
 
-    const response = await this.packetService.request(RegisterAccountResponse, null, RequestMethod.REGISTER_ACCOUNT_V1, RegisterAccountRequest.toBinary(request));
+    const response = await this.packetService.request(RegisterAccountResponseSchema, null, RPCRequestMethod.REGISTER_ACCOUNT_V1, toBinary(RegisterAccountRequestSchema, request));
     if (response.status === RegisterAccountResponse_Status.SUCCESS) {
       // trigger sync
       this.eventEmitter.sendEvent('triggerSync', {

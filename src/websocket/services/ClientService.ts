@@ -19,17 +19,18 @@
  */
 
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
-import {
-  RegisterClientRequest,
-  RegisterClientResponse,
-  ResumeClientRequest,
-  ResumeClientResponse,
-} from '@/proto/qbychat/websocket/session/v1/service';
 import log from 'loglevel';
-import { RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
 import { UAParser } from 'ua-parser-js';
-import { Platform } from '@/proto/qbychat/common/v1/platform';
 import { IPacketService } from '@/websocket/types.ts';
+import {
+  RegisterClientRequestSchema,
+  RegisterClientResponseSchema,
+  ResumeClientRequestSchema,
+  ResumeClientResponseSchema,
+} from '@/proto/qbychat/websocket/session/v1/service_pb';
+import { create, toBinary } from '@bufbuild/protobuf';
+import { Platform } from '@/proto/qbychat/common/v1/platform_pb';
+import { RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 class ClientService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -42,16 +43,16 @@ class ClientService implements IWebsocketService {
   }
 
   async resumeClient(authToken: string) {
-    const request: ResumeClientRequest = {
+    const request = create(ResumeClientRequestSchema, {
       token: authToken,
-    };
+    });
 
     log.debug('📦 ResumeClientRequest:', request);
-    return await this.packetService.request<ResumeClientResponse>(
-      ResumeClientResponse,
+    return await this.packetService.request(
+      ResumeClientResponseSchema,
       null,
-      RequestMethod.RESUME_CLIENT_V1,
-      ResumeClientRequest.toBinary(request),
+      RPCRequestMethod.RESUME_CLIENT_V1,
+      toBinary(ResumeClientRequestSchema, request),
     );
   }
 
@@ -65,22 +66,22 @@ class ClientService implements IWebsocketService {
     // parse User-Agent
     const ua = UAParser(navigator.userAgent);
 
-    const request: RegisterClientRequest = {
+    const request = create(RegisterClientRequestSchema, {
       clientMetadata: {
         clientName: __APP_NAME__,
         clientVersion: __APP_VERSION__,
         platform: Platform.BROWSER,
         platformDetails: `${ua.browser.name} v${ua.browser.version} on ${ua.os.name}`,
       },
-    };
+    });
 
     // send request
     log.info('🚀 Begin Registering client', request);
-    const response = await this.packetService.request<RegisterClientResponse>(
-      RegisterClientResponse,
+    const response = await this.packetService.request(
+      RegisterClientResponseSchema,
       null,
-      RequestMethod.REGISTER_CLIENT_V1,
-      RegisterClientRequest.toBinary(request),
+      RPCRequestMethod.REGISTER_CLIENT_V1,
+      toBinary(RegisterClientRequestSchema, request),
     );
 
     log.info('📥 Successfully registered client');

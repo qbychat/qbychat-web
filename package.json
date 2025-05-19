@@ -6,22 +6,24 @@
   "license": "GPL-3.0",
   "main": ".tmp/dist-electron/main.js",
   "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite build && vite preview",
+    "postinstall": "node scripts/postinstall.cjs",
+
     "electron": "node scripts/dev-electron.cjs",
     "transpile:electron": "tsc --project tsconfig.electron.json",
     "electron:dist:mac": "pnpm run transpile:electron && npm run build && electron-builder --mac --arm64",
     "electron:dist:win": "pnpm run transpile:electron && npm run build && electron-builder --win --x64",
     "electron:dist:linux": "pnpm run transpile:electron && npm run build && electron-builder --linux --x64",
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite build && vite preview",
-    "proto": "node scripts/gen-proto.cjs",
-    "postinstall": "node scripts/postinstall.cjs"
+    "generate:proto": "pnpm exec buf generate"
   },
   "packageManager": "pnpm@10.11.0",
   "dependencies": {
+    "@bufbuild/buf": "^1.54.0",
+    "@bufbuild/protobuf": "^2.4.0",
     "@hookform/resolvers": "^5.0.1",
-    "@protobuf-ts/runtime": "^2.10.0",
     "@radix-ui/react-label": "^2.1.6",
     "@radix-ui/react-slot": "^1.2.2",
     "@tailwindcss/vite": "^4.1.5",
@@ -35,7 +37,6 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "framer-motion": "^12.9.6",
-    "google-protobuf": "^3.21.4",
     "i18next": "^25.0.2",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
@@ -63,15 +64,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
-    "@protobuf-ts/plugin": "^2.10.0",
-    "@protobuf-ts/protoc": "^2.10.0",
-    "@types/google-protobuf": "^3.15.12",
     "@types/libsodium-wrappers-sumo": "^0.7.8",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "cross-env": "^7.0.3",
     "electron": "^36.2.1",
     "electron-builder": "^26.0.12",
     "esbuild": "^0.25.4",
@@ -80,7 +77,6 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "glob": "^11.0.2",
     "globals": "^16.0.0",
-    "ts-proto": "^2.7.0",
     "tw-animate-css": "^1.2.9",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
@@ -89,8 +85,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@tsparticles/engine",
-      "esbuild",
-      "protobufjs"
+      "esbuild"
     ]
   }
 }

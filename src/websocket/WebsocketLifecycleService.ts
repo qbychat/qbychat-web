@@ -17,8 +17,6 @@
  *
  */
 
-import { MessageType } from '@protobuf-ts/runtime';
-import { ClientboundMessage, RequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common';
 import log from 'loglevel';
 import { ConnectionConfig, IPacketService, WebsocketEvents } from './types';
 import WebsocketConnectionManager from './WebsocketConnectionManager.ts';
@@ -31,6 +29,9 @@ import { KeyPair } from '@/utils/cipherUtils.ts';
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import ClientService from '@/websocket/services/ClientService.ts';
 import UserService from '@/websocket/services/UserService.ts';
+import { fromBinary, Message } from '@bufbuild/protobuf';
+import { ClientboundMessageSchema, RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 
 class WebsocketLifecycleService implements IPacketService {
   // Configuration
@@ -162,7 +163,7 @@ class WebsocketLifecycleService implements IPacketService {
     }
 
     // Parse clientbound message
-    const clientboundMessage = ClientboundMessage.fromBinary(decryptedData);
+    const clientboundMessage = fromBinary(ClientboundMessageSchema, decryptedData);
     this.messageHandler.handlePacket(clientboundMessage);
   }
 
@@ -215,10 +216,10 @@ class WebsocketLifecycleService implements IPacketService {
   /**
    * Send a request and wait for response
    */
-  async request<T extends object>(
-    type: MessageType<T>,
+  async request<T extends Message>(
+    type: GenMessage<T>,
     userId: string | null,
-    method: RequestMethod,
+    method: RPCRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,
   ): Promise<T> {

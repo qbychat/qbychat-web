@@ -30,9 +30,9 @@ import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
 import UserService from '@/websocket/services/UserService.ts';
-import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
+import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service_pb';
 
 const RegisterPage = () => {
   const { t } = useTranslation();
