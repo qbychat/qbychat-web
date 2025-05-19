@@ -17,8 +17,9 @@
  *
  */
 import sodium from 'libsodium-wrappers-sumo';
-import { EncryptedMessage } from '@/proto/qbychat/websocket/protocol/v1/common.ts';
 import log from 'loglevel';
+import { EncryptedMessage, EncryptedMessageSchema } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { create } from '@bufbuild/protobuf';
 
 sodium.ready.then(() => {
   log.info('Loaded sodium');
@@ -92,12 +93,12 @@ export function encryptMessage(
     chachaKey,
   );
 
-  return {
+  return create(EncryptedMessageSchema, {
     sessionId: sessionId,
     sequenceNumber: sequenceNumber,
     nonce: nonce,
     ciphertext: ciphertext,
-  };
+  });
 }
 
 export function decryptMessage(

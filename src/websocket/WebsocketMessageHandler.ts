@@ -38,7 +38,7 @@ export class WebsocketMessageHandler {
   private responseHandlers: Map<string, RPCResponsePromiseHandlers> = new Map();
   private ticketCounter: number = 0;
   private eventEmitter: WebsocketEventEmitter;
-  private sendPacketFn: (data: Uint8Array) => void;
+  private readonly sendPacketFn: (data: Uint8Array) => void;
 
   constructor(eventEmitter: WebsocketEventEmitter, sendPacketFn: (data: Uint8Array) => void) {
     this.eventEmitter = eventEmitter;
