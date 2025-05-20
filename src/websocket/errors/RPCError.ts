@@ -17,7 +17,8 @@
  *
  */
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common';
+
+import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 export class RPCError extends Error {
   status: RPCResponse_Status;
