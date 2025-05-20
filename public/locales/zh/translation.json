@@ -13,6 +13,11 @@
   "auth.login.go-to-register": "去注册",
   "auth.login.qr": "二维码登录",
 
+  "auth.error.bad-credentials": "错误的用户名或密码",
+  "auth.error.user-banned": "你被封禁了",
+  "auth.error.rpc": "RPC 错误: {{error}}",
+  "auth.error.unknown": "未知错误 (大概是请求超时)",
+
   "auth.register.tip": "输入账户信息来注册",
   "auth.register.username": "用户名",
   "auth.register.password": "密码",

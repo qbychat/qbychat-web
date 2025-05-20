@@ -118,7 +118,7 @@ export class WebsocketConnectionManager {
       this.reconnectInterval = this.config.baseReconnectInterval;
       this.shouldReconnect = true;
 
-      log.info(`✅ Success connect to websocket ${this.config.url}, start handshake`);
+      log.info(`✅ Success connect to websocket ${discoveryConfig.websocketAddress}, start handshake`);
 
       // Call the onOpen callback if it's set
       if (this.onOpenCallback) {

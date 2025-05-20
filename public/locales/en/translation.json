@@ -11,6 +11,12 @@
   "auth.login.username": "Username",
   "auth.login.password": "Password",
   "auth.login.go-to-register": "Go to register",
+  "auth.login.qr": "Auth with QrCode",
+
+  "auth.error.bad-credentials": "Bad username or password",
+  "auth.error.user-banned": "You're banned",
+  "auth.error.rpc": "RPC Error: {{error}}",
+  "auth.error.unknown": "Unknown Error (probably request timeout)",
 
   "auth.register.tip": "Please enter your credentials to register",
   "auth.register.username": "Username",

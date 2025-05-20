@@ -29,11 +29,19 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
+import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
+import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
+import AuthService from '@/websocket/services/AuthService.ts';
+import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/websocket/auth/v1/service_pb';
+import { RPCError } from '@/websocket/errors/RPCError.ts';
 
 const LoginPage = () => {
   const { t } = useTranslation();
 
   const navigate = useAuthStore(state => state.navigateAuthPage);
+  const websocketLifecycleService = useWebsocketLifecycleService(state => state.service);
+
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const formSchema = z.object({
@@ -49,15 +57,38 @@ const LoginPage = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // TODO login
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!websocketLifecycleService) return;
+    // process login
     setLoading(true);
-    console.log(values);
+    setError('');
+    const authService = websocketLifecycleService.getService(AuthService);
+    try {
+      const response = await authService.usernamePasswordLogin(values.username, values.password);
+      switch (response.status) {
+        case UsernamePasswordLoginResponse_Status.BAD_USERNAME_OR_PASSWORD:
+          setError(t('auth.error.bad-credentials'));
+          break;
+        case UsernamePasswordLoginResponse_Status.USER_BANNED:
+          setError(t('auth.error.user-banned'));
+          break;
+      }
+    } catch (e) {
+      if (e instanceof RPCError) {
+        setError(t('auth.error.rpc', { error: e.message }));
+      } else {
+        setError(t('auth.error.unknown'));
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (<AuthLayout title={t('auth.title')} subtitle={t('auth.login.tip')}>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full space-y-3">
+        <AnimatedErrorMessage error={error} />
+
         <FormField
           control={form.control}
           name="username"
@@ -67,7 +98,7 @@ const LoginPage = () => {
               <FormControl>
                 <Input {...field} />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -81,7 +112,7 @@ const LoginPage = () => {
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
-              <FormMessage/>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -90,7 +121,7 @@ const LoginPage = () => {
           <Button type="button" variant="secondary" onClick={() => navigate('register')}
                   disabled={loading}>{t('auth.login.go-to-register')}</Button>
           <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="animate-spin"/>}
+            {loading && <Loader2 className="animate-spin" />}
             {t('auth.continue')}
           </Button>
         </div>

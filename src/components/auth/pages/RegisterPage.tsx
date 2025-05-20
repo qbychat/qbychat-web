@@ -33,6 +33,7 @@ import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service_pb';
+import { RPCError } from '@/websocket/errors/RPCError.ts';
 
 const RegisterPage = () => {
   const { t } = useTranslation();
@@ -68,9 +69,6 @@ const RegisterPage = () => {
       const userService = websocketLifecycleService.getService(UserService);
       const response = await userService.registerAccount(values.username, values.password);
       switch (response.status) {
-        case RegisterAccountResponse_Status.SUCCESS:
-          // TODO redirect to main
-          break;
         case RegisterAccountResponse_Status.BAD_USERNAME:
           setError('Bad username');
           break;
@@ -79,8 +77,10 @@ const RegisterPage = () => {
           break;
       }
     } catch (e) {
-      if (e instanceof Error) {
-        setError(e.message);
+      if (e instanceof RPCError) {
+        setError(t('auth.error.rpc', { error: e.message }));
+      } else {
+        setError(t('auth.error.unknown'));
       }
     } finally {
       setLoading(false);
