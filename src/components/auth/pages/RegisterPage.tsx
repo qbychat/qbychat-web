@@ -18,7 +18,7 @@
  *
  */
 
-import { useAuthStore } from '@/store/useAuthStore.ts';
+import { useAuthStore } from '@/store/controller/useAuthStore.ts';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +38,7 @@ import { RPCError } from '@/websocket/errors/RPCError.ts';
 const RegisterPage = () => {
   const { t } = useTranslation();
 
-  const navigate = useAuthStore(state => state.navigateAuthPage);
+  const navigate = useAuthStore(state => state.navigate);
   const websocketLifecycleService = useWebsocketLifecycleService(state => state.service);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,7 +87,7 @@ const RegisterPage = () => {
     }
   }
 
-  return (<AuthLayout title={t('auth.title')} subtitle={t('auth.register.tip')}>
+  return (<AuthLayout title={t('auth.register.title')} subtitle={t('auth.register.tip')}>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}

@@ -1,12 +1,15 @@
 {
   "loading.title": "Loading QbyChat client for the browsers...",
+
+  "onboarding.welcome.title": "Welcome to QbyChat",
+  "onboarding.welcome.go": "Let's Go",
   "onboarding.server": "Setup a QbyChat server",
   "onboarding.server.connection.error.ws": "Failed to establish connection to the websocket",
   "onboarding.server.connection.error.discovery": "Cannot fetch the websocket address",
   "onboarding.server.connect": "Connect",
 
-  "auth.title": "Welcome to QbyChat",
   "auth.continue": "Continue",
+  "auth.login.title": "Login to QbyChat",
   "auth.login.tip": "Please enter your credentials to continue",
   "auth.login.username": "Username",
   "auth.login.password": "Password",
@@ -18,6 +21,7 @@
   "auth.error.rpc": "RPC Error: {{error}}",
   "auth.error.unknown": "Unknown Error (probably request timeout)",
 
+  "auth.register.title": "Register a QbyChat account",
   "auth.register.tip": "Please enter your credentials to register",
   "auth.register.username": "Username",
   "auth.register.password": "Password",

@@ -18,11 +18,11 @@
  *
  */
 
-import { useAuthStore } from '@/store/useAuthStore.ts';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useAuthStore } from '@/store/controller/useAuthStore.ts';
+import React, { useMemo } from 'react';
 import LoginPage from '@/components/auth/pages/LoginPage.tsx';
 import RegisterPage from '@/components/auth/pages/RegisterPage.tsx';
+import SimpleController from '@/components/SimpleController.tsx';
 
 
 const AuthController = () => {
@@ -33,42 +33,9 @@ const AuthController = () => {
   }), []);
 
 
-  const targetPage = useAuthStore(state => state.page);
-  const [activePage, setActivePage] = useState(targetPage);
-  const [isExiting, setIsExiting] = useState(false);
+  const activePage = useAuthStore(state => state.page);
 
-  useEffect(() => {
-    if (targetPage !== activePage) {
-      setIsExiting(true);
-      const timeout = setTimeout(() => {
-        setActivePage(targetPage);
-        setIsExiting(false);
-      }, 200);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [targetPage, activePage]);
-
-  const Page = pageMap[activePage];
-
-  return (
-    <div style={{ position: 'relative', minHeight: '300px' }}>
-      <AnimatePresence mode="wait">
-        {!isExiting && activePage && (
-          <motion.div
-            key={activePage}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ width: '100%' }}
-          >
-            {Page}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+  return (<SimpleController pageMap={pageMap} activePage={activePage} />);
 };
 
 export default AuthController;

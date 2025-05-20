@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuthStore } from '@/store/useAuthStore.ts';
+import { useAuthStore } from '@/store/controller/useAuthStore.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
@@ -38,7 +38,7 @@ import { RPCError } from '@/websocket/errors/RPCError.ts';
 const LoginPage = () => {
   const { t } = useTranslation();
 
-  const navigate = useAuthStore(state => state.navigateAuthPage);
+  const navigate = useAuthStore(state => state.navigate);
   const websocketLifecycleService = useWebsocketLifecycleService(state => state.service);
 
   const [error, setError] = useState('');
@@ -84,7 +84,7 @@ const LoginPage = () => {
     }
   }
 
-  return (<AuthLayout title={t('auth.title')} subtitle={t('auth.login.tip')}>
+  return (<AuthLayout title={t('auth.login.title')} subtitle={t('auth.login.tip')}>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 w-full space-y-3">
         <AnimatedErrorMessage error={error} />

@@ -18,12 +18,12 @@
  */
 
 import { useAppStore } from '@/store/useAppStore.ts';
-import SetupServerPage from '@/components/onboarding/SetupServerPage.tsx';
 import backgroundImage from '@/assets/background.svg';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import AuthController from '@/components/auth/AuthController.tsx';
 import { isElectron } from '@/env.ts';
+import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
 
 function App() {
   const screen = useAppStore(state => state.screen);
@@ -35,8 +35,7 @@ function App() {
       case 'loading':
         return <LoadingAnimation/>;
       case 'onboarding':
-        // TODO use onboarding controller
-        return <SetupServerPage/>;
+        return <OnboardingController/>;
       case 'auth':
         return <AuthController/>;
       case 'main':
