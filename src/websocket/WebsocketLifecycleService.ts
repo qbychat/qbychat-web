@@ -99,6 +99,7 @@ class WebsocketLifecycleService implements IPacketService {
    * Connect to the WebSocket server
    */
   async connect(): Promise<void> {
+    this.encryptionService.reset();
     await this.connectionManager.connect();
   }
 
