@@ -19,11 +19,11 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { AppScreen, useAppStore } from '@/store/useAppStore.ts';
-import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
+import useAppStore, { AppScreen } from '@/store/appStore.ts';
+import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
-import useSettings from '@/store/useSettings.ts';
+import useSettings from '@/store/settingsStore.ts';
 
 function registerEvents(
   serverId: number,

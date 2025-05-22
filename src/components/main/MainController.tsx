@@ -16,20 +16,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useMemo } from 'react';
-import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
-import { useOnboardingStore } from '@/store/controller/onboardingRouterStore.ts';
-import SimpleController from '@/components/SimpleController.tsx';
-import WelcomePage from '@/components/onboarding/pages/WelcomePage.tsx';
+import { useMediaQuery } from 'react-responsive';
+import { useEffect } from 'react';
+import useMainRouterStore from '@/store/controller/mainRouterStore.ts';
 
-const OnboardingController = () => {
-  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
-    welcome: <WelcomePage />,
-    setupServer: <SetupServerPage />,
-  }), []);
+const MainController = () => {
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
+  const { setMobile } = useMainRouterStore();
 
-  const activePage = useOnboardingStore(state => state.page);
-  return (<SimpleController activePage={activePage} pageMap={pageMap} />);
+  useEffect(() => {
+    setMobile(isMobile);
+  }, [isMobile, setMobile]);
+
+  return (<div>
+
+  </div>);
 };
 
-export default OnboardingController;
+export default MainController;

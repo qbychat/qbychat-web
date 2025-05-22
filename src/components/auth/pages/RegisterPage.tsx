@@ -18,7 +18,7 @@
  *
  */
 
-import { useAuthStore } from '@/store/controller/useAuthStore.ts';
+import { useAuthStore } from '@/store/controller/authRouterStore.ts';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +28,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
-import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
+import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';

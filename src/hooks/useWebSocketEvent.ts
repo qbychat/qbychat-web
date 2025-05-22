@@ -19,7 +19,7 @@
  */
 
 import { useEffect } from 'react';
-import useWebsocketLifecycleService from '@/store/useWebsocketLifecycleService.ts';
+import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import { WebsocketEvents } from '@/websocket/types';
 
 export function useWebSocketEvent<T extends keyof WebsocketEvents>(

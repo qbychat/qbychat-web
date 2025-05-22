@@ -28,7 +28,7 @@ interface AppState {
   setScreen: (screen: AppScreen) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+const useAppStore = create<AppState>((set, get) => ({
   screen: 'loading',
   prevScreen: null,
   setScreen: (newScreen) => {
@@ -38,3 +38,5 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 }));
+
+export default useAppStore;

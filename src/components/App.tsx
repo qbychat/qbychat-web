@@ -17,13 +17,14 @@
  *
  */
 
-import { useAppStore } from '@/store/useAppStore.ts';
+import useAppStore from '@/store/appStore.ts';
 import backgroundImage from '@/assets/background.svg';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import AuthController from '@/components/auth/AuthController.tsx';
 import { isElectron } from '@/env.ts';
 import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
+import MainController from '@/components/main/MainController.tsx';
 
 function App() {
   const screen = useAppStore(state => state.screen);
@@ -39,7 +40,7 @@ function App() {
       case 'auth':
         return <AuthController/>;
       case 'main':
-        return <h1>main</h1>;
+        return <MainController/>;
     }
   };
 

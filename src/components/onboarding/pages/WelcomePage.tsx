@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/store/controller/useOnboardingStore.ts';
+import { useOnboardingStore } from '@/store/controller/onboardingRouterStore.ts';
 import { Button } from '@/components/ui/button.tsx';
 import { useTranslation } from 'react-i18next';
 

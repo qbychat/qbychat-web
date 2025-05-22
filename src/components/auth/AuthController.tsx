@@ -18,7 +18,7 @@
  *
  */
 
-import { useAuthStore } from '@/store/controller/useAuthStore.ts';
+import { useAuthStore } from '@/store/controller/authRouterStore.ts';
 import React, { useMemo } from 'react';
 import LoginPage from '@/components/auth/pages/LoginPage.tsx';
 import RegisterPage from '@/components/auth/pages/RegisterPage.tsx';
