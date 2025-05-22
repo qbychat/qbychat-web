@@ -18,11 +18,10 @@
 
 import { create } from 'zustand';
 
-type ViewName = 'main' | 'settings' | 'chat'
+type ViewName = 'settings' | 'chat'
 type ViewSide = 'left' | 'right'
 
 type ViewParamsMap = {
-  main: undefined
   settings: undefined
   chat: {
     chatId: string

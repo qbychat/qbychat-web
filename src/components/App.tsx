@@ -18,11 +18,9 @@
  */
 
 import useAppStore from '@/store/appStore.ts';
-import backgroundImage from '@/assets/background.svg';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import AuthController from '@/components/auth/AuthController.tsx';
-import { isElectron } from '@/env.ts';
 import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
 import MainController from '@/components/main/MainController.tsx';
 
@@ -34,32 +32,19 @@ function App() {
   const renderScreen = () => {
     switch (screen) {
       case 'loading':
-        return <LoadingAnimation/>;
+        return <LoadingAnimation />;
       case 'onboarding':
-        return <OnboardingController/>;
+        return <OnboardingController />;
       case 'auth':
-        return <AuthController/>;
+        return <AuthController />;
       case 'main':
-        return <MainController/>;
+        return <MainController />;
     }
   };
 
-  if (isElectron) {
-    // remove container for the desktop client
-    return (
-      <div className="w-full h-screen overflow-hidden m-0">
-        {renderScreen()}
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-screen overflow-hidden m-0" style={{ backgroundImage: `url("${backgroundImage}")` }}>
-      {/*todo add settings for the border*/}
-      <div
-        className="sm:p-0 h-full lg:m-auto lg:scale-90 lg:rounded-3xl shadow-xl backdrop-blur-sm transition-all">
-        {renderScreen()}
-      </div>
+    <div className="w-full h-screen overflow-hidden m-0">
+      {renderScreen()}
     </div>
   );
 }

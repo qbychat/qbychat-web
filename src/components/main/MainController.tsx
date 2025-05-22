@@ -17,16 +17,18 @@
  */
 
 import { useMediaQuery } from 'react-responsive';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useMainRouterStore, { ViewEntry } from '@/store/controller/mainRouterStore.ts';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import {
   useCurrentLeftDesktopViewEntry,
   useCurrentMobileViewEntry,
-  useCurrentRightDesktopViewEntry, useRouterHistorySync,
+  useCurrentRightDesktopViewEntry,
+  useRouterHistorySync,
   useStackControls,
 } from '@/hooks/mainRouterHooks.ts';
 import TransitionContainer from '@/components/main/TransitionContainer.tsx';
+import ChatListView from '@/components/main/views/ChatListView.tsx';
 
 const MainController = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -35,17 +37,19 @@ const MainController = () => {
   const leftDesktopViewEntry = useCurrentLeftDesktopViewEntry();
   const rightDesktopViewEntry = useCurrentRightDesktopViewEntry();
   const currentMobileViewEntry = useCurrentMobileViewEntry();
-  const { pushView, goBack } = useStackControls();
+  const { goBack } = useStackControls();
+
+  const chatListViewCache = useMemo(() => {
+    return <ChatListView/>;
+  }, []);
+
+  const introViewCache = useMemo(() => {
+    return <>intro</>;
+  }, []);
 
   useEffect(() => {
     setMobile(isMobile);
   }, [isMobile, setMobile]);
-
-  useEffect(() => {
-    pushView({ side: 'left', view: 'main' });
-    pushView({ side: 'right', view: 'chat' });
-    pushView({ side: 'right', view: 'settings' });
-  }, [pushView]);
 
   useRouterHistorySync();
 
@@ -54,11 +58,6 @@ const MainController = () => {
       return <>Unable to render (entry is empty)</>;
     }
     switch (entry.view) {
-      case 'main':
-        return <>main
-          <button onClick={() => pushView({ side: 'left', view: 'settings' })}>push settings</button>
-          <button onClick={() => goBack()}>back</button>
-        </>;
       case 'settings':
         return <>settings
           <button onClick={() => goBack()}>back</button>
@@ -76,6 +75,7 @@ const MainController = () => {
   if (isMobile) {
     return <TransitionContainer
       currentViewEntry={currentMobileViewEntry}
+      defaultElement={chatListViewCache}
       render={render}
     />;
   }
@@ -85,13 +85,15 @@ const MainController = () => {
       <TransitionContainer
         currentViewEntry={leftDesktopViewEntry}
         render={render}
+        defaultElement={chatListViewCache}
       />
     </Panel>
-    <PanelResizeHandle />
+    <PanelResizeHandle className="w-2"/>
     <Panel>
       <TransitionContainer
         currentViewEntry={rightDesktopViewEntry}
         render={render}
+        defaultElement={introViewCache}
       />
     </Panel>
   </PanelGroup>);

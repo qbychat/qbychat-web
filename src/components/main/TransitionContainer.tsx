@@ -24,13 +24,16 @@ import React from 'react';
 interface Props {
   currentViewEntry: ViewEntry | null;
   render: (entry: ViewEntry) => React.ReactNode;
+
+  defaultElement?: React.ReactNode | null;
 }
 
 const TransitionContainer = ({
-                                     currentViewEntry,
-                                     render,
-                                   }: Props) => {
-  const isBack = useIsBackDirection();
+                               currentViewEntry,
+                               render,
+                               defaultElement,
+                             }: Props) => {
+  let isBack = useIsBackDirection();
 
   const variants: Variants = {
     initial: (custom: boolean) => ({
@@ -53,14 +56,22 @@ const TransitionContainer = ({
     }),
   };
 
+  // render element
+  let element: React.ReactNode | null;
+  if (currentViewEntry) {
+    element = render(currentViewEntry);
+  } else {
+    isBack = true;
+    element = defaultElement;
+  }
 
 
   return (
     <div className="relative w-full h-full overflow-hidden">
       <AnimatePresence initial={false} custom={isBack}>
-        {currentViewEntry && (
+        {element && (
           <motion.div
-            key={currentViewEntry.view}
+            key={currentViewEntry?.view ?? 'default'}
             className="absolute w-full h-full"
             variants={variants}
             initial="initial"
@@ -69,7 +80,7 @@ const TransitionContainer = ({
             custom={isBack}
             transition={{ duration: 0.25 }}
           >
-            {render(currentViewEntry)}
+            {element}
           </motion.div>
         )}
       </AnimatePresence>
