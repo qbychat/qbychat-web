@@ -18,23 +18,38 @@
 
 import { create } from 'zustand';
 
+type ViewName = 'main' | 'settings' | 'chat'
 type ViewSide = 'left' | 'right'
-type ViewEntry = { side: ViewSide; view: string }
+
+type ViewParamsMap = {
+  main: undefined
+  settings: undefined
+  chat: {
+    chatId: string
+  }
+}
+
+export type ViewEntry = { side: ViewSide; view: ViewName, params?: ViewParamsMap[ViewName] }
 
 interface RouterState {
-  isMobile: boolean;
-
   stack: ViewEntry[];
 
+  isMobile: boolean;
+  lastStackLength: number;
+  isBack: boolean;
+
   // Views for Mobile UI
-  view: string | null;
-  previousView: string | null;
+  view: ViewEntry | null;
+  previousView: ViewEntry | null;
+  canGoBack: boolean;
 
   // Views for desktop UI
-  leftView: string | null;
-  previousLeftView: string | null;
-  rightView: string | null;
-  previousRightView: string | null;
+  leftView: ViewEntry | null;
+  previousLeftView: ViewEntry | null;
+  canGoBackLeft: boolean;
+  rightView: ViewEntry | null;
+  previousRightView: ViewEntry | null;
+  canGoBackRight: boolean;
 
   pushView: (entry: ViewEntry, options?: { replace?: boolean }) => void;
   popView: (side: ViewSide) => void;
@@ -47,17 +62,22 @@ interface RouterState {
 }
 
 export const useMainRouterStore = create<RouterState>((set, get) => ({
-  isMobile: false,
-
   stack: [],
+
+  isMobile: false,
+  lastStackLength: 0,
+  isBack: false,
 
   view: null,
   previousView: null,
+  canGoBack: false,
 
   leftView: null,
   previousLeftView: null,
+  canGoBackLeft: false,
   rightView: null,
   previousRightView: null,
+  canGoBackRight: false,
 
   pushView: (entry, options = {}) => {
     const { stack } = get();
@@ -65,7 +85,11 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
 
     window.history.pushState(newStack, ''); // Push to browser history
 
-    set({ stack: newStack }, false);
+    set({
+      stack: newStack,
+      isBack: false,
+      lastStackLength: newStack.length,
+    }, false);
     get().updateViews();
   },
 
@@ -79,7 +103,11 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
     const newStack = [...stack.slice(0, removeIndex), ...stack.slice(removeIndex + 1)];
 
     window.history.pushState(newStack, '');
-    set({ stack: newStack });
+    set({
+      stack: newStack,
+      isBack: true,
+      lastStackLength: newStack.length,
+    });
     get().updateViews();
   },
 
@@ -90,7 +118,11 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
     const newStack = stack.slice(0, -1);
     window.history.pushState(newStack, ''); // Update browser history
 
-    set({ stack: newStack }, false);
+    set({
+      stack: newStack,
+      isBack: true,
+      lastStackLength: newStack.length,
+    }, false);
     get().updateViews();
   },
 
@@ -98,8 +130,8 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
     const { stack, isMobile } = get();
 
     if (isMobile) {
-      const previous = stack[stack.length - 2]?.view ?? null;
-      const current = stack[stack.length - 1]?.view ?? null;
+      const previous = stack[stack.length - 2] ?? null;
+      const current = stack[stack.length - 1] ?? null;
 
       set({
         view: current,
@@ -108,28 +140,38 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
         rightView: null,
         previousLeftView: null,
         previousRightView: null,
+        canGoBack: stack.length >= 2,
+        canGoBackLeft: false,
+        canGoBackRight: false,
       });
       return;
     }
 
-    // Only update for desktop
     const leftEntries = stack.filter((e) => e.side === 'left');
     const rightEntries = stack.filter((e) => e.side === 'right');
 
     set({
-      leftView: leftEntries[leftEntries.length - 1]?.view ?? null,
-      previousLeftView: leftEntries[leftEntries.length - 2]?.view ?? null,
-      rightView: rightEntries[rightEntries.length - 1]?.view ?? null,
-      previousRightView: rightEntries[rightEntries.length - 2]?.view ?? null,
+      leftView: leftEntries[leftEntries.length - 1] ?? null,
+      previousLeftView: leftEntries[leftEntries.length - 2] ?? null,
+      rightView: rightEntries[rightEntries.length - 1] ?? null,
+      previousRightView: rightEntries[rightEntries.length - 2] ?? null,
       view: null,
       previousView: null,
+      canGoBack: false,
+      canGoBackLeft: leftEntries.length >= 2,
+      canGoBackRight: rightEntries.length >= 2,
     });
   },
 
   syncFromHistory: () => {
     const state = window.history.state;
     if (Array.isArray(state)) {
-      set({ stack: state });
+      const isBack = state.length < get().lastStackLength;
+      set({
+        stack: state,
+        isBack,
+        lastStackLength: state.length,
+      });
       get().updateViews();
     }
   },
