@@ -18,8 +18,6 @@
  */
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
 import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
 import useSettings from '@/store/settingsStore.ts';
@@ -28,6 +26,7 @@ import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import { Loader2 } from 'lucide-react';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
+import { Button, Input } from '@mantine/core';
 
 const SetupServerPage = () => {
   const { t } = useTranslation();

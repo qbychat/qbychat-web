@@ -17,8 +17,8 @@
  */
 
 import { useOnboardingStore } from '@/store/controller/onboardingRouterStore.ts';
-import { Button } from '@/components/ui/button.tsx';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@mantine/core';
 
 const WelcomePage = () => {
   const { t } = useTranslation();

@@ -17,18 +17,19 @@
  *
  */
 
+import './index.css';
 import './logger.ts';
 import './i18n.ts';
+import '@mantine/core/styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
 import App from './components/App.tsx';
-import { ThemeProvider } from '@/components/theme-provider.tsx';
+import { MantineProvider } from '@mantine/core';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <App/>
-    </ThemeProvider>
+    <MantineProvider defaultColorScheme="auto">
+      <App />
+    </MantineProvider>
   </StrictMode>,
 );
