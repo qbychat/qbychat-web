@@ -17,10 +17,13 @@
  */
 
 
+import DropdownMenu from '@/components/main/views/chat-list/DropdownMenu.tsx';
+
 const ChatListView = () => {
+
   return (<div className="flex flex-col h-full">
     <div className="flex flex-row gap-2 p-2 shadow-xl">
-      <div>menu</div>
+      <DropdownMenu />
       <div>search box</div>
     </div>
     <div className="flex flex-col h-full p-2">

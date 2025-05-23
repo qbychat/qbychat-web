@@ -20,11 +20,21 @@
   "auth.error.user-banned": "You're banned",
   "auth.error.rpc": "RPC Error: {{error}}",
   "auth.error.unknown": "Unknown Error (probably request timeout)",
+  "auth.error.username-length": "Username should be 5-16 character long",
+  "auth.error.password-required": "Requires a password",
+  "auth.error.bad-username": "Bad username",
+  "auth.error.username-invalid": "Username must be 5 to 16 characters long and contain only letters and numbers.",
+  "auth.error.username-taken": "Username was taken",
 
   "auth.register.title": "Register a QbyChat account",
   "auth.register.tip": "Please enter your credentials to register",
   "auth.register.username": "Username",
   "auth.register.password": "Password",
   "auth.register.password.verify": "Password (Again)",
-  "auth.register.go-to-login": "Go to login"
+  "auth.register.go-to-login": "Go to login",
+
+  "menu.login": "Add an account",
+  "menu.saved-messages": "Saved Messages",
+  "menu.contacts": "Contacts",
+  "menu.settings": "Settings"
 }

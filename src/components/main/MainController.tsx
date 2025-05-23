@@ -28,7 +28,7 @@ import {
   useStackControls,
 } from '@/hooks/mainRouterHooks.ts';
 import TransitionContainer from '@/components/main/TransitionContainer.tsx';
-import ChatListView from '@/components/main/views/ChatListView.tsx';
+import ChatListView from '@/components/main/views/chat-list/ChatListView.tsx';
 
 const MainController = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });

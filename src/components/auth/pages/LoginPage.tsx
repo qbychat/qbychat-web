@@ -28,7 +28,7 @@ import AuthService from '@/websocket/services/AuthService.ts';
 import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/websocket/auth/v1/service_pb';
 import { RPCError } from '@/websocket/errors/RPCError.ts';
 import { useForm } from '@mantine/form';
-import { Button, Loader, PasswordInput, TextInput } from '@mantine/core';
+import { Button, PasswordInput, TextInput } from '@mantine/core';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -100,14 +100,13 @@ const LoginPage = () => {
         <div className="flex flex-row justify-between mt-5">
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             onClick={() => navigate('register')}
             disabled={loading}
           >
             {t('auth.login.go-to-register')}
           </Button>
-          <Button type="submit" disabled={loading}>
-            {loading && <Loader className="animate-spin" />}
+          <Button type="submit" loading={loading}>
             {t('auth.continue')}
           </Button>
         </div>

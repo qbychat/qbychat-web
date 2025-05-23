@@ -16,74 +16,73 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { ViewEntry } from '@/store/controller/mainRouterStore.ts';
 import { useIsBackDirection } from '@/hooks/mainRouterHooks.ts';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Transition } from '@mantine/core';
 
 interface Props {
   currentViewEntry: ViewEntry | null;
   render: (entry: ViewEntry) => React.ReactNode;
+  duration?: number;
 
-  defaultElement?: React.ReactNode | null;
+  defaultElement?: React.ReactNode;
 }
 
 const TransitionContainer = ({
                                currentViewEntry,
                                render,
+                               duration = 200,
                                defaultElement,
                              }: Props) => {
   let isBack = useIsBackDirection();
 
-  const variants: Variants = {
-    initial: (custom: boolean) => ({
-      x: custom ? '-40%' : '40%',
-      opacity: 0,
-      position: 'absolute',
-      zIndex: 0,
-    }),
-    animate: {
-      x: 0,
-      opacity: 1,
-      position: 'relative',
-      zIndex: 1,
-    },
-    exit: (custom: boolean) => ({
-      x: custom ? '40%' : '-40%',
-      opacity: 0,
-      position: 'absolute',
-      zIndex: 0,
-    }),
-  };
+  const [transitioning, setTransitioning] = useState(false);
+  const [renderedEntry, setRenderedEntry] = useState<ViewEntry | null>(currentViewEntry);
+  const [renderedElement, setRenderedElement] = useState<React.ReactNode>(
+    currentViewEntry ? render(currentViewEntry) : defaultElement,
+  );
 
-  // render element
-  let element: React.ReactNode | null;
-  if (currentViewEntry) {
-    element = render(currentViewEntry);
-  } else {
+  if (currentViewEntry === null) {
     isBack = true;
-    element = defaultElement;
   }
 
+  useEffect(() => {
+    if (currentViewEntry === renderedEntry) return;
+
+    setTransitioning(true);
+
+    // Replace content after animation finished
+    const timeout = setTimeout(() => {
+      setRenderedEntry(currentViewEntry);
+      setRenderedElement(currentViewEntry ? render(currentViewEntry) : defaultElement);
+      setTransitioning(false);
+    }, duration);
+
+    return () => clearTimeout(timeout);
+  }, [currentViewEntry, defaultElement, duration, render, renderedEntry]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      <AnimatePresence initial={false} custom={isBack}>
-        {element && (
-          <motion.div
-            key={currentViewEntry?.view ?? 'default'}
-            className="absolute w-full h-full"
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            custom={isBack}
-            transition={{ duration: 0.25 }}
+      <Transition
+        mounted={!transitioning}
+        transition={isBack ? 'fade-right' : 'fade-left'}
+        duration={duration}
+        timingFunction="ease-out"
+      >
+        {(styles) => (
+          <div
+            style={{
+              ...styles,
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+            }}
           >
-            {element}
-          </motion.div>
+            {renderedElement}
+          </div>
         )}
-      </AnimatePresence>
+      </Transition>
     </div>
   );
 };

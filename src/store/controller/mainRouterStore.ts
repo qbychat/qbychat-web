@@ -112,7 +112,6 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
 
   goBack: () => {
     const { stack } = get();
-    if (stack.length <= 1) return;
 
     const newStack = stack.slice(0, -1);
     window.history.pushState(newStack, ''); // Update browser history

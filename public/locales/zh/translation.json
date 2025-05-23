@@ -20,11 +20,21 @@
   "auth.error.user-banned": "你被封禁了",
   "auth.error.rpc": "RPC 错误: {{error}}",
   "auth.error.unknown": "未知错误 (大概是请求超时)",
+  "auth.error.username-length": "用户名长度必须在5-16个字符区间",
+  "auth.error.password-required": "Requires a password",
+  "auth.error.bad-username": "非法用户名",
+  "auth.error.username-invalid": "用户名长度限制在5到16个字符，只能使用字母和数字。",
+  "auth.error.username-taken": "用户名被用了",
 
   "auth.register.title": "注册QbyChat账户",
   "auth.register.tip": "输入账户信息来注册",
   "auth.register.username": "用户名",
   "auth.register.password": "密码",
   "auth.register.password.verify": "密码 (再输入一次)",
-  "auth.register.go-to-login": "去登录"
+  "auth.register.go-to-login": "去登录",
+
+  "menu.login": "登录一个新账户",
+  "menu.saved-messages": "消息存档",
+  "menu.contacts": "联系人",
+  "menu.settings": "设置"
 }

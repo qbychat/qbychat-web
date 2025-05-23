@@ -28,7 +28,7 @@ import AuthLayout from '@/components/auth/AuthLayout.tsx';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service_pb';
 import { RPCError } from '@/websocket/errors/RPCError.ts';
 import { useForm } from '@mantine/form';
-import { Button, Loader, PasswordInput, TextInput } from '@mantine/core';
+import { Button, PasswordInput, TextInput } from '@mantine/core';
 
 const RegisterPage = () => {
   const { t } = useTranslation();
@@ -45,10 +45,13 @@ const RegisterPage = () => {
       passwordVerify: '',
     },
     validate: {
-      username: (value) =>
-        value.length < 5 || value.length > 16
-          ? t('auth.error.username-length')
-          : null,
+      username: (value) => {
+        const regex = /^[a-zA-Z0-9]{5,16}$/;
+        if (!regex.test(value)) {
+          return t('auth.error.username-invalid');
+        }
+        return null;
+      },
       password: (value) => (value.length === 0 ? t('auth.error.password-required') : null),
       passwordVerify: (value, values) =>
         value !== values.password ? t('auth.error.password-mismatch') : null,
@@ -107,15 +110,14 @@ const RegisterPage = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4">
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             onClick={() => navigate('login')}
             disabled={loading}
             className="w-full sm:w-auto"
           >
             {t('auth.register.go-to-login')}
           </Button>
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-            {loading && <Loader className="animate-spin mr-2" />}
+          <Button type="submit" loading={loading} className="w-full sm:w-auto">
             {t('auth.continue')}
           </Button>
         </div>

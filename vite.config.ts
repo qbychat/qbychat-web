@@ -40,14 +40,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          chunk1: [
-            'react', 'react-dom', 'react-hook-form', 'zod',
-            'i18next-http-backend', 'i18next-browser-languagedetector',
-            'dexie-react-hooks', 'react-i18next', 'react-hook-form',
-            'react-resizable-panels', 'react-responsive', 'zustand',
-          ],
-          chunk2: ['tailwindcss', 'tailwind-merge', 'dexie', 'motion'],
-          chunk3: ['loglevel', 'uuid', 'queue', 'js-sha256', 'mitt', 'libsodium-wrappers-sumo'],
         },
       },
     },
