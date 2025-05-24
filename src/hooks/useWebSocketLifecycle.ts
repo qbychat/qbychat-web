@@ -18,19 +18,28 @@
  *
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useAppStore from '@/store/appStore.ts';
 import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import useSettings from '@/store/settingsStore.ts';
+import useAccountsStore from '@/store/accountsStore.ts';
 
 export function useWebSocketLifecycle() {
-  const { setScreen, setConnectionStatus, screen } = useAppStore();
+  const setScreen = useAppStore(s => s.setScreen);
+  const setConnectionStatus = useAppStore(s => s.setConnectionStatus);
+  const screen = useAppStore(s => s.screen);
+
+  const addAccount = useAccountsStore(s => s.addAccount);
+
   const setService = useWebsocketLifecycleService(state => state.setService);
   const currentServerId = useSettings((state) => state.currentServerId);
 
   const [websocketAddress, setWebsocketAddress] = useState<{ url: string; authToken: string | null } | null>(null);
+
+  const currentServerIdRef = useRef(currentServerId);
+  const screenRef = useRef(screen);
 
   useEffect(() => {
     if (!currentServerId) {
@@ -62,17 +71,17 @@ export function useWebSocketLifecycle() {
   }, [service, setService]);
 
   useEffect(() => {
-    if (!service || !currentServerId) return;
+    if (!service) return;
     // register events
     service.registerEvent('updateToken', async (data) => {
       await db.remoteServer
         .where('id')
-        .equals(currentServerId)
+        .equals(currentServerIdRef.current!)
         .modify({ authToken: data.token });
     });
 
     service.registerEvent('syncCompleted', async () => {
-      if (screen === 'auth') {
+      if (screenRef.current === 'auth') {
         setScreen('main');
       }
     });
@@ -85,6 +94,15 @@ export function useWebSocketLifecycle() {
       setConnectionStatus(status);
     });
 
+    service.registerEvent('syncUser', async (data) => {
+      addAccount({
+        userId: data.userId,
+        username: data.username,
+        nickname: data.nickname,
+        bio: data.bio,
+      });
+    });
+
     // connect to websocket
     (async function() {
       await service.connect();
@@ -93,5 +111,5 @@ export function useWebSocketLifecycle() {
     return () => {
       service.close();
     };
-  }, [service]);
+  }, [service, setConnectionStatus, setScreen]);
 }

@@ -20,10 +20,13 @@ import { ActionIcon, Menu, rgba } from '@mantine/core';
 import { ArchiveIcon, Contact2Icon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { useStackControls } from '@/hooks/mainRouterHooks.ts';
 import { useTranslation } from 'react-i18next';
+import useAccountsStore from '@/store/accountsStore.ts';
 
 const DropdownMenu = () => {
   const { t } = useTranslation();
   const { pushView } = useStackControls();
+
+  const accounts = useAccountsStore(s => s.accounts);
 
   return (
     <Menu shadow="md" width={280} trapFocus transitionProps={{ transition: 'pop-top-left', duration: 200 }}
@@ -44,9 +47,9 @@ const DropdownMenu = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item leftSection={<UserIcon size={14} />}>
-          Example User
-        </Menu.Item>
+        {Object.entries(accounts).map(account => (<Menu.Item leftSection={<UserIcon size={14}/>}>
+          {account[1].nickname}
+          </Menu.Item>))}
         <Menu.Divider />
         <Menu.Item leftSection={<PlusIcon size={14} />}>
           {t('menu.login')}

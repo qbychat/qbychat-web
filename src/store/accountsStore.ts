@@ -22,12 +22,13 @@ import { immer } from 'zustand/middleware/immer';
 interface Account {
   userId: string;
   username: string;
-
+  nickname: string;
+  bio?: string | null;
 }
 
 interface AccountState {
   accounts: Record<string, Account>;
-  setAccount: (account: Account) => void;
+  addAccount: (account: Account) => void;
   removeAccount: (userId: string) => void;
   updateAccount: (userId: string, data: Partial<Account>) => void;
 }
@@ -36,7 +37,7 @@ export const useAccountsStore = create<AccountState>()(
   immer((set) => ({
     accounts: {},
 
-    setAccount: (account) =>
+    addAccount: (account) =>
       set((state) => {
         state.accounts[account.userId] = account;
       }),
