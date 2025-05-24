@@ -18,13 +18,18 @@
 
 
 import DropdownMenu from '@/components/main/views/chat-list/DropdownMenu.tsx';
+import SearchView from '@/components/main/views/chat-list/SearchView.tsx';
 
 const ChatListView = () => {
+
+  const onSearch = (value: string)=>{
+    console.log(value);
+  };
 
   return (<div className="flex flex-col h-full">
     <div className="flex flex-row gap-2 p-2 shadow-xl">
       <DropdownMenu />
-      <div>search box</div>
+      <SearchView onSubmit={onSearch}/>
     </div>
     <div className="flex flex-col h-full p-2">
       <div>chat list</div>

@@ -23,6 +23,7 @@ import LoadingAnimation from '@/components/LoadingAnimation.tsx';
 import AuthController from '@/components/auth/AuthController.tsx';
 import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
 import MainController from '@/components/main/MainController.tsx';
+import { isProd } from '@/env';
 
 function App() {
   const screen = useAppStore(state => state.screen);
@@ -30,6 +31,7 @@ function App() {
   useWebSocketLifecycle();
 
   const renderScreen = () => {
+    if(!isProd) return <MainController/>;
     switch (screen) {
       case 'loading':
         return <LoadingAnimation />;
