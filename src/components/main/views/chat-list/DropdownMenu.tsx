@@ -47,9 +47,11 @@ const DropdownMenu = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {Object.entries(accounts).map(account => (<Menu.Item leftSection={<UserIcon size={14}/>}>
+        {Object.entries(accounts).map(account => (
+          <Menu.Item key={account[0]} leftSection={<UserIcon size={14}/>}>
           {account[1].nickname}
-          </Menu.Item>))}
+          </Menu.Item>
+        ))}
         <Menu.Divider />
         <Menu.Item leftSection={<PlusIcon size={14} />}>
           {t('menu.login')}

@@ -33,6 +33,7 @@
   "auth.register.password": "密码",
   "auth.register.password.verify": "密码 (再输入一次)",
   "auth.register.go-to-login": "去登录",
+  "auth.error.already-logged-in1": "你已经在这个会话中使用这个账户登录了",
 
   "menu.login": "登录一个新账户",
   "menu.saved-messages": "消息存档",

@@ -70,6 +70,9 @@ const LoginPage = () => {
         case UsernamePasswordLoginResponse_Status.USER_BANNED:
           setError(t('auth.error.user-banned'));
           break;
+        case UsernamePasswordLoginResponse_Status.ALREADY_LOGGED_IN:
+          setError(t('auth.error.already-logged-in'));
+          break;
       }
     } catch (e) {
       if (e instanceof RpcError) {

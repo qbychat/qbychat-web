@@ -33,6 +33,7 @@
   "auth.register.password": "Password",
   "auth.register.password.verify": "Password (Again)",
   "auth.register.go-to-login": "Go to login",
+  "auth.error.already-logged-in": "This account is already logged in during this session.",
 
   "menu.login": "Add an account",
   "menu.saved-messages": "Saved Messages",
