@@ -28,7 +28,7 @@ import {
   RegisterAccountResponse_Status,
   RegisterAccountResponseSchema,
 } from '@/proto/qbychat/websocket/user/v1/service_pb';
-import { RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 class UserService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -49,11 +49,11 @@ class UserService implements IWebsocketService {
       password: password,
     });
 
-    const response = await this.packetService.request(RegisterAccountResponseSchema, null, RPCRequestMethod.REGISTER_ACCOUNT_V1, toBinary(RegisterAccountRequestSchema, request));
+    const response = await this.packetService.request(RegisterAccountResponseSchema, null, RpcRequestMethod.REGISTER_ACCOUNT_V1, toBinary(RegisterAccountRequestSchema, request));
     if (response.status === RegisterAccountResponse_Status.SUCCESS) {
       // trigger sync
       this.eventEmitter.sendEvent('triggerSync', {
-        accountId: response.accountId!
+        accountId: response.accountId!,
       });
     }
     return response;

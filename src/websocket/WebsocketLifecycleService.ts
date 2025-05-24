@@ -30,7 +30,7 @@ import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import ClientService from '@/websocket/services/ClientService.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import { fromBinary, Message } from '@bufbuild/protobuf';
-import { ClientboundMessageSchema, RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { ClientboundMessageSchema, RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import AuthService from '@/websocket/services/AuthService.ts';
 
@@ -222,7 +222,7 @@ class WebsocketLifecycleService implements IPacketService {
   async request<T extends Message>(
     type: GenMessage<T>,
     userId: string | null,
-    method: RPCRequestMethod,
+    method: RpcRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,
   ): Promise<T> {

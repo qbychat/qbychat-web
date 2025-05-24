@@ -26,7 +26,7 @@ import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service_pb';
-import { RPCError } from '@/websocket/errors/RPCError.ts';
+import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { useForm } from '@mantine/form';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
 
@@ -77,7 +77,7 @@ const RegisterPage = () => {
           break;
       }
     } catch (e) {
-      if (e instanceof RPCError) {
+      if (e instanceof RpcError) {
         setError(t('auth.error.rpc', { error: e.message }));
       } else {
         setError(t('auth.error.unknown'));

@@ -25,7 +25,7 @@ import {
   UsernamePasswordLoginResponse_Status,
   UsernamePasswordLoginResponseSchema,
 } from '@/proto/qbychat/websocket/auth/v1/service_pb';
-import { RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { create, toBinary } from '@bufbuild/protobuf';
 
 class AuthService implements IWebsocketService {
@@ -48,7 +48,7 @@ class AuthService implements IWebsocketService {
 
     const response = await this.packetService.request(
       UsernamePasswordLoginResponseSchema,
-      null, RPCRequestMethod.USERNAME_PASSWORD_LOGIN_V1,
+      null, RpcRequestMethod.USERNAME_PASSWORD_LOGIN_V1,
       toBinary(UsernamePasswordLoginRequestSchema, request),
     );
     if (response.status === UsernamePasswordLoginResponse_Status.SUCCESS) {

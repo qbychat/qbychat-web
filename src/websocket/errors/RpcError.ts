@@ -18,14 +18,14 @@
  */
 
 
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
-export class RPCError extends Error {
-  status: RPCResponse_Status;
+export class RpcError extends Error {
+  status: RpcResponse_Status;
 
-  constructor(status: RPCResponse_Status, message: string | undefined) {
+  constructor(status: RpcResponse_Status, message: string | undefined) {
     super(`${status} ${message}`);
-    this.name = 'RPCError';
+    this.name = 'RpcError';
     this.status = status;
   }
 }

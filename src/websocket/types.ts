@@ -19,16 +19,16 @@
  */
 
 import SlidingWindow from '@/websocket/SlidingWindow';
-import { RPCError } from '@/websocket/errors/RPCError';
+import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
-import { RPCResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
-export interface RPCResponsePromiseHandlers {
-  resolve: (value: RPCResponse) => void;
-  reject: (reason: RPCError) => void;
+export interface RpcResponsePromiseHandlers {
+  resolve: (value: RpcResponse) => void;
+  reject: (reason: RpcError) => void;
 }
 
 export interface SSEPayload<T> {

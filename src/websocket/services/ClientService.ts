@@ -30,7 +30,7 @@ import {
 } from '@/proto/qbychat/websocket/session/v1/service_pb';
 import { create, toBinary } from '@bufbuild/protobuf';
 import { Platform } from '@/proto/qbychat/common/v1/platform_pb';
-import { RPCRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 class ClientService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -51,7 +51,7 @@ class ClientService implements IWebsocketService {
     return await this.packetService.request(
       ResumeClientResponseSchema,
       null,
-      RPCRequestMethod.RESUME_CLIENT_V1,
+      RpcRequestMethod.RESUME_CLIENT_V1,
       toBinary(ResumeClientRequestSchema, request),
     );
   }
@@ -80,7 +80,7 @@ class ClientService implements IWebsocketService {
     const response = await this.packetService.request(
       RegisterClientResponseSchema,
       null,
-      RPCRequestMethod.REGISTER_CLIENT_V1,
+      RpcRequestMethod.REGISTER_CLIENT_V1,
       toBinary(RegisterClientRequestSchema, request),
     );
 

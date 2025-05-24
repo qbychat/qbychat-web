@@ -21,8 +21,8 @@
 import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
 import ClientService from '@/websocket/services/ClientService.ts';
-import { RPCError } from '@/websocket/errors/RPCError.ts';
-import { RPCResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcError } from '@/websocket/errors/RpcError.ts';
+import { RpcResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 
 export class WebsocketAuthService {
   private eventEmitter: WebsocketEventEmitter;
@@ -47,8 +47,8 @@ export class WebsocketAuthService {
       try {
         await this.resumeSession();
       } catch (e) {
-        if (e instanceof RPCError) {
-          if (e.status === RPCResponse_Status.UNAUTHORIZED) {
+        if (e instanceof RpcError) {
+          if (e.status === RpcResponse_Status.UNAUTHORIZED) {
             // the client was revoked at the serverside
             // try to register a new one
             await this.registerClient();

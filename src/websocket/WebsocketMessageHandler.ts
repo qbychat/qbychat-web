@@ -18,24 +18,23 @@
  *
  */
 
-import { RPCResponsePromiseHandlers } from './types';
-import { RPCError } from '@/websocket/errors/RPCError';
+import { RpcResponsePromiseHandlers } from './types';
+import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { sha256 } from 'js-sha256';
 import { numToUint8Array } from '@/utils/binaryUtils';
 import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
 import {
   ClientboundMessage,
-  RPCRequestMethod,
-  RPCResponse,
-  RPCResponse_Status,
+  RpcRequestMethod, RpcResponse,
+  RpcResponse_Status,
   ServerboundMessageSchema,
 } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { create, fromBinary, Message, toBinary } from '@bufbuild/protobuf';
 
 export class WebsocketMessageHandler {
-  private responseHandlers: Map<string, RPCResponsePromiseHandlers> = new Map();
+  private responseHandlers: Map<string, RpcResponsePromiseHandlers> = new Map();
   private ticketCounter: number = 0;
   private eventEmitter: WebsocketEventEmitter;
   private readonly sendPacketFn: (data: Uint8Array) => void;
@@ -61,7 +60,7 @@ export class WebsocketMessageHandler {
   /**
    * Handle response packet
    */
-  private handleResponse(response: RPCResponse): void {
+  private handleResponse(response: RpcResponse): void {
     const ticketHash = sha256(response.ticket!);
     log.info(`📥 Received response with ticket ${ticketHash}`);
     log.debug('📥 Received response', response);
@@ -69,12 +68,12 @@ export class WebsocketMessageHandler {
     const responseHandler = this.responseHandlers.get(ticketHash);
     if (responseHandler) {
       // invoke handler
-      if (response.status === RPCResponse_Status.SUCCESS) {
+      if (response.status === RpcResponse_Status.SUCCESS) {
         // success
         responseHandler.resolve(response);
       } else {
         // error
-        responseHandler.reject(new RPCError(response.status, response.message));
+        responseHandler.reject(new RpcError(response.status, response.message));
       }
       // cleanup handler
       this.responseHandlers.delete(ticketHash);
@@ -96,7 +95,7 @@ export class WebsocketMessageHandler {
   async request<T extends Message>(
     type: GenMessage<T>,
     userId: string | null,
-    method: RPCRequestMethod,
+    method: RpcRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,
   ): Promise<T> {
@@ -123,7 +122,7 @@ export class WebsocketMessageHandler {
         reject(new Error(`Request timed out after ${timeout}ms`));
       }, timeout);
 
-      const callback = (response: RPCResponse) => {
+      const callback = (response: RpcResponse) => {
         // clean timeout
         clearTimeout(timeoutId);
         // parse payload
