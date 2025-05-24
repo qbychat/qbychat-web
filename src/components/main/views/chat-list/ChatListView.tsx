@@ -18,18 +18,14 @@
 
 
 import DropdownMenu from '@/components/main/views/chat-list/DropdownMenu.tsx';
-import SearchView from '@/components/main/views/chat-list/SearchView.tsx';
+import ConnectionStateLabel from '@/components/ui/ConnectionStateLabel.tsx';
 
 const ChatListView = () => {
 
-  const onSearch = (value: string)=>{
-    console.log(value);
-  };
-
   return (<div className="flex flex-col h-full">
-    <div className="flex flex-row gap-2 p-2 shadow-xl">
+    <div className="flex flex-row gap-2 p-2">
       <DropdownMenu />
-      <SearchView onSubmit={onSearch}/>
+      <ConnectionStateLabel text="QbyChat"/>
     </div>
     <div className="flex flex-col h-full p-2">
       <div>chat list</div>

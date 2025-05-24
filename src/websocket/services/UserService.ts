@@ -27,8 +27,23 @@ import {
   RegisterAccountResponse,
   RegisterAccountResponse_Status,
   RegisterAccountResponseSchema,
+  SyncRequestSchema,
+  SyncResponseSchema,
 } from '@/proto/qbychat/websocket/user/v1/service_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import log from 'loglevel';
+import { Role } from '@/proto/qbychat/websocket/user/v1/common_pb';
+
+export type UserServiceEvents = {
+  syncUser: {
+    userId: string;
+    username: string;
+    nickname: string;
+    bio?: string | null;
+    registerTime?: bigint | null;
+    roles: Role[]
+  }
+}
 
 class UserService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -39,8 +54,24 @@ class UserService implements IWebsocketService {
     this.eventEmitter = eventEmitter;
   }
 
-  async sync() {
-    // TODO send SyncRequest
+  async sync(userId: string): Promise<void> {
+    const request = create(SyncRequestSchema, {});
+
+    try {
+      const response = await this.packetService.request(SyncResponseSchema, userId, RpcRequestMethod.USER_SYNC_V1, toBinary(SyncRequestSchema, request));
+      // push event
+      this.eventEmitter.sendEvent('syncUser', {
+        userId: response.privateInfo!.userId,
+        username: response.publicInfo!.username,
+        nickname: response.publicInfo!.nickname,
+        bio: response.publicInfo!.bio,
+
+        registerTime: response.privateInfo!.createTime?.seconds,
+        roles: response.privateInfo!.roles,
+      });
+    } catch (error) {
+      log.error(`❌ Failed to sync user info for user ${userId}`, error);
+    }
   }
 
   async registerAccount(username: string, password: string): Promise<RegisterAccountResponse> {

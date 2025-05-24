@@ -19,24 +19,34 @@
 
 // store.ts
 import { create } from 'zustand';
+import { WebSocketStatus } from '@/websocket/types.ts';
 
-export type AppScreen = 'loading' | 'onboarding' | 'auth' | 'main'
+export type AppScreen = 'onboarding' | 'auth' | 'main'
 
 interface AppState {
   screen: AppScreen;
   prevScreen: AppScreen | null;
+  connectionStatus: WebSocketStatus;
+
+  // actions
   setScreen: (screen: AppScreen) => void;
+  setConnectionStatus: (connectionStatus: WebSocketStatus) => void;
 }
 
 const useAppStore = create<AppState>((set, get) => ({
-  screen: 'loading',
+  screen: 'main',
   prevScreen: null,
+  connectionStatus: 'connecting',
+
   setScreen: (newScreen) => {
     const { screen } = get();
     if (newScreen !== screen) {
       set({ prevScreen: screen, screen: newScreen });
     }
   },
+  setConnectionStatus: (connectionStatus: WebSocketStatus) => {
+    set({ connectionStatus });
+  }
 }));
 
 export default useAppStore;

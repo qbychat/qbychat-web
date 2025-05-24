@@ -40,7 +40,7 @@ const MainController = () => {
   const { goBack } = useStackControls();
 
   const chatListViewCache = useMemo(() => {
-    return <ChatListView/>;
+    return <ChatListView />;
   }, []);
 
   const introViewCache = useMemo(() => {
@@ -88,7 +88,7 @@ const MainController = () => {
         defaultElement={chatListViewCache}
       />
     </Panel>
-    <PanelResizeHandle className="w-2"/>
+    <PanelResizeHandle />
     <Panel>
       <TransitionContainer
         currentViewEntry={rightDesktopViewEntry}

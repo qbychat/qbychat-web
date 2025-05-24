@@ -22,6 +22,7 @@
   "auth.error.unknown": "Unknown Error (probably request timeout)",
   "auth.error.username-length": "Username should be 5-16 character long",
   "auth.error.password-required": "Requires a password",
+  "auth.error.password-mismatch": "Password doesn't match",
   "auth.error.bad-username": "Bad username",
   "auth.error.username-invalid": "Username must be 5 to 16 characters long and contain only letters and numbers.",
   "auth.error.username-taken": "Username was taken",

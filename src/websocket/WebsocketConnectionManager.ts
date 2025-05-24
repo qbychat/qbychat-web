@@ -109,7 +109,7 @@ export class WebsocketConnectionManager {
     this.socket = new WebSocket(discoveryConfig.websocketAddress);
     this.eventEmitter.updateStatus('connecting');
 
-    log.info(`🚀 Start connecting to websocket ${this.config.url}`);
+    log.info(`🚀 Start connecting to websocket ${discoveryConfig.websocketAddress}`);
 
     this.socket.onopen = () => {
       // socket opened

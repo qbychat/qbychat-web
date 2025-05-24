@@ -86,6 +86,10 @@ class WebsocketLifecycleService implements IPacketService {
 
     // Register internal events
     this.eventEmitter.registerEvent('triggerSync', (data) => this.sync(data.accountId));
+    this.eventEmitter.registerEvent('updateStatus', (status) => {
+      // reset encryption metadata after disconnected
+      if (status === 'closed') this.encryptionService.reset();
+    });
   }
 
   /**
@@ -99,7 +103,6 @@ class WebsocketLifecycleService implements IPacketService {
    * Connect to the WebSocket server
    */
   async connect(): Promise<void> {
-    this.encryptionService.reset();
     await this.connectionManager.connect();
   }
 

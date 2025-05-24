@@ -23,6 +23,7 @@ import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { RpcResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { UserServiceEvents } from '@/websocket/services/UserService.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -38,14 +39,17 @@ export interface SSEPayload<T> {
 }
 
 export type WebsocketEvents = {
+  /* Internal Events */
   sse: SSEPayload<unknown>;
+
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
   requireLogin: null;
   loginStateSynced: { mainAccountId: string; loggedInAccountIds: string[] };
   triggerSync: { accountId: string };
   syncCompleted: { accountId: string };
-}
+
+} & UserServiceEvents
 
 export interface EncryptionState {
   sessionId: bigint | null;

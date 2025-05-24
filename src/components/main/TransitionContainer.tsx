@@ -21,19 +21,20 @@ import { useIsBackDirection } from '@/hooks/mainRouterHooks.ts';
 import React, { useEffect, useState } from 'react';
 import { Transition } from '@mantine/core';
 
-interface Props {
+type Props = {
   currentViewEntry: ViewEntry | null;
   render: (entry: ViewEntry) => React.ReactNode;
   duration?: number;
 
   defaultElement?: React.ReactNode;
-}
+} & React.HTMLAttributes<HTMLDivElement>
 
 const TransitionContainer = ({
                                currentViewEntry,
                                render,
                                duration = 200,
                                defaultElement,
+                               ...divProps
                              }: Props) => {
   let isBack = useIsBackDirection();
 
@@ -62,6 +63,12 @@ const TransitionContainer = ({
     return () => clearTimeout(timeout);
   }, [currentViewEntry, defaultElement, duration, render, renderedEntry]);
 
+  const {
+    className: divClassName = '',
+    style: divStyle = {},
+    ...otherDivProps
+  } = divProps;
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       <Transition
@@ -71,14 +78,8 @@ const TransitionContainer = ({
         timingFunction="ease-out"
       >
         {(styles) => (
-          <div
-            style={{
-              ...styles,
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-            }}
-          >
+          <div className={`w-full h-full absolute ${divClassName}`}
+               style={{ ...styles, ...divStyle }} {...otherDivProps}>
             {renderedElement}
           </div>
         )}

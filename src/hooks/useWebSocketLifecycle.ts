@@ -19,39 +19,14 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import useAppStore, { AppScreen } from '@/store/appStore.ts';
+import useAppStore from '@/store/appStore.ts';
 import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import useSettings from '@/store/settingsStore.ts';
 
-function registerEvents(
-  serverId: number,
-  service: WebsocketLifecycleService,
-  screen: AppScreen,
-  setScreen: (screen: AppScreen) => void,
-) {
-
-  service.registerEvent('updateToken', async (data) => {
-    await db.remoteServer
-      .where('id')
-      .equals(serverId)
-      .modify({ authToken: data.token });
-  });
-
-  service.registerEvent('syncCompleted', async () => {
-    if (screen === 'auth' || screen === 'loading') {
-      setScreen('main');
-    }
-  });
-
-  service.registerEvent('requireLogin', async () => {
-    setScreen('auth');
-  });
-}
-
 export function useWebSocketLifecycle() {
-  const { setScreen, screen } = useAppStore();
+  const { setScreen, setConnectionStatus, screen } = useAppStore();
   const setService = useWebsocketLifecycleService(state => state.setService);
   const currentServerId = useSettings((state) => state.currentServerId);
 
@@ -89,12 +64,27 @@ export function useWebSocketLifecycle() {
   useEffect(() => {
     if (!service || !currentServerId) return;
     // register events
-    registerEvents(
-      currentServerId,
-      service,
-      screen,
-      setScreen,
-    );
+    service.registerEvent('updateToken', async (data) => {
+      await db.remoteServer
+        .where('id')
+        .equals(currentServerId)
+        .modify({ authToken: data.token });
+    });
+
+    service.registerEvent('syncCompleted', async () => {
+      if (screen === 'auth') {
+        setScreen('main');
+      }
+    });
+
+    service.registerEvent('requireLogin', async () => {
+      setScreen('auth');
+    });
+
+    service.registerEvent('updateStatus', async (status) => {
+      setConnectionStatus(status);
+    });
+
     // connect to websocket
     (async function() {
       await service.connect();
