@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite build && vite preview",
-    "postinstall": "node scripts/postinstall.cjs",
+    "postinstall": "node ./node_modules/electron/install.js",
     "electron": "node scripts/dev-electron.cjs",
     "transpile:electron": "tsc --project tsconfig.electron.json",
     "electron:dist:mac": "pnpm run transpile:electron && npm run build && electron-builder --mac --arm64",
