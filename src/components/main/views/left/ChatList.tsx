@@ -17,11 +17,9 @@
  */
 
 
-// import useConversationStore from '@/store/conversationStore.ts';
 import { List } from 'react-virtualized';
 
 export default function ChatList({width, height}:{width: number, height: number}) {
-  // const conversations = useConversationStore(s=>s.conversations);
 
   const conversations = [
     {

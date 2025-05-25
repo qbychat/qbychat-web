@@ -16,25 +16,3 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create } from 'zustand';
-import { Conversation } from '@/proto/qbychat/websocket/conversation/v1/common_pb';
-import { immer } from 'zustand/middleware/immer';
-
-interface ConversationState {
-  conversations: Conversation[];
-
-  setConversations: (conversations: Conversation[]) => void;
-}
-
-const useConversationStore = create<ConversationState>()(
-  immer((set) => ({
-    conversations: [],
-
-    setConversations: (newConversation: Conversation[]) =>
-      set((state) => {
-        state.conversations = newConversation;
-      }),
-  })),
-);
-
-export default useConversationStore;

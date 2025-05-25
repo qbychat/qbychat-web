@@ -24,7 +24,6 @@ import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { RpcResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { UserServiceEvents } from '@/websocket/services/UserService.ts';
-import { ConversationServiceEvents } from '@/websocket/services/ConversationService.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -50,7 +49,7 @@ export type WebsocketEvents = {
   triggerSync: { accountId: string };
   syncCompleted: { accountId: string };
 
-} & UserServiceEvents & ConversationServiceEvents;
+} & UserServiceEvents;
 
 export interface EncryptionState {
   sessionId: bigint | null;
