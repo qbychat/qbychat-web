@@ -33,6 +33,7 @@ import { fromBinary, Message } from '@bufbuild/protobuf';
 import { ClientboundMessageSchema, RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import AuthService from '@/websocket/services/AuthService.ts';
+import ConversationService from '@/websocket/services/ConversationService.ts';
 
 class WebsocketLifecycleService implements IPacketService {
   // Configuration
@@ -72,6 +73,7 @@ class WebsocketLifecycleService implements IPacketService {
     // Initialize services
     this.registerService(new UserService(this, this.eventEmitter));
     this.registerService(new AuthService(this, this.eventEmitter));
+    this.registerService(new ConversationService(this, this.eventEmitter));
     const clientService = this.registerService(new ClientService(this));
 
     this.authService = new WebsocketAuthService(

@@ -22,19 +22,21 @@ import ConnectionStateLabel from '@/components/ui/ConnectionStateLabel.tsx';
 import SearchBox from '@/components/main/views/left/SearchBox.tsx';
 import React, { useMemo, useState } from 'react';
 import SimpleController from '@/components/SimpleController.tsx';
+import ChatList from './ChatList';
 
 type LeftPage = 'chatList' | 'search';
 
-const LeftPanel = () => {
+const LeftPanel = ({width}: {width: number}) => {
   const [searchBoxContent, setSearchBoxContent] = useState('');
   const [currentPage, setCurrentPage] = useState<LeftPage>('chatList');
 
-  const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
-    chatList: <div>chatList</div>,
-    search: <div>search</div>,
-  }), []);
 
-  return (<div className="flex flex-col h-full">
+  const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
+    chatList: <ChatList width={width} height={document.getElementById('leftPanel')?.clientHeight || 840}/>,
+    search: <div>search</div>,
+  }), [width]);
+
+  return (<div className="flex flex-col h-full" id="leftPanel">
     <div className="flex flex-row p-2 items-center">
       <DropdownMenu />
       <ConnectionStateLabel className="flex-1">

@@ -25,6 +25,7 @@ import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import useSettings from '@/store/settingsStore.ts';
 import useAccountsStore from '@/store/accountsStore.ts';
+import useConversationStore from '@/store/conversationStore.ts';
 
 export function useWebSocketLifecycle() {
   const setScreen = useAppStore(s => s.setScreen);
@@ -32,6 +33,8 @@ export function useWebSocketLifecycle() {
   const screen = useAppStore(s => s.screen);
 
   const addAccount = useAccountsStore(s => s.addAccount);
+
+  const setConversations = useConversationStore(s => s.setConversations);
 
   const setService = useWebsocketLifecycleService(state => state.setService);
   const currentServerId = useSettings((state) => state.currentServerId);
@@ -102,6 +105,11 @@ export function useWebSocketLifecycle() {
         bio: data.bio,
       });
     });
+
+    service.registerEvent('syncConversation', async (data) => {
+      setConversations(data.conversations);
+    });
+
 
     // connect to websocket
     (async function() {
