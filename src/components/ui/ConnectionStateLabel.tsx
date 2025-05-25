@@ -22,10 +22,10 @@ import { Transition } from '@mantine/core';
 import useAppStore from '@/store/appStore.ts';
 
 type Props = {
-  text?: React.ReactNode;
+  children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLParagraphElement>
 
-const ConnectionStateLabel = ({ text, ...props }: Props) => {
+const ConnectionStateLabel = ({ children, ...props }: Props) => {
   const { connectionStatus } = useAppStore();
 
   const statusMap: Record<WebSocketStatus, {
@@ -46,8 +46,8 @@ const ConnectionStateLabel = ({ text, ...props }: Props) => {
       animDots: true,
     },
     open: {
-      label: text,
-      hidden: !text,
+      label: children,
+      hidden: !children,
       color: 'white',
       animDots: false,
     },
@@ -66,7 +66,7 @@ const ConnectionStateLabel = ({ text, ...props }: Props) => {
       color: 'red',
       animDots: false,
     },
-  }), [text]);
+  }), [children]);
 
   const { animDots } = statusMap[connectionStatus];
 
@@ -104,16 +104,16 @@ const ConnectionStateLabel = ({ text, ...props }: Props) => {
   return (
     <Transition mounted={mounted && !current.hidden} transition="fade" duration={200} timingFunction="ease">
       {(styles) => (
-        <p
+        <div
           style={{ color: current.color, ...styles, display: 'flex', alignItems: 'center', gap: 6, ...pStyle }}
           {...otherProps}
         >
           {current.icon && <span>{current.icon}</span>}
-          <span>
+          <span className="w-full">
             {current.label}
             {current.animDots ? '.'.repeat(dots) : ''}
           </span>
-        </p>
+        </div>
       )}
     </Transition>
   );

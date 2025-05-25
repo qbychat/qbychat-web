@@ -17,14 +17,21 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { MantineTransition, Transition } from '@mantine/core';
 
 type Props = {
   pageMap: Record<string, React.ReactNode>,
   activePage: string
+  transition?: MantineTransition;
+  transitionDuration?: number
 }
 
-const SimpleController = ({ pageMap, activePage }: Props) => {
+const SimpleController = ({
+                            pageMap,
+                            activePage,
+                            transition = 'scale',
+                            transitionDuration = 200,
+                          }: Props) => {
   const [activePageCache, setActivePageCache] = useState(activePage);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -34,30 +41,28 @@ const SimpleController = ({ pageMap, activePage }: Props) => {
       const timeout = setTimeout(() => {
         setActivePageCache(activePage);
         setIsExiting(false);
-      }, 200);
+      }, transitionDuration);
 
       return () => clearTimeout(timeout);
     }
-  }, [activePage, activePageCache]);
+  }, [activePage, activePageCache, transitionDuration]);
 
   const Page = pageMap[activePageCache];
 
   return (
-    <div style={{ position: 'relative' }} className="h-full">
-      <AnimatePresence mode="wait">
-        {!isExiting && activePageCache && (
-          <motion.div
-            key={activePageCache}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ width: '100%', height: '100%' }}
-          >
+    <div className="relative h-full w-full">
+      <Transition
+        mounted={!isExiting && !!activePageCache}
+        transition={transition}
+        duration={transitionDuration}
+        timingFunction="ease"
+      >
+        {(styles) => (
+          <div style={{ ...styles, width: '100%', height: '100%' }}>
             {Page}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </Transition>
     </div>
   );
 };

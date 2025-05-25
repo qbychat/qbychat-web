@@ -28,7 +28,7 @@ import {
   useStackControls,
 } from '@/hooks/mainRouterHooks.ts';
 import TransitionContainer from '@/components/main/TransitionContainer.tsx';
-import ChatListView from '@/components/main/views/chat-list/ChatListView.tsx';
+import LeftPanel from '@/components/main/views/left/LeftPanel.tsx';
 
 const MainController = () => {
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -40,7 +40,7 @@ const MainController = () => {
   const { goBack } = useStackControls();
 
   const chatListViewCache = useMemo(() => {
-    return <ChatListView />;
+    return <LeftPanel />;
   }, []);
 
   const introViewCache = useMemo(() => {

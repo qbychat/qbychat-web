@@ -17,7 +17,7 @@
  *
  */
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { Transition } from '@mantine/core';
 
 type Props = {
   error: string;
@@ -25,20 +25,14 @@ type Props = {
 
 const AnimatedErrorMessage = ({ error }: Props) => {
   return (
-    <AnimatePresence>
-      {error && (
-        <motion.p
-          key="error"
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -5 }}
-          transition={{ duration: 0.2 }}
-          className="text-red-500"
-        >
-          {error}
-        </motion.p>
-      )}
-    </AnimatePresence>
+    <Transition
+      mounted={!!error}
+      transition="slide-down"
+      duration={200}
+      timingFunction="ease"
+    >
+      {(styles) => <p style={styles} className="text-red-500">{error}</p>}
+    </Transition>
   );
 };
 
