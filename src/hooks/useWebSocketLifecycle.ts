@@ -71,7 +71,11 @@ export function useWebSocketLifecycle() {
   }, [service, setService]);
 
   useEffect(() => {
-    if (!service) return;
+    screenRef.current = screen;
+  }, [screen]);
+
+  useEffect(() => {
+    if (!service || !currentServerIdRef.current) return;
     // register events
     service.registerEvent('updateToken', async (data) => {
       await db.remoteServer
@@ -112,5 +116,5 @@ export function useWebSocketLifecycle() {
     return () => {
       service.close();
     };
-  }, [service, setConnectionStatus, setScreen]);
+  }, [service, addAccount, setConnectionStatus, setScreen]);
 }
