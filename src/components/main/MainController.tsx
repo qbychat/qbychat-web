@@ -17,7 +17,7 @@
  */
 
 import { useMediaQuery } from 'react-responsive';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import useMainRouterStore, { ViewEntry } from '@/store/controller/mainRouterStore.ts';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import {
@@ -39,11 +39,9 @@ const MainController = () => {
   const currentMobileViewEntry = useCurrentMobileViewEntry();
   const { goBack } = useStackControls();
 
-  const [leftWidth, setLeftWidth] = useState<number>(window.innerWidth * 0.25);
-
   const chatListViewCache = useMemo(() => {
-    return <LeftPanel width={leftWidth}/>;
-  }, [leftWidth]);
+    return <LeftPanel />;
+  }, []);
 
   const introViewCache = useMemo(() => {
     return <>intro</>;
@@ -83,14 +81,14 @@ const MainController = () => {
   }
 
   return (<PanelGroup autoSaveId="qbychat-main" direction="horizontal">
-    <Panel defaultSize={25} maxSize={40} minSize={20} onResize={(size)=>{setLeftWidth(size/100*window.innerWidth);}}>
+    <Panel defaultSize={25} maxSize={40} minSize={20}>
       <TransitionContainer
         currentViewEntry={leftDesktopViewEntry}
         render={render}
         defaultElement={chatListViewCache}
       />
     </Panel>
-    <PanelResizeHandle/>
+    <PanelResizeHandle />
     <Panel>
       <TransitionContainer
         currentViewEntry={rightDesktopViewEntry}

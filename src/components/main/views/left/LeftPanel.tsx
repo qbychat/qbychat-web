@@ -26,15 +26,15 @@ import ChatList from './ChatList';
 
 type LeftPage = 'chatList' | 'search';
 
-const LeftPanel = ({width}: {width: number}) => {
+const LeftPanel = () => {
   const [searchBoxContent, setSearchBoxContent] = useState('');
   const [currentPage, setCurrentPage] = useState<LeftPage>('chatList');
 
 
   const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
-    chatList: <ChatList width={width} height={document.getElementById('leftPanel')?.clientHeight || 840}/>,
+    chatList: <ChatList/>,
     search: <div>search</div>,
-  }), [width]);
+  }), []);
 
   return (<div className="flex flex-col h-full" id="leftPanel">
     <div className="flex flex-row p-2 items-center">

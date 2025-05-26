@@ -17,9 +17,9 @@
  */
 
 
-import { List } from 'react-virtualized';
+import { AutoSizer, List } from 'react-virtualized';
 
-export default function ChatList({width, height}:{width: number, height: number}) {
+export default function ChatList() {
 
   const conversations = [
     {
@@ -180,7 +180,7 @@ export default function ChatList({width, height}:{width: number, height: number}
     }
   ];
 
-  function Chat({ index }:{index: number}){
+  function rowRenderer({ index }:{index: number}){
     const conversation = conversations[index];
 
     return (
@@ -191,8 +191,16 @@ export default function ChatList({width, height}:{width: number, height: number}
   }
 
   return (
-    <>
-      <List height={height} rowCount={conversations.length} rowHeight={25} rowRenderer={Chat} width={width}/>
-    </>
-  );
+    <AutoSizer>
+      {({height, width}) => (
+        <List
+          height={height}
+          rowCount={conversations.length}
+          rowHeight={20}
+          rowRenderer={rowRenderer}
+          width={width}
+        />
+      )}
+    </AutoSizer>
+    );
 }
