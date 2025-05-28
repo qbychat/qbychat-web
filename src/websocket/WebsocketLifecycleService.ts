@@ -30,9 +30,11 @@ import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import ClientService from '@/websocket/services/ClientService.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import { fromBinary, Message } from '@bufbuild/protobuf';
-import { ClientboundMessageSchema, RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import AuthService from '@/websocket/services/AuthService.ts';
+import { ClientboundMessageSchema } from '@/proto/qbychat/rpc/protocol/v1/client_server_messages_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { IdType } from '@/utils/protoUtils.ts';
 
 class WebsocketLifecycleService implements IPacketService {
   // Configuration
@@ -176,7 +178,7 @@ class WebsocketLifecycleService implements IPacketService {
   /**
    * Sync data from the remote
    * */
-  private async sync(accountId: string): Promise<void> {
+  private async sync(accountId: IdType): Promise<void> {
     log.info(`🚀 Start sync data for account ${accountId}`);
     for (const service of this.serviceMap.values()) {
       await service.sync(accountId);
@@ -224,7 +226,7 @@ class WebsocketLifecycleService implements IPacketService {
    */
   async request<T extends Message>(
     type: GenMessage<T>,
-    userId: string | null,
+    userId: IdType | null | undefined,
     method: RpcRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,

@@ -22,8 +22,9 @@ import SlidingWindow from '@/websocket/SlidingWindow';
 import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
-import { RpcResponse } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { UserServiceEvents } from '@/websocket/services/UserService.ts';
+import { RpcResponse } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { IdType } from '@/utils/protoUtils.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -33,7 +34,7 @@ export interface RpcResponsePromiseHandlers {
 }
 
 export interface SSEPayload<T> {
-  userId: string | null | undefined;
+  userId: IdType | null | undefined;
   eventType: string;
   payload: T;
 }
@@ -45,9 +46,9 @@ export type WebsocketEvents = {
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
   requireLogin: null;
-  loginStateSynced: { mainAccountId: string; loggedInAccountIds: string[] };
-  triggerSync: { accountId: string };
-  syncCompleted: { accountId: string };
+  loginStateSynced: { mainAccountId: IdType; loggedInAccountIds: IdType[] };
+  triggerSync: { accountId: IdType };
+  syncCompleted: { accountId: IdType };
 
 } & UserServiceEvents;
 
@@ -72,7 +73,7 @@ export interface IPacketService {
 
   request<T extends Message>(
     type: GenMessage<T>,
-    userId: string | null,
+    userId: IdType | null | undefined,
     method: number,
     payload: Uint8Array | null,
     timeout?: number,

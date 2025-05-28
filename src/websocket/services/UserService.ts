@@ -22,26 +22,23 @@ import { IPacketService } from '@/websocket/types.ts';
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
 import { create, toBinary } from '@bufbuild/protobuf';
+import log from 'loglevel';
 import {
   RegisterAccountRequestSchema,
-  RegisterAccountResponse,
-  RegisterAccountResponse_Status,
-  RegisterAccountResponseSchema,
+  RegisterAccountResponse, RegisterAccountResponse_Status, RegisterAccountResponseSchema,
   SyncRequestSchema,
   SyncResponseSchema,
-} from '@/proto/qbychat/websocket/user/v1/service_pb';
-import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
-import log from 'loglevel';
-import { Role } from '@/proto/qbychat/websocket/user/v1/common_pb';
+} from '@/proto/qbychat/rpc/user/v1/user_service_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { IdType, parseProtobufLocalId } from '@/utils/protoUtils.ts';
 
 export type UserServiceEvents = {
   syncUser: {
-    userId: string;
+    userId: IdType;
     username: string;
     nickname: string;
     bio?: string | null;
     registerTime?: bigint | null;
-    roles: Role[]
   }
 }
 
@@ -54,20 +51,24 @@ class UserService implements IWebsocketService {
     this.eventEmitter = eventEmitter;
   }
 
-  async sync(userId: string): Promise<void> {
+  async sync(userId: IdType): Promise<void> {
     const request = create(SyncRequestSchema, {});
 
     try {
       const response = await this.packetService.request(SyncResponseSchema, userId, RpcRequestMethod.USER_SYNC_V1, toBinary(SyncRequestSchema, request));
       // push event
+      if (!response.publicInfo?.userId?.localId) {
+        log.error(`❌ Failed to sync user info for user ${userId}: localId missing`);
+        return;
+      }
+
       this.eventEmitter.sendEvent('syncUser', {
-        userId: response.privateInfo!.userId,
+        userId: parseProtobufLocalId(response.publicInfo!.userId?.localId)!,
         username: response.publicInfo!.username,
         nickname: response.publicInfo!.nickname,
         bio: response.publicInfo!.bio,
 
         registerTime: response.privateInfo!.createTime?.seconds,
-        roles: response.privateInfo!.roles,
       });
     } catch (error) {
       log.error(`❌ Failed to sync user info for user ${userId}`, error);

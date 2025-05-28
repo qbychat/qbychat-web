@@ -20,6 +20,7 @@
 
 import mitt from 'mitt';
 import { WebsocketEvents, SSEPayload, WebSocketStatus } from './types';
+import { IdType } from '@/utils/protoUtils.ts';
 
 export class WebsocketEventEmitter {
   private emitter = mitt<WebsocketEvents>();
@@ -54,7 +55,7 @@ export class WebsocketEventEmitter {
   /**
    * Send an SSE event
    */
-  sendSseEvent<T>(userId: string | null | undefined, eventType: string, payload: T): void {
+  sendSseEvent<T>(userId: IdType | null | undefined, eventType: string, payload: T): void {
     const ssePayload: SSEPayload<T> = {
       userId,
       eventType,

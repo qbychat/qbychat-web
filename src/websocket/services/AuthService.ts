@@ -19,14 +19,13 @@
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import { IPacketService } from '@/websocket/types.ts';
 import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
-import {
-  UsernamePasswordLoginRequestSchema,
-  UsernamePasswordLoginResponse,
-  UsernamePasswordLoginResponse_Status,
-  UsernamePasswordLoginResponseSchema,
-} from '@/proto/qbychat/websocket/auth/v1/service_pb';
-import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { create, toBinary } from '@bufbuild/protobuf';
+import {
+  UsernamePasswordLoginRequestSchema, UsernamePasswordLoginResponse,
+  UsernamePasswordLoginResponse_Status, UsernamePasswordLoginResponseSchema,
+} from '@/proto/qbychat/rpc/auth/v1/auth_service_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { parseProtobufLocalId } from '@/utils/protoUtils.ts';
 
 class AuthService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -55,7 +54,7 @@ class AuthService implements IWebsocketService {
       // login successfully
       // trigger sync
       this.eventEmitter.sendEvent('triggerSync', {
-        accountId: response.accountId!,
+        accountId: parseProtobufLocalId(response.accountId)!,
       });
     }
     return response;

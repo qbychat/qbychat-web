@@ -18,8 +18,10 @@
  *
  */
 
+import { IdType } from '@/utils/protoUtils.ts';
+
 interface IWebsocketService {
-  sync: (accountId: string) => Promise<void>;
+  sync: (accountId: IdType) => Promise<void>;
 }
 
 export default IWebsocketService;

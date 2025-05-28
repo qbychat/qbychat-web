@@ -24,14 +24,14 @@ import { sha256 } from 'js-sha256';
 import { numToUint8Array } from '@/utils/binaryUtils';
 import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
-import {
-  ClientboundMessage,
-  RpcRequestMethod, RpcResponse,
-  RpcResponse_Status,
-  ServerboundMessageSchema,
-} from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { create, fromBinary, Message, toBinary } from '@bufbuild/protobuf';
+import {
+  ClientboundMessage,
+  ServerboundMessageSchema,
+} from '@/proto/qbychat/rpc/protocol/v1/client_server_messages_pb';
+import { RpcRequestMethod, RpcResponse, RpcResponse_Status } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { IdType, parseProtobufLocalId, protobufLocalIdOf } from '@/utils/protoUtils.ts';
 
 export class WebsocketMessageHandler {
   private responseHandlers: Map<string, RpcResponsePromiseHandlers> = new Map();
@@ -48,7 +48,7 @@ export class WebsocketMessageHandler {
    * Handle incoming packet
    */
   handlePacket(packet: ClientboundMessage): void {
-    const userId = packet.userId;
+    const userId = parseProtobufLocalId(packet.userId);
 
     if (packet.content.case === 'response') {
       this.handleResponse(packet.content.value);
@@ -83,7 +83,7 @@ export class WebsocketMessageHandler {
   /**
    * Handle event packet
    */
-  private handleEvent(userId: string | undefined, event: { typeUrl: string; value: Uint8Array }): void {
+  private handleEvent(userId: IdType | undefined, event: { typeUrl: string; value: Uint8Array }): void {
     log.info(`Received event ${event.typeUrl}`);
     // emit event
     this.eventEmitter.sendSseEvent(userId, event.typeUrl, event.value);
@@ -94,7 +94,7 @@ export class WebsocketMessageHandler {
    */
   async request<T extends Message>(
     type: GenMessage<T>,
-    userId: string | null,
+    userId: IdType | null | undefined,
     method: RpcRequestMethod,
     payload: Uint8Array | null,
     timeout: number = 15000,
@@ -106,7 +106,7 @@ export class WebsocketMessageHandler {
 
       // build request
       const message = create(ServerboundMessageSchema, {
-        userId: userId === null ? undefined : userId,
+        userId: protobufLocalIdOf(userId),
         request: {
           ticket: ticket,
           method: method,

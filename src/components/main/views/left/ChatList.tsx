@@ -23,164 +23,164 @@ export default function ChatList() {
 
   const conversations = [
     {
-      name: 'zszf'
+      name: 'zszf',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
+      name: 'zszt3',
     },
     {
-      name: 'zszt'
+      name: 'zszt',
     },
     {
-      name: 'zszt2'
+      name: 'zszt2',
     },
     {
-      name: 'zszt3'
-    }
+      name: 'zszt3',
+    },
   ];
 
-  function rowRenderer({ index }:{index: number}){
+  function rowRenderer({ index }: { index: number }) {
     const conversation = conversations[index];
 
     return (
@@ -192,7 +192,7 @@ export default function ChatList() {
 
   return (
     <AutoSizer>
-      {({height, width}) => (
+      {({ height, width }) => (
         <List
           height={height}
           rowCount={conversations.length}
@@ -202,5 +202,5 @@ export default function ChatList() {
         />
       )}
     </AutoSizer>
-    );
+  );
 }

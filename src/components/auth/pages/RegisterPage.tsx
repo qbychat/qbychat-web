@@ -25,10 +25,10 @@ import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore
 import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
-import { RegisterAccountResponse_Status } from '@/proto/qbychat/websocket/user/v1/service_pb';
 import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { useForm } from '@mantine/form';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
+import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
 
 const RegisterPage = () => {
   const { t } = useTranslation();

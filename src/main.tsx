@@ -25,6 +25,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './components/App.tsx';
 import { MantineProvider } from '@mantine/core';
+import { enableMapSet } from 'immer';
+
+enableMapSet();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

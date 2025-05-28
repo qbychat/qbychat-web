@@ -18,39 +18,43 @@
 
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { IdType } from '@/utils/protoUtils.ts';
 
 interface Account {
-  userId: string;
+  userId: IdType;
   username: string;
   nickname: string;
   bio?: string | null;
 }
 
 interface AccountState {
-  accounts: Record<string, Account>;
+  accounts: Map<IdType, Account>;
   addAccount: (account: Account) => void;
-  removeAccount: (userId: string) => void;
-  updateAccount: (userId: string, data: Partial<Account>) => void;
+  removeAccount: (userId: IdType) => void;
+  updateAccount: (userId: IdType, data: Partial<Account>) => void;
 }
 
 export const useAccountsStore = create<AccountState>()(
   immer((set) => ({
-    accounts: {},
+    accounts: new Map<IdType, Account>(),
 
     addAccount: (account) =>
       set((state) => {
-        state.accounts[account.userId] = account;
+        state.accounts.set(account.userId, account);
       }),
 
     removeAccount: (userId) =>
       set((state) => {
-        delete state.accounts[userId];
+        state.accounts.delete(userId);
       }),
 
     updateAccount: (userId, data) =>
       set((state) => {
-        if (state.accounts[userId]) {
-          Object.assign(state.accounts[userId], data);
+        const account = state.accounts.get(userId);
+
+        if (account) {
+          Object.assign(account, data);
+          state.accounts.set(userId, account);
         }
       }),
   })),

@@ -22,7 +22,7 @@ import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
 import ClientService from '@/websocket/services/ClientService.ts';
 import { RpcError } from '@/websocket/errors/RpcError.ts';
-import { RpcResponse_Status } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import { RpcResponse_Status } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
 
 export class WebsocketAuthService {
   private eventEmitter: WebsocketEventEmitter;

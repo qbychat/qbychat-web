@@ -18,8 +18,8 @@
  */
 import sodium from 'libsodium-wrappers-sumo';
 import log from 'loglevel';
-import { EncryptedMessage, EncryptedMessageSchema } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
 import { create } from '@bufbuild/protobuf';
+import { EncryptedMessage, EncryptedMessageSchema } from '@/proto/qbychat/rpc/protocol/v1/encryption_pb';
 
 sodium.ready.then(() => {
   log.info('Loaded sodium');

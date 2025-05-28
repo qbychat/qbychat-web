@@ -25,10 +25,10 @@ import AuthLayout from '@/components/auth/AuthLayout.tsx';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
 import AuthService from '@/websocket/services/AuthService.ts';
-import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/websocket/auth/v1/service_pb';
 import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { useForm } from '@mantine/form';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
+import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/rpc/auth/v1/auth_service_pb';
 
 const LoginPage = () => {
   const { t } = useTranslation();

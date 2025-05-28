@@ -47,7 +47,7 @@ const DropdownMenu = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {Object.entries(accounts).map(account => (
+        {Array.from(accounts.entries()).map(account => (
           <Menu.Item key={account[0]} leftSection={<UserIcon size={14}/>}>
           {account[1].nickname}
           </Menu.Item>

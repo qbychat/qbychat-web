@@ -29,12 +29,12 @@ import {
   KeyPair,
   performKeyExchange,
 } from '@/utils/cipherUtils';
+import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
 import {
   ClientboundHandshakeSchema,
   EncryptedMessageSchema,
   ServerboundHandshakeSchema,
-} from '@/proto/qbychat/websocket/protocol/v1/common_pb';
-import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
+} from '@/proto/qbychat/rpc/protocol/v1/encryption_pb';
 
 export class WebsocketEncryptionService {
   private readonly state: EncryptionState;

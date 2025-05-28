@@ -22,15 +22,14 @@ import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import log from 'loglevel';
 import { UAParser } from 'ua-parser-js';
 import { IPacketService } from '@/websocket/types.ts';
-import {
-  RegisterClientRequestSchema,
-  RegisterClientResponseSchema,
-  ResumeClientRequestSchema,
-  ResumeClientResponseSchema,
-} from '@/proto/qbychat/websocket/session/v1/service_pb';
 import { create, toBinary } from '@bufbuild/protobuf';
 import { Platform } from '@/proto/qbychat/common/v1/platform_pb';
-import { RpcRequestMethod } from '@/proto/qbychat/websocket/protocol/v1/common_pb';
+import {
+  RegisterClientRequestSchema, RegisterClientResponseSchema,
+  ResumeClientRequestSchema,
+  ResumeClientResponseSchema,
+} from '@/proto/qbychat/rpc/session/v1/session_service_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
 
 class ClientService implements IWebsocketService {
   private readonly packetService: IPacketService;
