@@ -48,7 +48,7 @@ const LeftPanel = () => {
         </ConnectionStateLabel>
       </div>
       <div className="flex flex-col h-full p-2">
-        <SimpleController pageMap={pageMap} activePage={searchBoxFocused ? 'search' : currentPage} />
+        <SimpleController pageMap={pageMap} activePage={(searchBoxFocused || searchBoxContent) ? 'search' : currentPage} />
       </div>
     </div>
   );

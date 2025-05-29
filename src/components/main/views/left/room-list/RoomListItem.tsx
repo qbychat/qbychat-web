@@ -91,7 +91,7 @@ const RoomListItem = ({ room }: Props) => {
 
             {room.unreadCount > 0 && (
               <Badge size="sm" variant="filled" color="red" style={{ minWidth: 20 }}>
-                {room.unreadCount > 99 ? '99+' : room.unreadCount}
+                {room.unreadCount > 999 ? '999+' : room.unreadCount}
               </Badge>
             )}
           </Group>

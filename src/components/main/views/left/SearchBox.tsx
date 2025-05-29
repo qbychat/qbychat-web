@@ -26,33 +26,35 @@ type Props = {
 }
 
 const SearchBox = ({ value, onContentChange, onFocusChange }: Props) => {
-  return (<TextInput
-    radius="xl" className="mx-2"
-    placeholder="Search"
-    value={value}
-    onFocus={() => onFocusChange?.(true)}
-    onBlur={() => onFocusChange?.(false)}
-    onChange={(e) => onContentChange(e.target.value)}
-    rightSectionPointerEvents="all"
-    leftSection={<SearchIcon size={20} />}
-    rightSection={
-      <Transition
-        mounted={!!value}
-        transition="slide-left"
-        duration={200}
-        timingFunction="ease"
-      >
-        {(styles) =>
-          <CloseButton
-            aria-label="Clear search box"
-            variant="transparent"
-            onClick={() => onContentChange('')}
-            style={styles}
-          />
-        }
-      </Transition>
-    }
-  />);
+  return (
+    <TextInput
+      radius="xl" className="mx-2"
+      placeholder="Search"
+      value={value}
+      onFocus={() => onFocusChange?.(true)}
+      onBlur={() => onFocusChange?.(false)}
+      onChange={(e) => onContentChange(e.target.value)}
+      rightSectionPointerEvents="all"
+      leftSection={<SearchIcon size={20} />}
+      rightSection={
+        <Transition
+          mounted={!!value}
+          transition="slide-left"
+          duration={200}
+          timingFunction="ease"
+        >
+          {(styles) =>
+            <CloseButton
+              aria-label="Clear search box"
+              variant="transparent"
+              onClick={() => onContentChange('')}
+              style={styles}
+            />
+          }
+        </Transition>
+      }
+    />
+  );
 };
 
 export default SearchBox;
