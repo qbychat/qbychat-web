@@ -17,18 +17,25 @@
  */
 
 import { create } from 'zustand';
+import { v4 as uuidv4 } from 'uuid';
 
-type ViewName = 'settings' | 'chat'
+export type ViewName = 'settings' | 'chat'
 type ViewSide = 'left' | 'right'
 
-type ViewParamsMap = {
+export type ViewParamsMap = {
   settings: undefined
   chat: {
     chatId: string
   }
 }
 
-export type ViewEntry = { side: ViewSide; view: ViewName, params?: ViewParamsMap[ViewName] }
+export type ViewEntry = {
+  side: ViewSide;
+  view: ViewName,
+  params?: ViewParamsMap[ViewName]
+
+  cacheKey?: string
+}
 
 interface RouterState {
   stack: ViewEntry[];
@@ -36,6 +43,8 @@ interface RouterState {
   isMobile: boolean;
   lastStackLength: number;
   isBack: boolean;
+
+  paramsMap: Record<string, ViewParamsMap[ViewName]>;
 
   // Views for Mobile UI
   view: ViewEntry | null;
@@ -54,6 +63,7 @@ interface RouterState {
   popView: (side: ViewSide) => void;
   goBack: () => void;
   updateViews: () => void;
+  updateParams: (cacheKey: string, newParams: ViewParamsMap[ViewName], replace?: boolean) => void;
 
   syncFromHistory: () => void;
 
@@ -62,6 +72,7 @@ interface RouterState {
 
 export const useMainRouterStore = create<RouterState>((set, get) => ({
   stack: [],
+  paramsMap: {},
 
   isMobile: false,
   lastStackLength: 0,
@@ -80,15 +91,26 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
 
   pushView: (entry, options = {}) => {
     const { stack } = get();
+    if (!entry.cacheKey) {
+      entry.cacheKey = uuidv4();
+    }
     const newStack = options.replace ? [...stack.slice(0, -1), entry] : [...stack, entry];
 
-    window.history.pushState(newStack, ''); // Push to browser history
+    if (options.replace) {
+      window.history.replaceState(newStack, '');
+    } else {
+      window.history.pushState(newStack, '');
+    }
 
-    set({
+    set(state => ({
       stack: newStack,
       isBack: false,
       lastStackLength: newStack.length,
-    }, false);
+      paramsMap: {
+        ...state.paramsMap,
+        [entry.cacheKey!]: entry.params,
+      },
+    }), false);
     get().updateViews();
   },
 
@@ -161,12 +183,57 @@ export const useMainRouterStore = create<RouterState>((set, get) => ({
     });
   },
 
+  updateParams: (cacheKey: string, newParams: ViewParamsMap[ViewName], replace?: boolean) => {
+    const stack = get().stack;
+    const index = stack.findIndex(entry => entry.cacheKey === cacheKey);
+    if (index === -1) return;
+
+    const entry = stack[index];
+
+    if (JSON.stringify(entry.params) === JSON.stringify(newParams)) return;
+
+    const updatedEntry: ViewEntry = {
+      ...entry,
+      params: newParams,
+    };
+
+    const newStack = [...stack];
+    newStack[index] = updatedEntry;
+
+    if (replace) {
+      window.history.replaceState(newStack, '');
+    } else {
+      window.history.pushState(newStack, '');
+    }
+
+    set(state => ({
+      stack: newStack,
+      lastStackLength: newStack.length,
+      paramsMap: {
+        ...state.paramsMap,
+        [cacheKey]: newParams,
+      },
+    }), false);
+
+    get().updateViews();
+  },
+
+
   syncFromHistory: () => {
     const state = window.history.state;
     if (Array.isArray(state)) {
       const isBack = state.length < get().lastStackLength;
+
+      const paramsMap: Record<string, ViewParamsMap[ViewName]> = {};
+      state.forEach(entry => {
+        if (entry.cacheKey) {
+          paramsMap[entry.cacheKey] = entry.params;
+        }
+      });
+
       set({
         stack: state,
+        paramsMap,
         isBack,
         lastStackLength: state.length,
       });

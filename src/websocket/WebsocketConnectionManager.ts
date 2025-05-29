@@ -22,7 +22,7 @@ import log from 'loglevel';
 import WebsocketEventEmitter from './WebsocketEventEmitter';
 import { ConnectionConfig } from './types';
 import { blobToByteArray } from '@/utils/binaryUtils';
-import { ClientDiscoveryConfig, fetchClientDiscovery } from '@/well-known/discovery.ts';
+import { ClientDiscoveryConfig, fetchClientDiscovery } from '@/services/wellKnownService.ts';
 import axios from 'axios';
 
 export class WebsocketConnectionManager {

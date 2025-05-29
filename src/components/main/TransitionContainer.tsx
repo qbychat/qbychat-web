@@ -17,9 +17,9 @@
  */
 
 import { ViewEntry } from '@/store/controller/mainRouterStore.ts';
-import { useIsBackDirection } from '@/hooks/mainRouterHooks.ts';
 import React, { useEffect, useState } from 'react';
 import { Transition } from '@mantine/core';
+import { useIsBackDirection } from '@/hooks/mainRouterHooks.ts';
 
 type Props = {
   currentViewEntry: ViewEntry | null;
@@ -27,16 +27,16 @@ type Props = {
   duration?: number;
 
   defaultElement?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>
+} & React.HTMLAttributes<HTMLDivElement>;
 
-const TransitionContainer = ({
-                               currentViewEntry,
-                               render,
-                               duration = 200,
-                               defaultElement,
-                               ...divProps
-                             }: Props) => {
-  let isBack = useIsBackDirection();
+const TransitionContainer = React.memo(({
+                                          currentViewEntry,
+                                          render,
+                                          duration = 200,
+                                          defaultElement,
+                                          ...divProps
+                                        }: Props) => {
+  const isBack = useIsBackDirection();
 
   const [transitioning, setTransitioning] = useState(false);
   const [renderedEntry, setRenderedEntry] = useState<ViewEntry | null>(currentViewEntry);
@@ -44,16 +44,17 @@ const TransitionContainer = ({
     currentViewEntry ? render(currentViewEntry) : defaultElement,
   );
 
-  if (currentViewEntry === null) {
-    isBack = true;
-  }
+  const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    return a.side === b.side && a.view === b.view;
+  };
 
   useEffect(() => {
-    if (currentViewEntry === renderedEntry) return;
+    if (isSameViewEntry(currentViewEntry, renderedEntry)) return;
 
     setTransitioning(true);
 
-    // Replace content after animation finished
     const timeout = setTimeout(() => {
       setRenderedEntry(currentViewEntry);
       setRenderedElement(currentViewEntry ? render(currentViewEntry) : defaultElement);
@@ -77,15 +78,25 @@ const TransitionContainer = ({
         duration={duration}
         timingFunction="ease-out"
       >
-        {(styles) => (
-          <div className={`w-full h-full absolute ${divClassName}`}
-               style={{ ...styles, ...divStyle }} {...otherDivProps}>
+        {styles =>
+          <div
+            className={`w-full h-full absolute ${divClassName}`}
+            style={{...divStyle, ...styles}}
+            {...otherDivProps}
+          >
             {renderedElement}
           </div>
-        )}
+        }
       </Transition>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
+    if (a === b) return true;
+    if (!a || !b) return false;
+    return a.side === b.side && a.view === b.view;
+  };
+  return isSameViewEntry(prevProps.currentViewEntry, nextProps.currentViewEntry);
+});
 
 export default TransitionContainer;

@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import useMainRouterStore from '@/store/controller/mainRouterStore.ts';
-import { useEffect } from 'react';
+import useMainRouterStore, { ViewName, ViewParamsMap } from '@/store/controller/mainRouterStore.ts';
+import { useContext, useEffect } from 'react';
+import ViewContext from '@/components/router/ViewContext.tsx';
 
 export const useCurrentMobileViewEntry = () =>
   useMainRouterStore(state => state.view);
@@ -67,5 +68,22 @@ export const useStackControls = () => {
     popView,
     goBack,
     syncFromHistory,
+  };
+};
+
+export const useViewParams = () => {
+  const { cacheKey } = useContext(ViewContext)!;
+  const paramsMap = useMainRouterStore(s => s.paramsMap);
+  const originUpdateParams = useMainRouterStore(s => s.updateParams);
+
+  const updateParams = (newParams: ViewParamsMap[ViewName], replace?: boolean) => {
+    originUpdateParams(cacheKey, newParams, replace);
+  };
+
+  const params = paramsMap[cacheKey];
+
+  return {
+    params,
+    updateParams,
   };
 };
