@@ -30,7 +30,8 @@ import {
   SyncResponseSchema,
 } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
-import { IdType, parseProtobufLocalId } from '@/utils/protoUtils.ts';
+import { parseProtobufLocalId } from '@/utils/protoUtils.ts';
+import { IdType } from '@/types/roomTypes.ts';
 
 export type UserServiceEvents = {
   syncUser: {

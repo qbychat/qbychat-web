@@ -16,20 +16,16 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useMemo } from 'react';
-import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
-import { useOnboardingStore } from '@/stores/controller/onboardingRouterStore.ts';
-import SimpleController from '@/components/SimpleController.tsx';
-import WelcomePage from '@/components/onboarding/pages/WelcomePage.tsx';
 
-const OnboardingController = () => {
-  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
-    welcome: <WelcomePage />,
-    setupServer: <SetupServerPage />,
-  }), []);
+import { convertFederationIdV1 } from '@/mappers/idMapper.ts';
+import { PublicUserInfo } from '@/proto/qbychat/rpc/user/v1/user_model_pb';
+import { PublicUserInfoModel } from '@/types/userTypes.ts';
 
-  const activePage = useOnboardingStore(state => state.page);
-  return (<SimpleController activePage={activePage} pageMap={pageMap} />);
-};
-
-export default OnboardingController;
+export function convertPublicUserInfoV1(proto: PublicUserInfo): PublicUserInfoModel {
+  return {
+    userId: convertFederationIdV1(proto.userId!),
+    username: proto.username,
+    nickname: proto.nickname,
+    bio: proto.bio,
+  };
+}

@@ -18,10 +18,10 @@
  *
  */
 
-import { useAuthStore } from '@/store/controller/authRouterStore.ts';
+import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
+import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';

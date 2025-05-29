@@ -18,8 +18,9 @@
 
 import { Id, IdSchema } from '@/proto/qbychat/common/v1/id_pb';
 import { create } from '@bufbuild/protobuf';
+import { IdType } from '@/types/roomTypes.ts';
 
-export type IdType = string | bigint;
+
 
 export const parseProtobufLocalId = (id: Id | null | undefined): IdType | undefined => {
   if (!id) return undefined;

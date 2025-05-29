@@ -16,20 +16,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useMemo } from 'react';
-import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
-import { useOnboardingStore } from '@/stores/controller/onboardingRouterStore.ts';
-import SimpleController from '@/components/SimpleController.tsx';
-import WelcomePage from '@/components/onboarding/pages/WelcomePage.tsx';
+import { IdType } from '@/types/roomTypes.ts';
 
-const OnboardingController = () => {
-  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
-    welcome: <WelcomePage />,
-    setupServer: <SetupServerPage />,
-  }), []);
-
-  const activePage = useOnboardingStore(state => state.page);
-  return (<SimpleController activePage={activePage} pageMap={pageMap} />);
-};
-
-export default OnboardingController;
+export interface FederationIdModel {
+  domain?: string;
+  localId: IdType;
+}

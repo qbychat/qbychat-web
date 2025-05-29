@@ -18,12 +18,12 @@
  *
  */
 
-import { useAuthStore } from '@/store/controller/authRouterStore.ts';
+import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
-import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
+import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
 import AuthService from '@/websocket/services/AuthService.ts';
 import { RpcError } from '@/websocket/errors/RpcError.ts';
 import { useForm } from '@mantine/form';

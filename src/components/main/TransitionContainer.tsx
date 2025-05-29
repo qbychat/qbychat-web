@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ViewEntry } from '@/store/controller/mainRouterStore.ts';
+import { ViewEntry } from '@/stores/controller/mainRouterStore.ts';
 import React, { useEffect, useState } from 'react';
 import { Transition } from '@mantine/core';
 import { useIsBackDirection } from '@/hooks/mainRouterHooks.ts';
@@ -28,6 +28,12 @@ type Props = {
 
   defaultElement?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
+
+const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.side === b.side && a.cacheKey === b.cacheKey;
+};
 
 const TransitionContainer = React.memo(({
                                           currentViewEntry,
@@ -44,14 +50,11 @@ const TransitionContainer = React.memo(({
     currentViewEntry ? render(currentViewEntry) : defaultElement,
   );
 
-  const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
-    if (a === b) return true;
-    if (!a || !b) return false;
-    return a.side === b.side && a.view === b.view;
-  };
-
   useEffect(() => {
-    if (isSameViewEntry(currentViewEntry, renderedEntry)) return;
+    if (isSameViewEntry(currentViewEntry, renderedEntry)) {
+      // just update params
+      return;
+    }
 
     setTransitioning(true);
 
@@ -81,7 +84,7 @@ const TransitionContainer = React.memo(({
         {styles =>
           <div
             className={`w-full h-full absolute ${divClassName}`}
-            style={{...divStyle, ...styles}}
+            style={{ ...divStyle, ...styles }}
             {...otherDivProps}
           >
             {renderedElement}
@@ -91,11 +94,6 @@ const TransitionContainer = React.memo(({
     </div>
   );
 }, (prevProps, nextProps) => {
-  const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
-    if (a === b) return true;
-    if (!a || !b) return false;
-    return a.side === b.side && a.view === b.view;
-  };
   return isSameViewEntry(prevProps.currentViewEntry, nextProps.currentViewEntry);
 });
 

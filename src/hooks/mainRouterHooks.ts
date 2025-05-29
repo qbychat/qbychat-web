@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import useMainRouterStore, { ViewName, ViewParamsMap } from '@/store/controller/mainRouterStore.ts';
+import useMainRouterStore, { ViewName, ViewParamsMap } from '@/stores/controller/mainRouterStore.ts';
 import { useContext, useEffect } from 'react';
 import ViewContext from '@/components/router/ViewContext.tsx';
 

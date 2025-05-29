@@ -34,7 +34,9 @@ import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import AuthService from '@/websocket/services/AuthService.ts';
 import { ClientboundMessageSchema } from '@/proto/qbychat/rpc/protocol/v1/client_server_messages_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
-import { IdType } from '@/utils/protoUtils.ts';
+import { IdType } from '@/types/roomTypes.ts';
+import RoomService from '@/websocket/services/RoomService.ts';
+
 
 class WebsocketLifecycleService implements IPacketService {
   // Configuration
@@ -74,6 +76,7 @@ class WebsocketLifecycleService implements IPacketService {
     // Initialize services
     this.registerService(new UserService(this, this.eventEmitter));
     this.registerService(new AuthService(this, this.eventEmitter));
+    this.registerService(new RoomService(this, this.eventEmitter));
     const clientService = this.registerService(new ClientService(this));
 
     this.authService = new WebsocketAuthService(

@@ -22,33 +22,36 @@ import ConnectionStateLabel from '@/components/ui/ConnectionStateLabel.tsx';
 import SearchBox from '@/components/main/views/left/SearchBox.tsx';
 import React, { useMemo, useState } from 'react';
 import SimpleController from '@/components/SimpleController.tsx';
-import ChatList from './ChatList';
+import RoomList from './room-list/RoomList.tsx';
 
-type LeftPage = 'chatList' | 'search';
+type LeftPage = 'roomList' | 'search';
 
 const LeftPanel = () => {
   const [searchBoxContent, setSearchBoxContent] = useState('');
-  const [currentPage, setCurrentPage] = useState<LeftPage>('chatList');
+  const [searchBoxFocused, setSearchBoxFocused] = useState(false);
+  // const [currentPage, setCurrentPage] = useState<LeftPage>('roomList');
+  const [currentPage] = useState<LeftPage>('roomList');
 
 
   const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
-    chatList: <ChatList/>,
+    roomList: <RoomList />,
     search: <div>search</div>,
   }), []);
 
-  return (<div className="flex flex-col h-full" id="leftPanel">
-    <div className="flex flex-row p-2 items-center">
-      <DropdownMenu />
-      <ConnectionStateLabel className="flex-1">
-        <SearchBox value={searchBoxContent} onContentChange={setSearchBoxContent}
-                   onFocusChange={(state) => setCurrentPage(state ? 'search' : 'chatList')} />
-      </ConnectionStateLabel>
+  return (
+    <div className="flex flex-col h-full" id="leftPanel">
+      <div className="flex flex-row p-2 items-center">
+        <DropdownMenu />
+        <ConnectionStateLabel className="flex-1">
+          <SearchBox value={searchBoxContent} onContentChange={setSearchBoxContent}
+                     onFocusChange={(state) => setSearchBoxFocused(state)} />
+        </ConnectionStateLabel>
+      </div>
+      <div className="flex flex-col h-full p-2">
+        <SimpleController pageMap={pageMap} activePage={searchBoxFocused ? 'search' : currentPage} />
+      </div>
     </div>
-    <div className="flex flex-col h-full p-2">
-      {/*TODO modify browser history after switch page*/}
-      <SimpleController pageMap={pageMap} activePage={currentPage}/>
-    </div>
-  </div>);
+  );
 };
 
 export default LeftPanel;

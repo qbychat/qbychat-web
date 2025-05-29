@@ -18,7 +18,9 @@
  *
  */
 
-import { IdType } from '@/utils/protoUtils.ts';
+
+
+import { IdType } from '@/types/roomTypes.ts';
 
 interface IWebsocketService {
   sync: (accountId: IdType) => Promise<void>;

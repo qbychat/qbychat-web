@@ -16,20 +16,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useMemo } from 'react';
-import SetupServerPage from '@/components/onboarding/pages/SetupServerPage.tsx';
-import { useOnboardingStore } from '@/stores/controller/onboardingRouterStore.ts';
-import SimpleController from '@/components/SimpleController.tsx';
-import WelcomePage from '@/components/onboarding/pages/WelcomePage.tsx';
+import { FederationId } from '@/proto/qbychat/rpc/federation/v1/federation_model_pb';
+import { FederationIdModel } from '@/types/idTypes.ts';
+import { parseProtobufLocalId } from '@/utils/protoUtils.ts';
 
-const OnboardingController = () => {
-  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
-    welcome: <WelcomePage />,
-    setupServer: <SetupServerPage />,
-  }), []);
-
-  const activePage = useOnboardingStore(state => state.page);
-  return (<SimpleController activePage={activePage} pageMap={pageMap} />);
+export const convertFederationIdV1 = (federationId: FederationId): FederationIdModel => {
+  return {
+    domain: federationId.domain,
+    localId: parseProtobufLocalId(federationId.localId)!,
+  };
 };
-
-export default OnboardingController;

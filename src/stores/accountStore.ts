@@ -18,7 +18,8 @@
 
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { IdType } from '@/utils/protoUtils.ts';
+import { IdType } from '@/types/roomTypes.ts';
+
 
 interface Account {
   userId: IdType;
@@ -34,7 +35,7 @@ interface AccountState {
   updateAccount: (userId: IdType, data: Partial<Account>) => void;
 }
 
-export const useAccountsStore = create<AccountState>()(
+const useAccountStore = create<AccountState>()(
   immer((set) => ({
     accounts: new Map<IdType, Account>(),
 
@@ -60,4 +61,4 @@ export const useAccountsStore = create<AccountState>()(
   })),
 );
 
-export default useAccountsStore;
+export default useAccountStore;

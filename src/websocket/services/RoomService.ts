@@ -16,3 +16,38 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { IdType, RoomModel } from '@/types/roomTypes.ts';
+import IWebsocketService from '@/websocket/IWebsocketService.ts';
+import { IPacketService } from '@/websocket/types.ts';
+import { SyncRequestSchema, SyncResponseSchema } from '@/proto/qbychat/rpc/room/v1/room_service_pb';
+import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { create, toBinary } from '@bufbuild/protobuf';
+import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
+import { convertRoomV1 } from '@/mappers/roomMapper.ts';
+
+export type RoomServiceEvents = {
+  syncRoom: {
+    joinedRooms: RoomModel[]
+  }
+}
+
+class RoomService implements IWebsocketService {
+  private readonly packetService: IPacketService;
+  private readonly eventEmitter: WebsocketEventEmitter;
+
+  constructor(packetService: IPacketService, eventEmitter: WebsocketEventEmitter) {
+    this.packetService = packetService;
+    this.eventEmitter = eventEmitter;
+  }
+
+  async sync(accountId: IdType) {
+    const request = create(SyncRequestSchema, {});
+    const response = await this.packetService.request(SyncResponseSchema, accountId, RpcRequestMethod.ROOM_SYNC_V1, toBinary(SyncRequestSchema, request));
+    // emit event
+    this.eventEmitter.sendEvent('syncRoom', {
+      joinedRooms: response.joinedRooms.map(room => convertRoomV1(room)),
+    });
+  }
+}
+
+export default RoomService;

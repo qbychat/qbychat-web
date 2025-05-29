@@ -24,7 +24,8 @@ import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { UserServiceEvents } from '@/websocket/services/UserService.ts';
 import { RpcResponse } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
-import { IdType } from '@/utils/protoUtils.ts';
+import { IdType } from '@/types/roomTypes.ts';
+import { RoomServiceEvents } from '@/websocket/services/RoomService.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
 
@@ -50,7 +51,7 @@ export type WebsocketEvents = {
   triggerSync: { accountId: IdType };
   syncCompleted: { accountId: IdType };
 
-} & UserServiceEvents;
+} & UserServiceEvents & RoomServiceEvents;
 
 export interface EncryptionState {
   sessionId: bigint | null;
@@ -72,7 +73,7 @@ export interface IPacketService {
   sendPacket(data: Uint8Array): void;
 
   request<T extends Message>(
-    type: GenMessage<T>,
+    responseType: GenMessage<T>,
     userId: IdType | null | undefined,
     method: number,
     payload: Uint8Array | null,

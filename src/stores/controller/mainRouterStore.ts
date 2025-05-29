@@ -18,6 +18,7 @@
 
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
+import { FederationIdModel } from '@/types/idTypes.ts';
 
 export type ViewName = 'settings' | 'chat'
 type ViewSide = 'left' | 'right'
@@ -25,7 +26,7 @@ type ViewSide = 'left' | 'right'
 export type ViewParamsMap = {
   settings: undefined
   chat: {
-    chatId: string
+    roomId: FederationIdModel
   }
 }
 

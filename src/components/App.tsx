@@ -18,7 +18,7 @@
  */
 
 import 'react-virtualized/styles.css';
-import useAppStore from '@/store/appStore.ts';
+import useAppStore from '@/stores/appStore.ts';
 import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
 import AuthController from '@/components/auth/AuthController.tsx';
 import OnboardingController from '@/components/onboarding/OnboardingController.tsx';

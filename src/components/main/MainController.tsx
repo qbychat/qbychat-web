@@ -18,7 +18,7 @@
 
 import { useMediaQuery } from 'react-responsive';
 import { useEffect, useRef, useState } from 'react';
-import useMainRouterStore, { ViewEntry } from '@/store/controller/mainRouterStore.ts';
+import useMainRouterStore, { ViewEntry } from '@/stores/controller/mainRouterStore.ts';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import {
   useCurrentLeftDesktopViewEntry,
@@ -35,7 +35,7 @@ const MainController = () => {
   // Detects if the current screen width is mobile-sized (≤768px)
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
-  // Zustand store for marking current layout as mobile or not
+  // Zustand stores for marking current layout as mobile or not
   const { setMobile } = useMainRouterStore();
 
   // Which stack is currently visible: left, right, or both
@@ -115,15 +115,70 @@ const MainController = () => {
       case 'settings':
         return <>settings <button onClick={() => goBack()}>back</button></>;
       case 'chat':
-        return <>chat (id: {entry.params?.chatId}) <button onClick={() => goBack()}>back</button></>;
+        return <>chat (id: {entry.params?.roomId.localId}) <button onClick={() => goBack()}>back</button></>;
       default:
         return <>Unable to render (unknown entry {entry.view})</>;
     }
   }
 
+  // return (
+  //   <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
+  //     {/* Left Panel */}
+  //     <AnimatePresence initial={false}>
+  //       {(visibleStack === 'both' || visibleStack === 'left') && (
+  //         <motion.div
+  //           key="left"
+  //           layout
+  //           initial={{ flex: 0 }}
+  //           animate={{ flex: visibleStack === 'both' ? 0.25 : 1 }}
+  //           exit={{ flex: 0 }}
+  //           transition={{ duration: 0.3, ease: 'easeInOut' }}
+  //           style={{ display: 'flex', overflow: 'hidden' }}
+  //         >
+  //           <Panel maxSize={40} minSize={20}>
+  //             <TransitionContainer
+  //               currentViewEntry={leftEntry}
+  //               render={render}
+  //               defaultElement={<LeftPanel />}
+  //             />
+  //           </Panel>
+  //         </motion.div>
+  //       )}
+  //     </AnimatePresence>
+  //
+  //     {/* Resize Handle */}
+  //     {visibleStack === 'both' && (<PanelResizeHandle />)}
+  //
+  //     {/* Right Panel */}
+  //     <AnimatePresence initial={false}>
+  //       {(visibleStack === 'both' || visibleStack === 'right') && (
+  //         <motion.div
+  //           key="right"
+  //           layout
+  //           initial={{ flex: 0 }}
+  //           animate={{ flex: visibleStack === 'both' ? 0.75 : 1 }}
+  //           exit={{ flex: 0 }}
+  //           transition={{ duration: 0.3, ease: 'easeInOut' }}
+  //           style={{ display: 'flex', overflow: 'hidden' }}
+  //         >
+  //           <Panel>
+  //             <TransitionContainer
+  //               currentViewEntry={rightEntry}
+  //               render={render}
+  //               defaultElement={<>intro</>}
+  //             />
+  //           </Panel>
+  //         </motion.div>
+  //       )}
+  //     </AnimatePresence>
+  //   </PanelGroup>
+  // );
+
   // Render two panels horizontally (desktop: both shown, mobile: only one shown)
+
   return (
     <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
+      {/* Left Panel */}
       {(visibleStack === 'both' || visibleStack === 'left') && (
         <Panel defaultSize={25} maxSize={40} minSize={20}>
           <TransitionContainer
@@ -133,7 +188,11 @@ const MainController = () => {
           />
         </Panel>
       )}
-      <PanelResizeHandle />
+
+      {/* Resize Handle */}
+      {visibleStack === 'both' && (<PanelResizeHandle />)}
+
+      {/* Right Panel */}
       {(visibleStack === 'both' || visibleStack === 'right') && (
         <Panel>
           <TransitionContainer
@@ -145,6 +204,7 @@ const MainController = () => {
       )}
     </PanelGroup>
   );
+
 };
 
 export default MainController;

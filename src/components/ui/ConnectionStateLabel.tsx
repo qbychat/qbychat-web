@@ -19,7 +19,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { WebSocketStatus } from '@/websocket/types.ts';
 import { Transition } from '@mantine/core';
-import useAppStore from '@/store/appStore.ts';
+import useAppStore from '@/stores/appStore.ts';
 
 type Props = {
   children?: React.ReactNode;

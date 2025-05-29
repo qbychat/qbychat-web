@@ -20,13 +20,13 @@ import { ActionIcon, Menu, rgba } from '@mantine/core';
 import { ArchiveIcon, Contact2Icon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { useStackControls } from '@/hooks/mainRouterHooks.ts';
 import { useTranslation } from 'react-i18next';
-import useAccountsStore from '@/store/accountsStore.ts';
+import useAccountStore from '@/stores/accountStore.ts';
 
 const DropdownMenu = () => {
   const { t } = useTranslation();
   const { pushView } = useStackControls();
 
-  const accounts = useAccountsStore(s => s.accounts);
+  const accounts = useAccountStore(s => s.accounts);
 
   return (
     <Menu shadow="md" width={280} trapFocus transitionProps={{ transition: 'pop-top-left', duration: 200 }}

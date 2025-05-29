@@ -17,7 +17,7 @@
  *
  */
 
-// store.ts
+// stores.ts
 import { create } from 'zustand';
 import { WebSocketStatus } from '@/websocket/types.ts';
 

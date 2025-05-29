@@ -20,9 +20,9 @@
 import React, { useState } from 'react';
 import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
-import useSettings from '@/store/settingsStore.ts';
-import useAppStore from '@/store/appStore.ts';
-import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
+import useSettings from '@/stores/settingsStore.ts';
+import useAppStore from '@/stores/appStore.ts';
+import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import { Button, Input } from '@mantine/core';

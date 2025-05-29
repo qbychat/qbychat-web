@@ -19,19 +19,19 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import useAppStore from '@/store/appStore.ts';
-import useWebsocketLifecycleService from '@/store/websocketLifecycleServiceStore.ts';
+import useAppStore from '@/stores/appStore.ts';
+import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
-import useSettings from '@/store/settingsStore.ts';
-import useAccountsStore from '@/store/accountsStore.ts';
+import useSettings from '@/stores/settingsStore.ts';
+import useAccountStore from '@/stores/accountStore.ts';
 
 export function useWebSocketLifecycle() {
   const setScreen = useAppStore(s => s.setScreen);
   const setConnectionStatus = useAppStore(s => s.setConnectionStatus);
   const screen = useAppStore(s => s.screen);
 
-  const addAccount = useAccountsStore(s => s.addAccount);
+  const addAccount = useAccountStore(s => s.addAccount);
 
   const setService = useWebsocketLifecycleService(state => state.setService);
   const currentServerId = useSettings((state) => state.currentServerId);

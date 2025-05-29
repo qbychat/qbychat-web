@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/store/controller/onboardingRouterStore.ts';
+import { useOnboardingStore } from '@/stores/controller/onboardingRouterStore.ts';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@mantine/core';
 
