@@ -16,31 +16,20 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Id, IdSchema } from '@/proto/qbychat/common/v1/id_pb';
-import { create } from '@bufbuild/protobuf';
-import { IdType } from '@/types/idTypes.ts';
+import { Center, Stack, Text, Title } from '@mantine/core';
 
-export const parseProtobufLocalId = (id: Id | null | undefined): IdType | undefined => {
-  if (!id) return undefined;
-  if (!id.content.value) throw new Error('Id.content was undefined');
-  return id.content.value;
+const IntroView = () => {
+
+  return (
+    <Center style={{ height: '100%', width: '100%' }}>
+      <Stack align="center">
+        <Title order={2}>Welcome to QbyChat</Title>
+        <Text c="dimmed" ta="center" maw={360}>
+          Select a chat to start messaging
+        </Text>
+      </Stack>
+    </Center>
+  );
 };
 
-export const protobufLocalIdOf = (id: IdType | null | undefined): Id | undefined => {
-  if (!id) return undefined;
-  if (typeof id === 'string') {
-    return create(IdSchema, {
-      content: {
-        case: 'stringId',
-        value: id,
-      },
-    });
-  } else {
-    return create(IdSchema, {
-      content: {
-        case: 'longId',
-        value: id,
-      },
-    });
-  }
-};
+export default IntroView;

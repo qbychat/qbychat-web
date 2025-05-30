@@ -18,7 +18,7 @@
 
 import { FederationIdModel } from '@/types/idTypes.ts';
 
-export interface PublicUserInfoModel {
+export interface PublicUserProfileModel {
   userId: FederationIdModel;
   username: string;
   nickname: string;

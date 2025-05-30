@@ -30,6 +30,7 @@ import {
 import TransitionContainer from '@/components/main/TransitionContainer.tsx';
 import LeftPanel from '@/components/main/views/left/LeftPanel.tsx';
 import { usePrevious } from '@mantine/hooks';
+import IntroView from '@/components/main/views/right/IntroView.tsx';
 
 const MainController = () => {
   // Detects if the current screen width is mobile-sized (≤768px)
@@ -180,7 +181,8 @@ const MainController = () => {
     <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
       {/* Left Panel */}
       {(visibleStack === 'both' || visibleStack === 'left') && (
-        <Panel defaultSize={25} maxSize={40} minSize={20}>
+        <Panel defaultSize={25} maxSize={40} minSize={20}
+               className={visibleStack === 'both' ? 'border-r border-[#393939]' : undefined}>
           <TransitionContainer
             currentViewEntry={leftEntry}
             render={render}
@@ -198,7 +200,7 @@ const MainController = () => {
           <TransitionContainer
             currentViewEntry={rightEntry}
             render={render}
-            defaultElement={<>intro</>}
+            defaultElement={<IntroView />}
           />
         </Panel>
       )}

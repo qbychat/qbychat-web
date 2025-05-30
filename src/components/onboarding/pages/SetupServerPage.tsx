@@ -22,7 +22,7 @@ import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
 import useSettings from '@/stores/settingsStore.ts';
 import useAppStore from '@/stores/appStore.ts';
-import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
+import useWebsocketLifecycleServiceStore from '@/stores/websocketLifecycleServiceStore.ts';
 import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import { Button, Input } from '@mantine/core';
@@ -30,7 +30,7 @@ import { Button, Input } from '@mantine/core';
 const SetupServerPage = () => {
   const { t } = useTranslation();
   const settings = useSettings();
-  const setSocket = useWebsocketLifecycleService((state) => state.setService);
+  const setSocket = useWebsocketLifecycleServiceStore((state) => state.setService);
   const setScreen = useAppStore((state) => state.setScreen);
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');

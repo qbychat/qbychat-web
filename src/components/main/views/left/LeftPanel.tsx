@@ -23,6 +23,8 @@ import SearchBox from '@/components/main/views/left/SearchBox.tsx';
 import React, { useMemo, useState } from 'react';
 import SimpleController from '@/components/SimpleController.tsx';
 import RoomList from './room-list/RoomList.tsx';
+import { useDisclosure } from '@mantine/hooks';
+import CreateChatModal from '@/components/main/views/left/mvp/CreateChatModal.tsx';
 
 type LeftPage = 'roomList' | 'search';
 
@@ -32,6 +34,8 @@ const LeftPanel = () => {
   // const [currentPage, setCurrentPage] = useState<LeftPage>('roomList');
   const [currentPage] = useState<LeftPage>('roomList');
 
+  const [opened, { close, open }] = useDisclosure(false);
+
 
   const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
     roomList: <RoomList />,
@@ -39,18 +43,23 @@ const LeftPanel = () => {
   }), []);
 
   return (
-    <div className="flex flex-col h-full" id="leftPanel">
-      <div className="flex flex-row p-2 items-center">
-        <DropdownMenu />
-        <ConnectionStateLabel className="flex-1">
-          <SearchBox value={searchBoxContent} onContentChange={setSearchBoxContent}
-                     onFocusChange={(state) => setSearchBoxFocused(state)} />
-        </ConnectionStateLabel>
+    <>
+      <CreateChatModal opened={opened} close={close} />
+
+      <div className="flex flex-col h-full" id="leftPanel">
+        <div className="flex flex-row p-2 items-center">
+          <DropdownMenu openPMModel={open} />
+          <ConnectionStateLabel className="flex-1">
+            <SearchBox value={searchBoxContent} onContentChange={setSearchBoxContent}
+                       onFocusChange={(state) => setSearchBoxFocused(state)} />
+          </ConnectionStateLabel>
+        </div>
+        <div className="flex flex-col h-full p-2">
+          <SimpleController pageMap={pageMap}
+                            activePage={(searchBoxFocused || searchBoxContent) ? 'search' : currentPage} />
+        </div>
       </div>
-      <div className="flex flex-col h-full p-2">
-        <SimpleController pageMap={pageMap} activePage={(searchBoxFocused || searchBoxContent) ? 'search' : currentPage} />
-      </div>
-    </div>
+    </>
   );
 };
 

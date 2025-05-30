@@ -32,7 +32,7 @@ import {
 } from '@/proto/qbychat/rpc/protocol/v1/client_server_messages_pb';
 import { RpcRequestMethod, RpcResponse, RpcResponse_Status } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
 import { parseProtobufLocalId, protobufLocalIdOf } from '@/utils/protoUtils.ts';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 
 export class WebsocketMessageHandler {
   private responseHandlers: Map<string, RpcResponsePromiseHandlers> = new Map();

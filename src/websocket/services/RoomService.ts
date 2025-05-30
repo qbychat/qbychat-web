@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { IdType, RoomModel } from '@/types/roomTypes.ts';
+import { RoomModel } from '@/types/roomTypes.ts';
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
 import { IPacketService } from '@/websocket/types.ts';
 import { SyncRequestSchema, SyncResponseSchema } from '@/proto/qbychat/rpc/room/v1/room_service_pb';
@@ -24,6 +24,7 @@ import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_p
 import { create, toBinary } from '@bufbuild/protobuf';
 import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
 import { convertRoomV1 } from '@/mappers/roomMapper.ts';
+import { IdType } from '@/types/idTypes.ts';
 
 export type RoomServiceEvents = {
   syncRoom: {

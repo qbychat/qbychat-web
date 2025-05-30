@@ -24,7 +24,7 @@ import { Message } from '@bufbuild/protobuf';
 import { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import { UserServiceEvents } from '@/websocket/services/UserService.ts';
 import { RpcResponse } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 import { RoomServiceEvents } from '@/websocket/services/RoomService.ts';
 
 export type WebSocketStatus = 'connecting' | 'open' | 'waiting' | 'authenticating' | 'closed' | 'updating';
@@ -47,6 +47,7 @@ export type WebsocketEvents = {
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
   requireLogin: null;
+  switchMainAccount: { mainAccountId: IdType };
   loginStateSynced: { mainAccountId: IdType; loggedInAccountIds: IdType[] };
   triggerSync: { accountId: IdType };
   syncCompleted: { accountId: IdType };

@@ -78,6 +78,9 @@ export class WebsocketAuthService {
         mainAccountId: response.currentAccountId,
         loggedInAccountIds: response.accountIds,
       });
+      this.eventEmitter.sendEvent('switchMainAccount', {
+        mainAccountId: response.currentAccountId,
+      });
       this.eventEmitter.sendEvent('triggerSync', {
         accountId: response.currentAccountId,
       });

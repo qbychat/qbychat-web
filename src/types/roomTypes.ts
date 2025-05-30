@@ -16,13 +16,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { PublicUserInfoModel } from '@/types/userTypes.ts';
+import { PublicUserProfileModel } from '@/types/userTypes.ts';
 import { FederationIdModel } from '@/types/idTypes.ts';
 
-export type IdType = string | bigint;
-
 export interface PrivateRoomModel {
-  peerUser: PublicUserInfoModel;
+  peerUser: PublicUserProfileModel;
 }
 
 export interface GroupRoomModel {
@@ -56,4 +54,5 @@ export type RoomModel = {
 
   lastMessage: { content: string; }; // TODO replace with MessageModel
   unreadCount: number;
+  // TODO multi roles (accounts/alts)
 } & RoomDetails;

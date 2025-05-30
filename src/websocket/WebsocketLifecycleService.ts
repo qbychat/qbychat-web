@@ -34,7 +34,7 @@ import type { GenMessage } from '@bufbuild/protobuf/codegenv1';
 import AuthService from '@/websocket/services/AuthService.ts';
 import { ClientboundMessageSchema } from '@/proto/qbychat/rpc/protocol/v1/client_server_messages_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 import RoomService from '@/websocket/services/RoomService.ts';
 
 

@@ -16,30 +16,24 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ActionIcon, Menu, rgba } from '@mantine/core';
-import { ArchiveIcon, Contact2Icon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
+import { ActionIcon, Menu } from '@mantine/core';
+import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { useStackControls } from '@/hooks/mainRouterHooks.ts';
 import { useTranslation } from 'react-i18next';
 import useAccountStore from '@/stores/accountStore.ts';
 
-const DropdownMenu = () => {
+type Props = {
+  openPMModel: () => void;
+}
+
+const DropdownMenu = ({ openPMModel }: Props) => {
   const { t } = useTranslation();
   const { pushView } = useStackControls();
 
   const accounts = useAccountStore(s => s.accounts);
 
   return (
-    <Menu shadow="md" width={280} trapFocus transitionProps={{ transition: 'pop-top-left', duration: 200 }}
-          styles={(theme) => ({
-            dropdown: {
-              border: 'none',
-              backdropFilter: 'blur(12px)',
-              backgroundColor: rgba(theme.colors.dark[7], 0.8),
-            },
-            label: {
-              textAlign: 'center',
-            },
-          })}>
+    <Menu shadow="md" width={280} trapFocus transitionProps={{ transition: 'pop-top-left', duration: 200 }}>
       <Menu.Target>
         <ActionIcon variant="transparent">
           <MenuIcon size={20} />
@@ -48,8 +42,8 @@ const DropdownMenu = () => {
 
       <Menu.Dropdown>
         {Array.from(accounts.entries()).map(account => (
-          <Menu.Item key={account[0]} leftSection={<UserIcon size={14}/>}>
-          {account[1].nickname}
+          <Menu.Item key={account[0]} leftSection={<UserIcon size={14} />}>
+            {account[1].nickname}
           </Menu.Item>
         ))}
         <Menu.Divider />
@@ -57,13 +51,18 @@ const DropdownMenu = () => {
           {t('menu.login')}
         </Menu.Item>
         <Menu.Divider />
+        {/*TODO move create PM to search*/}
+        <Menu.Item leftSection={<MailIcon size={14} />} onClick={openPMModel}>
+          Start PM
+        </Menu.Item>
         <Menu.Item leftSection={<ArchiveIcon size={14} />}>
           {t('menu.saved-messages')}
         </Menu.Item>
         <Menu.Item leftSection={<Contact2Icon size={14} />}>
           {t('menu.contacts')}
         </Menu.Item>
-        <Menu.Item leftSection={<SettingsIcon size={14} />} onClick={() => pushView({side: 'left', view: 'settings'})}>
+        <Menu.Item leftSection={<SettingsIcon size={14} />}
+                   onClick={() => pushView({ side: 'left', view: 'settings' })}>
           {t('menu.settings')}
         </Menu.Item>
         <Menu.Divider />

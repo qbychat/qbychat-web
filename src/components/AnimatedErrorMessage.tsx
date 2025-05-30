@@ -17,7 +17,7 @@
  *
  */
 
-import { Transition } from '@mantine/core';
+import { Text, Transition } from '@mantine/core';
 
 type Props = {
   error: string;
@@ -31,7 +31,7 @@ const AnimatedErrorMessage = ({ error }: Props) => {
       duration={200}
       timingFunction="ease"
     >
-      {(styles) => <p style={styles} className="text-red-500">{error}</p>}
+      {(styles) => <Text style={styles} c="red">{error}</Text>}
     </Transition>
   );
 };

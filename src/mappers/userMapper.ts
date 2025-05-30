@@ -18,10 +18,10 @@
 
 
 import { convertFederationIdV1 } from '@/mappers/idMapper.ts';
-import { PublicUserInfo } from '@/proto/qbychat/rpc/user/v1/user_model_pb';
-import { PublicUserInfoModel } from '@/types/userTypes.ts';
+import { PublicUserProfile } from '@/proto/qbychat/rpc/user/v1/user_model_pb';
+import { PublicUserProfileModel } from '@/types/userTypes.ts';
 
-export function convertPublicUserInfoV1(proto: PublicUserInfo): PublicUserInfoModel {
+export function convertPublicUserProfileV1(proto: PublicUserProfile): PublicUserProfileModel {
   return {
     userId: convertFederationIdV1(proto.userId!),
     username: proto.username,

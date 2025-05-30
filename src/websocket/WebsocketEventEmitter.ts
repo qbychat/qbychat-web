@@ -20,7 +20,7 @@
 
 import mitt from 'mitt';
 import { WebsocketEvents, SSEPayload, WebSocketStatus } from './types';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 
 
 export class WebsocketEventEmitter {

@@ -24,14 +24,19 @@ import WebsocketEventEmitter from '@/websocket/WebsocketEventEmitter.ts';
 import { create, toBinary } from '@bufbuild/protobuf';
 import log from 'loglevel';
 import {
+  QueryUserRequestSchema,
+  QueryUserResponse,
+  QueryUserResponseSchema,
   RegisterAccountRequestSchema,
-  RegisterAccountResponse, RegisterAccountResponse_Status, RegisterAccountResponseSchema,
+  RegisterAccountResponse,
+  RegisterAccountResponse_Status,
+  RegisterAccountResponseSchema,
   SyncRequestSchema,
   SyncResponseSchema,
 } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
 import { parseProtobufLocalId } from '@/utils/protoUtils.ts';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 
 export type UserServiceEvents = {
   syncUser: {
@@ -92,6 +97,19 @@ class UserService implements IWebsocketService {
     return response;
   }
 
+  async queryUserByUsername(selfUserId: IdType, username: string, domain?: string): Promise<QueryUserResponse> {
+    const request = create(QueryUserRequestSchema, {
+      identifier: {
+        case: 'username',
+        value: {
+          domain: domain,
+          username: username,
+        },
+      },
+    });
+
+    return await this.packetService.request(QueryUserResponseSchema, selfUserId, RpcRequestMethod.QUERY_USER_V1, toBinary(QueryUserRequestSchema, request));
+  }
 }
 
 export default UserService;

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { IdType } from '@/types/roomTypes.ts';
+export type IdType = string | bigint;
 
 export interface FederationIdModel {
   domain?: string;

@@ -19,12 +19,12 @@
 import { ChannelRoom, GroupRoom, PrivateRoom, Room } from '@/proto/qbychat/rpc/room/v1/room_model_pb';
 import { ChannelRoomModel, GroupRoomModel, PrivateRoomModel, RoomModel, RoomType } from '@/types/roomTypes.ts';
 import { convertFederationIdV1 } from '@/mappers/idMapper.ts';
-import { convertPublicUserInfoV1 } from '@/mappers/userMapper.ts';
+import { convertPublicUserProfileV1 } from '@/mappers/userMapper.ts';
 import { FederationIdModel } from '@/types/idTypes.ts';
 
 function convertPrivateRoom(proto: PrivateRoom): PrivateRoomModel {
   return {
-    peerUser: convertPublicUserInfoV1(proto.peerUser!),
+    peerUser: convertPublicUserProfileV1(proto.peerUser!),
   };
 }
 

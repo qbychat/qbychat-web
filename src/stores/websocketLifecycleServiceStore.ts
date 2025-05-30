@@ -26,9 +26,9 @@ type WebSocketState = {
   setService: (socket: WebsocketLifecycleService) => void,
 }
 
-const useWebsocketLifecycleService = create<WebSocketState>((set) => ({
+const useWebsocketLifecycleServiceStore = create<WebSocketState>((set) => ({
   service: null,
   setService: (socket: WebsocketLifecycleService) => set({ service: socket }),
 }));
 
-export default useWebsocketLifecycleService;
+export default useWebsocketLifecycleServiceStore;

@@ -18,7 +18,7 @@
 
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { IdType } from '@/types/roomTypes.ts';
+import { IdType } from '@/types/idTypes.ts';
 
 
 interface Account {
@@ -29,14 +29,19 @@ interface Account {
 }
 
 interface AccountState {
+  mainAccountId: IdType | null;
   accounts: Map<IdType, Account>;
+
   addAccount: (account: Account) => void;
   removeAccount: (userId: IdType) => void;
   updateAccount: (userId: IdType, data: Partial<Account>) => void;
+
+  selectMainAccount: (accountId: IdType) => void;
 }
 
 const useAccountStore = create<AccountState>()(
   immer((set) => ({
+    mainAccountId: null,
     accounts: new Map<IdType, Account>(),
 
     addAccount: (account) =>
@@ -57,6 +62,11 @@ const useAccountStore = create<AccountState>()(
           Object.assign(account, data);
           state.accounts.set(userId, account);
         }
+      }),
+
+    selectMainAccount: (userId: IdType) =>
+      set((state) => {
+        state.mainAccountId = userId;
       }),
   })),
 );

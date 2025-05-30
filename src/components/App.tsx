@@ -19,7 +19,7 @@
 
 import 'react-virtualized/styles.css';
 import useAppStore from '@/stores/appStore.ts';
-import { useWebSocketLifecycle } from '@/hooks/useWebSocketLifecycle.ts';
+import { useWebSocketLifecycleManager } from '@/hooks/websocketLifecycleServiceHooks.ts';
 import AuthController from '@/components/auth/AuthController.tsx';
 import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
 import MainController from '@/components/main/MainController.tsx';
@@ -27,7 +27,7 @@ import MainController from '@/components/main/MainController.tsx';
 function App() {
   const screen = useAppStore(state => state.screen);
 
-  useWebSocketLifecycle();
+  useWebSocketLifecycleManager();
 
   const renderScreen = () => {
     switch (screen) {

@@ -21,7 +21,7 @@
 import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useWebsocketLifecycleService from '@/stores/websocketLifecycleServiceStore.ts';
+import useWebsocketLifecycleServiceStore from '@/stores/websocketLifecycleServiceStore.ts';
 import UserService from '@/websocket/services/UserService.ts';
 import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
 import AuthLayout from '@/components/auth/AuthLayout.tsx';
@@ -33,7 +33,7 @@ import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user
 const RegisterPage = () => {
   const { t } = useTranslation();
   const navigate = useAuthStore((state) => state.navigate);
-  const websocketLifecycleService = useWebsocketLifecycleService((state) => state.service);
+  const websocketLifecycleService = useWebsocketLifecycleServiceStore((state) => state.service);
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
