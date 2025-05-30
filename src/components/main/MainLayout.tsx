@@ -194,7 +194,9 @@ export const MainLayout = () => {
     <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
       {/* Left Panel */}
       <Panel defaultSize={25} maxSize={40} minSize={20} key="left" id="left-panel"
-             className={((visibleStack === 'both'||visibleStack === 'left') ? '' : ' hidden')}>
+             className={(visibleStack === 'both'||visibleStack === 'left') ? '' : ' hidden'}
+             aria-hidden={!(visibleStack === 'both'||visibleStack === 'left')}
+      >
         <TransitionContainer
           currentViewEntry={leftEntry}
           render={render}
@@ -208,7 +210,7 @@ export const MainLayout = () => {
       {/* Right Panel */}
 
       <Panel key="right" id="right-panel"
-             className={(visibleStack === 'both' || visibleStack === 'right') ? '' : 'hidden'}>
+             className={(visibleStack === 'both' || visibleStack === 'right') ? '' : 'hidden'} aria-hidden={!(visibleStack === 'both' || visibleStack === 'right')}>
         <TransitionContainer
           currentViewEntry={rightEntry}
           render={render}
@@ -217,50 +219,4 @@ export const MainLayout = () => {
       </Panel>
     </PanelGroup>
   );
-
-  // return (
-  //   <Split direction="horizontal">
-  //     {/* Left Panel */}
-  //     <AnimatePresence initial={false}>
-  //       {(visibleStack === 'both' || visibleStack === 'left') && (
-  //         <motion.div
-  //           key="left"
-  //           layout
-  //           initial={{ flex: 0 }}
-  //           animate={{ flex: visibleStack === 'both' ? 0.25 : 1 }}
-  //           exit={{ flex: 0 }}
-  //           transition={{ duration: 0.3, ease: 'easeInOut' }}
-  //           style={{ display: 'flex', overflow: 'hidden' }}
-  //         >
-  //           <TransitionContainer
-  //             currentViewEntry={leftEntry}
-  //             render={render}
-  //             defaultElement={<LeftPanel />}
-  //           />
-  //         </motion.div>
-  //       )}
-  //     </AnimatePresence>
-  //
-  //     {/* Right Panel */}
-  //     <AnimatePresence initial={false}>
-  //       {(visibleStack === 'both' || visibleStack === 'right') && (
-  //         <motion.div
-  //           key="right"
-  //           layout
-  //           initial={{ flex: 0 }}
-  //           animate={{ flex: visibleStack === 'both' ? 0.75 : 1 }}
-  //           exit={{ flex: 0 }}
-  //           transition={{ duration: 0.3, ease: 'easeInOut' }}
-  //           style={{ display: 'flex', overflow: 'hidden' }}
-  //         >
-  //           <TransitionContainer
-  //             currentViewEntry={rightEntry}
-  //             render={render}
-  //             defaultElement={<>intro</>}
-  //           />
-  //         </motion.div>
-  //       )}
-  //     </AnimatePresence>
-  //   </Split>
-  // );
 };
