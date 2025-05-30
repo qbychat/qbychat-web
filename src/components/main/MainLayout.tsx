@@ -194,7 +194,7 @@ export const MainLayout = () => {
     <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
       {/* Left Panel */}
       <Panel defaultSize={25} maxSize={40} minSize={20} key="left" id="left-panel"
-             className={visibleStack === 'both' ? 'border-r border-[#393939]' : undefined + ((visibleStack === 'left') ? '' : ' hidden')}>
+             className={((visibleStack === 'both'||visibleStack === 'left') ? '' : ' hidden')}>
         <TransitionContainer
           currentViewEntry={leftEntry}
           render={render}
@@ -203,7 +203,7 @@ export const MainLayout = () => {
       </Panel>
 
       {/* Resize Handle */}
-      {visibleStack === 'both' && (<PanelResizeHandle />)}
+      <PanelResizeHandle className={visibleStack === 'both' ? 'border-r border-[#393939]' : 'hidden'} />
 
       {/* Right Panel */}
 
