@@ -17,7 +17,7 @@
  */
 
 import { ViewEntry } from '@/stores/router/main-router-store.ts';
-import { memo, ReactNode, HTMLAttributes, useEffect, useState } from 'react';
+import { HTMLAttributes, memo, ReactNode, useEffect, useState } from 'react';
 import { Transition } from '@mantine/core';
 import { useIsBackDirection } from '@/hooks/main-router-hooks.ts';
 
@@ -36,12 +36,12 @@ const isSameViewEntry = (a: ViewEntry | null, b: ViewEntry | null): boolean => {
 };
 
 export const TransitionContainer = memo(({
-                                                 currentViewEntry,
-                                                 render,
-                                                 duration = 200,
-                                                 defaultElement,
-                                                 ...divProps
-                                               }: Props) => {
+                                           currentViewEntry,
+                                           render,
+                                           duration = 200,
+                                           defaultElement,
+                                           ...divProps
+                                         }: Props) => {
   const isBack = useIsBackDirection();
 
   const [transitioning, setTransitioning] = useState(false);
@@ -53,6 +53,7 @@ export const TransitionContainer = memo(({
   useEffect(() => {
     if (isSameViewEntry(currentViewEntry, renderedEntry)) {
       // just update params
+      setTransitioning(false);
       return;
     }
 

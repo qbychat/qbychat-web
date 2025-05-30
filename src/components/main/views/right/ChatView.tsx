@@ -19,8 +19,8 @@
 import { useViewParams } from '@/hooks/main-router-hooks.ts';
 import { useEffect, useState } from 'react';
 import log from 'loglevel';
-import { Alert, Container } from '@mantine/core';
-import { AlertCircleIcon } from 'lucide-react';
+import { ActionIcon, Alert, Avatar, Button, Container, Group, Stack, Text } from '@mantine/core';
+import { AlertCircleIcon, ArrowLeftIcon } from 'lucide-react';
 
 export const ChatView = () => {
   const { params } = useViewParams();
@@ -33,6 +33,7 @@ export const ChatView = () => {
         setError('Neither roomId or peerUser is provided (please report this to developer)');
       }
     }
+    // TODO load room or peerUser
   }, [params]);
 
   if (error) {
@@ -46,8 +47,24 @@ export const ChatView = () => {
   }
 
   return (
-    <Container fluid h="100%">
+    <Group justify="space-between" px="md" py="sm" style={{ borderBottom: '1px solid #393939' }}>
+      <Group>
+        <ActionIcon variant="subtle" radius="xl" aria-label="Back">
+          <ArrowLeftIcon size={20} />
+        </ActionIcon>
 
-    </Container>
+        <Group gap="sm" align="center">
+          <Avatar size="md" radius="xl">
+            {params?.peerUser?.nickname.slice(0, 1).toUpperCase()}
+          </Avatar>
+          <Stack gap={0}>
+            <Text fw={500}>{params?.peerUser?.nickname}</Text>
+            <Text size="sm" c="blue">Online</Text>
+          </Stack>
+        </Group>
+      </Group>
+
+      <Button variant="default">ACTIONS</Button>
+    </Group>
   );
 };
