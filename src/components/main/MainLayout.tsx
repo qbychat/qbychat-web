@@ -193,30 +193,28 @@ export const MainLayout = () => {
   return (
     <PanelGroup autoSaveId="qbychat-main" direction="horizontal">
       {/* Left Panel */}
-      {(visibleStack === 'both' || visibleStack === 'left') && (
-        <Panel defaultSize={25} maxSize={40} minSize={20} key="left" id="left-panel"
-               className={visibleStack === 'both' ? 'border-r border-[#393939]' : undefined}>
-          <TransitionContainer
-            currentViewEntry={leftEntry}
-            render={render}
-            defaultElement={<LeftPanel />}
-          />
-        </Panel>
-      )}
+      <Panel defaultSize={25} maxSize={40} minSize={20} key="left" id="left-panel"
+             className={visibleStack === 'both' ? 'border-r border-[#393939]' : undefined + ((visibleStack === 'left') ? '' : ' hidden')}>
+        <TransitionContainer
+          currentViewEntry={leftEntry}
+          render={render}
+          defaultElement={<LeftPanel />}
+        />
+      </Panel>
 
       {/* Resize Handle */}
       {visibleStack === 'both' && (<PanelResizeHandle />)}
 
       {/* Right Panel */}
-      {(visibleStack === 'both' || visibleStack === 'right') && (
-        <Panel key="right" id="right-panel">
-          <TransitionContainer
-            currentViewEntry={rightEntry}
-            render={render}
-            defaultElement={<IntroView />}
-          />
-        </Panel>
-      )}
+
+      <Panel key="right" id="right-panel"
+             className={(visibleStack === 'both' || visibleStack === 'right') ? '' : 'hidden'}>
+        <TransitionContainer
+          currentViewEntry={rightEntry}
+          render={render}
+          defaultElement={<IntroView />}
+        />
+      </Panel>
     </PanelGroup>
   );
 
