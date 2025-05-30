@@ -18,8 +18,7 @@
 
 import { Center, Stack, Text, Title } from '@mantine/core';
 
-const IntroView = () => {
-
+export const IntroView = () => {
   return (
     <Center style={{ height: '100%', width: '100%' }}>
       <Stack align="center">
@@ -31,5 +30,3 @@ const IntroView = () => {
     </Center>
   );
 };
-
-export default IntroView;

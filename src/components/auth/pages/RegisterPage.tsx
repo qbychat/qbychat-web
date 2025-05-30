@@ -18,19 +18,19 @@
  *
  */
 
-import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
+import { useAuthStore } from '@/stores/router/auth-router-store.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useWebsocketLifecycleServiceStore from '@/stores/websocketLifecycleServiceStore.ts';
-import UserService from '@/websocket/services/UserService.ts';
-import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
-import AuthLayout from '@/components/auth/AuthLayout.tsx';
-import { RpcError } from '@/websocket/errors/RpcError.ts';
+import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
+import UserService from '@/websocket/services/user.service.ts';
+import { AnimatedErrorMessage } from '@/components/AnimatedErrorMessage.tsx';
+import { AuthLayout } from '@/components/auth/AuthLayout.tsx';
+import { RpcError } from '@/websocket/errors/rpc-error.ts';
 import { useForm } from '@mantine/form';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
 
-const RegisterPage = () => {
+export const RegisterPage = () => {
   const { t } = useTranslation();
   const navigate = useAuthStore((state) => state.navigate);
   const websocketLifecycleService = useWebsocketLifecycleServiceStore((state) => state.service);
@@ -125,5 +125,3 @@ const RegisterPage = () => {
     </AuthLayout>
   );
 };
-
-export default RegisterPage;

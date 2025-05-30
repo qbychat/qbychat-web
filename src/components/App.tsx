@@ -18,13 +18,13 @@
  */
 
 import 'react-virtualized/styles.css';
-import useAppStore from '@/stores/appStore.ts';
-import { useWebSocketLifecycleManager } from '@/hooks/websocketLifecycleServiceHooks.ts';
-import AuthController from '@/components/auth/AuthController.tsx';
-import OnboardingController from '@/components/onboarding/OnboardingController.tsx';
-import MainController from '@/components/main/MainController.tsx';
+import useAppStore from '@/stores/app-store.ts';
+import { useWebSocketLifecycleManager } from '@/hooks/websocket-lifecycle-service-hooks.ts';
+import { AuthController } from '@/components/auth/AuthController.tsx';
+import { OnboardingView } from '@/components/onboarding/OnboardingView.tsx';
+import { MainLayout } from '@/components/main/MainLayout.tsx';
 
-function App() {
+export const App = () => {
   const screen = useAppStore(state => state.screen);
 
   useWebSocketLifecycleManager();
@@ -32,11 +32,11 @@ function App() {
   const renderScreen = () => {
     switch (screen) {
       case 'onboarding':
-        return <OnboardingController />;
+        return <OnboardingView />;
       case 'auth':
         return <AuthController />;
       case 'main':
-        return <MainController />;
+        return <MainLayout />;
     }
   };
 
@@ -45,6 +45,4 @@ function App() {
       {renderScreen()}
     </div>
   );
-}
-
-export default App;
+};

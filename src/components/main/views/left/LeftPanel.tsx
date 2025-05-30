@@ -17,18 +17,18 @@
  */
 
 
-import DropdownMenu from '@/components/main/views/left/DropdownMenu.tsx';
-import ConnectionStateLabel from '@/components/ui/ConnectionStateLabel.tsx';
-import SearchBox from '@/components/main/views/left/SearchBox.tsx';
-import React, { useMemo, useState } from 'react';
-import SimpleController from '@/components/SimpleController.tsx';
-import RoomList from './room-list/RoomList.tsx';
+import { DropdownMenu } from '@/components/main/views/left/DropdownMenu.tsx';
+import { ConnectionStateLabel } from '@/components/ui/ConnectionStateLabel.tsx';
+import { SearchBox } from '@/components/main/views/left/SearchBox.tsx';
+import { ReactNode, useMemo, useState } from 'react';
+import { SimpleViewContainer } from '@/components/SimpleViewContainer.tsx';
+import { RoomList } from './room-list/RoomList.tsx';
 import { useDisclosure } from '@mantine/hooks';
-import CreateChatModal from '@/components/main/views/left/mvp/CreateChatModal.tsx';
+import { CreateChatModal } from '@/components/main/views/left/mvp/CreateChatModal.tsx';
 
 type LeftPage = 'roomList' | 'search';
 
-const LeftPanel = () => {
+export const LeftPanel = () => {
   const [searchBoxContent, setSearchBoxContent] = useState('');
   const [searchBoxFocused, setSearchBoxFocused] = useState(false);
   // const [currentPage, setCurrentPage] = useState<LeftPage>('roomList');
@@ -37,7 +37,7 @@ const LeftPanel = () => {
   const [opened, { close, open }] = useDisclosure(false);
 
 
-  const pageMap: Record<LeftPage, React.ReactNode> = useMemo(() => ({
+  const pageMap: Record<LeftPage, ReactNode> = useMemo(() => ({
     roomList: <RoomList />,
     search: <div>search</div>,
   }), []);
@@ -55,12 +55,10 @@ const LeftPanel = () => {
           </ConnectionStateLabel>
         </div>
         <div className="flex flex-col h-full p-2">
-          <SimpleController pageMap={pageMap}
-                            activePage={(searchBoxFocused || searchBoxContent) ? 'search' : currentPage} />
+          <SimpleViewContainer pageMap={pageMap}
+                               activePage={(searchBoxFocused || searchBoxContent) ? 'search' : currentPage} />
         </div>
       </div>
     </>
   );
 };
-
-export default LeftPanel;

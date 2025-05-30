@@ -16,16 +16,18 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ReactNode, useMemo } from 'react';
+import { SetupServerPage } from '@/components/onboarding/pages/SetupServerPage.tsx';
 import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@mantine/core';
+import { SimpleViewContainer } from '@/components/SimpleViewContainer.tsx';
+import { WelcomePage } from '@/components/onboarding/pages/WelcomePage.tsx';
 
-export const WelcomePage = () => {
-  const { t } = useTranslation();
-  const navigate = useOnboardingStore(state => state.navigate);
+export const OnboardingView = () => {
+  const pageMap = useMemo<Record<string, ReactNode>>(() => ({
+    welcome: <WelcomePage />,
+    setupServer: <SetupServerPage />,
+  }), []);
 
-  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
-    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.welcome.title')}</h1>
-    <Button onClick={() => navigate('setupServer')}>{t('onboarding.welcome.go')}</Button>
-  </div>);
+  const activePage = useOnboardingStore(state => state.page);
+  return (<SimpleViewContainer activePage={activePage} pageMap={pageMap} />);
 };

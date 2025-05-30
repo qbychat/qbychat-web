@@ -17,15 +17,15 @@
  *
  */
 
-import React from 'react';
+import { ReactNode } from 'react';
 
 type Props = {
   title: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const AuthLayout = ({ title, subtitle, children }: Props) => {
+export const AuthLayout = ({ title, subtitle, children }: Props) => {
   return (
     <div className="mx-auto flex flex-col items-center justify-center pt-10 px-4 sm:px-6 lg:px-8 w-full max-w-xl">
       <img src="/qbychat.svg" alt="QbyChat Logo" className="size-50 mb-4"/>
@@ -39,5 +39,3 @@ const AuthLayout = ({ title, subtitle, children }: Props) => {
     </div>
   );
 };
-
-export default AuthLayout;

@@ -18,13 +18,13 @@
 
 
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
-import RoomListItem from '@/components/main/views/left/room-list/RoomListItem.tsx';
+import { RoomListItem } from '@/components/main/views/left/room-list/RoomListItem.tsx';
 import { useRef } from 'react';
 import { ListRowProps } from 'react-virtualized/dist/es/List';
-import { RoomModel } from '@/types/roomTypes.ts';
-import useRoomStore from '@/stores/room/roomStore.ts';
+import { RoomModel } from '@/types/room-types.ts';
+import useRoomStore from '@/stores/room-store.ts';
 
-const RoomList = () => {
+export const RoomList = () => {
   const cache = useRef(
     new CellMeasurerCache({
       fixedWidth: true,
@@ -69,5 +69,3 @@ const RoomList = () => {
     </AutoSizer>
   );
 };
-
-export default RoomList;

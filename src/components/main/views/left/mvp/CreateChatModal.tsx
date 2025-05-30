@@ -19,16 +19,21 @@
 import { Button, Group, Modal, TextInput } from '@mantine/core';
 import { User2Icon } from 'lucide-react';
 import { useState } from 'react';
-import useWebsocketLifecycleServiceStore from '@/stores/websocketLifecycleServiceStore.ts';
-import UserService from '@/websocket/services/UserService.ts';
-import useAccountStore from '@/stores/accountStore.ts';
+import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
+import UserService from '@/websocket/services/user.service.ts';
+import useAccountStore from '@/stores/account-store.ts';
 import { QueryUserResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
+import { parseProtobufLocalId } from '@/utils/proto-utils.ts';
+import { useStackControls } from '@/hooks/main-router-hooks.ts';
+import { convertPublicUserProfileV1 } from '@/mappers/user-mapper.ts';
 
-const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
+export const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const service = useWebsocketLifecycleServiceStore(s => s.service);
   const mainAccountId = useAccountStore(s => s.mainAccountId);
+
+  const { pushView } = useStackControls();
 
   const handleCreateChat = async () => {
     setError('');
@@ -54,7 +59,21 @@ const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void
         return;
     }
     const profile = response.userProfile!;
-    setError(`Ok ${profile.username} (${profile.userId?.localId?.content.value})`);
+    const targetId = parseProtobufLocalId(profile.userId?.localId);
+    if (targetId === mainAccountId) {
+      setError('You cannot message yourself');
+      return;
+    }
+    // push chat page
+    pushView({
+      side: 'right',
+      view: 'chat',
+      params: {
+        peerUser: convertPublicUserProfileV1(profile),
+      },
+    });
+    // close modal
+    close();
   };
 
   return (
@@ -68,6 +87,11 @@ const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void
         withAsterisk
         error={error}
         value={username}
+        onKeyDown={async (e) => {
+          if (e.key === 'Enter') {
+            await handleCreateChat();
+          }
+        }}
         onChange={(event) => setUsername(event.currentTarget.value)}
       />
 
@@ -77,5 +101,3 @@ const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void
     </Modal>
   );
 };
-
-export default CreateChatModal;

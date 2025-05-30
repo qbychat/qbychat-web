@@ -16,16 +16,25 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@mantine/core';
+import { IdType } from '@/types/id-types.ts';
+import { RpcResponse } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
+import { Message } from '@bufbuild/protobuf';
+import { GenMessage } from '@bufbuild/protobuf/codegenv1';
+import { RpcError } from '@/websocket/errors/rpc-error.ts';
 
-export const WelcomePage = () => {
-  const { t } = useTranslation();
-  const navigate = useOnboardingStore(state => state.navigate);
+export interface RpcResponsePromiseHandlers {
+  resolve: (value: RpcResponse) => void;
+  reject: (reason: RpcError) => void;
+}
 
-  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
-    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.welcome.title')}</h1>
-    <Button onClick={() => navigate('setupServer')}>{t('onboarding.welcome.go')}</Button>
-  </div>);
-};
+export interface IPacketService {
+  sendPacket(data: Uint8Array): void;
+
+  request<T extends Message>(
+    responseType: GenMessage<T>,
+    userId: IdType | null | undefined,
+    method: number,
+    payload: Uint8Array | null,
+    timeout?: number,
+  ): Promise<T>;
+}

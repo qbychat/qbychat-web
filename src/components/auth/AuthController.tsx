@@ -18,15 +18,14 @@
  *
  */
 
-import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
-import React, { useMemo } from 'react';
-import LoginPage from '@/components/auth/pages/LoginPage.tsx';
-import RegisterPage from '@/components/auth/pages/RegisterPage.tsx';
-import SimpleController from '@/components/SimpleController.tsx';
+import { useAuthStore } from '@/stores/router/auth-router-store.ts';
+import { ReactNode, useMemo } from 'react';
+import { LoginPage } from '@/components/auth/pages/LoginPage.tsx';
+import { RegisterPage } from '@/components/auth/pages/RegisterPage.tsx';
+import { SimpleViewContainer } from '@/components/SimpleViewContainer.tsx';
 
-
-const AuthController = () => {
-  const pageMap = useMemo<Record<string, React.ReactNode>>(() => ({
+export const AuthController = () => {
+  const pageMap = useMemo<Record<string, ReactNode>>(() => ({
     login: <LoginPage />,
     register: <RegisterPage />,
     qrcode: <>QR Code Login</>,
@@ -35,7 +34,5 @@ const AuthController = () => {
 
   const activePage = useAuthStore(state => state.page);
 
-  return (<SimpleController pageMap={pageMap} activePage={activePage} />);
+  return (<SimpleViewContainer pageMap={pageMap} activePage={activePage} />);
 };
-
-export default AuthController;

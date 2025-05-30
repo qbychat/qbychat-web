@@ -17,22 +17,18 @@
  *
  */
 
-import { Text, Transition } from '@mantine/core';
+import { create } from 'zustand';
+import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
 
-type Props = {
-  error: string;
+type WebSocketState = {
+  service: WebsocketLifecycleService | null;
+
+  setService: (socket: WebsocketLifecycleService) => void,
 }
 
-export const AnimatedErrorMessage = ({ error }: Props) => {
-  return (
-    <Transition
-      mounted={!!error}
-      transition="slide-down"
-      duration={200}
-      timingFunction="ease"
-    >
-      {(styles) => <Text style={styles} c="red">{error}</Text>}
-    </Transition>
-  );
-};
+const useWebsocketLifecycleServiceStore = create<WebSocketState>((set) => ({
+  service: null,
+  setService: (socket: WebsocketLifecycleService) => set({ service: socket }),
+}));
 
+export default useWebsocketLifecycleServiceStore;

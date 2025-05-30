@@ -18,6 +18,4 @@
 
 import { createContext } from 'react';
 
-const ViewContext = createContext<{ cacheKey: string } | null>(null);
-
-export default ViewContext;
+export const ViewContext = createContext<{ cacheKey: string } | null>(null);

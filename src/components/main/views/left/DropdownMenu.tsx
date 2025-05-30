@@ -18,15 +18,15 @@
 
 import { ActionIcon, Menu } from '@mantine/core';
 import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
-import { useStackControls } from '@/hooks/mainRouterHooks.ts';
+import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { useTranslation } from 'react-i18next';
-import useAccountStore from '@/stores/accountStore.ts';
+import useAccountStore from '@/stores/account-store.ts';
 
 type Props = {
   openPMModel: () => void;
 }
 
-const DropdownMenu = ({ openPMModel }: Props) => {
+export const DropdownMenu = ({ openPMModel }: Props) => {
   const { t } = useTranslation();
   const { pushView } = useStackControls();
 
@@ -71,5 +71,3 @@ const DropdownMenu = ({ openPMModel }: Props) => {
     </Menu>
   );
 };
-
-export default DropdownMenu;

@@ -17,17 +17,17 @@
  *
  */
 
-import React, { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { db } from '@/db.ts';
 import { useTranslation } from 'react-i18next';
-import useSettings from '@/stores/settingsStore.ts';
-import useAppStore from '@/stores/appStore.ts';
-import useWebsocketLifecycleServiceStore from '@/stores/websocketLifecycleServiceStore.ts';
-import WebsocketLifecycleService from '@/websocket/WebsocketLifecycleService.ts';
-import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
+import useSettings from '@/stores/settings-store.ts';
+import useAppStore from '@/stores/app-store.ts';
+import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
+import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
+import { AnimatedErrorMessage } from '@/components/AnimatedErrorMessage.tsx';
 import { Button, Input } from '@mantine/core';
 
-const SetupServerPage = () => {
+export const SetupServerPage = () => {
   const { t } = useTranslation();
   const settings = useSettings();
   const setSocket = useWebsocketLifecycleServiceStore((state) => state.setService);
@@ -36,7 +36,7 @@ const SetupServerPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -79,5 +79,3 @@ const SetupServerPage = () => {
     </form>
   </div>);
 };
-
-export default SetupServerPage;

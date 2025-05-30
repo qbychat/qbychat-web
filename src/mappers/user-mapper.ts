@@ -16,16 +16,16 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@mantine/core';
 
-export const WelcomePage = () => {
-  const { t } = useTranslation();
-  const navigate = useOnboardingStore(state => state.navigate);
+import { convertFederationIdV1 } from '@/mappers/id-mapper.ts';
+import { PublicUserProfile } from '@/proto/qbychat/rpc/user/v1/user_model_pb';
+import { PublicUserProfileModel } from '@/types/user-types.ts';
 
-  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
-    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.welcome.title')}</h1>
-    <Button onClick={() => navigate('setupServer')}>{t('onboarding.welcome.go')}</Button>
-  </div>);
-};
+export function convertPublicUserProfileV1(proto: PublicUserProfile): PublicUserProfileModel {
+  return {
+    userId: convertFederationIdV1(proto.userId!),
+    username: proto.username,
+    nickname: proto.nickname,
+    bio: proto.bio,
+  };
+}

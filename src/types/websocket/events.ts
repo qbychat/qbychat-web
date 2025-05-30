@@ -16,16 +16,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@mantine/core';
+import { IdType } from '@/types/id-types.ts';
+import { SSEPayload } from './sse';
+import { WebSocketStatus } from './connection';
+import { UserServiceEvents } from '@/types/websocket/events/user-service-events.ts';
+import { RoomServiceEvents } from '@/types/websocket/events/room-service-events.ts';
 
-export const WelcomePage = () => {
-  const { t } = useTranslation();
-  const navigate = useOnboardingStore(state => state.navigate);
+export type WebsocketEvents = {
+  /* Internal Events */
+  sse: SSEPayload<unknown>;
 
-  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
-    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.welcome.title')}</h1>
-    <Button onClick={() => navigate('setupServer')}>{t('onboarding.welcome.go')}</Button>
-  </div>);
-};
+  updateStatus: WebSocketStatus;
+  updateToken: { token: string };
+  requireLogin: null;
+  switchMainAccount: { mainAccountId: IdType };
+  loginStateSynced: { mainAccountId: IdType; loggedInAccountIds: IdType[] };
+  triggerSync: { accountId: IdType };
+  syncCompleted: { accountId: IdType };
+} & UserServiceEvents
+  & RoomServiceEvents;

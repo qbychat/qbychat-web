@@ -25,7 +25,7 @@ type Props = {
   onFocusChange?: (value: boolean) => void;
 }
 
-const SearchBox = ({ value, onContentChange, onFocusChange }: Props) => {
+export const SearchBox = ({ value, onContentChange, onFocusChange }: Props) => {
   return (
     <TextInput
       radius="xl" className="mx-2"
@@ -56,5 +56,3 @@ const SearchBox = ({ value, onContentChange, onFocusChange }: Props) => {
     />
   );
 };
-
-export default SearchBox;

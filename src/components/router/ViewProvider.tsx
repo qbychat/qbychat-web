@@ -16,14 +16,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ViewContext from '@/components/router/ViewContext.tsx';
+import { ViewContext } from '@/components/router/ViewContext.tsx';
+import { ReactNode } from 'react';
 
-const ViewProvider = ({ cacheKey, children }: {
+export const ViewProvider = ({ cacheKey, children }: {
   cacheKey: string;
-  children: React.ReactNode
+  children: ReactNode
 }) => (
   <ViewContext.Provider value={{ cacheKey }}>{children}</ViewContext.Provider>
 );
-
-export default ViewProvider;

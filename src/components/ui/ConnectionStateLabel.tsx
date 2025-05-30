@@ -16,22 +16,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { WebSocketStatus } from '@/websocket/types.ts';
+import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react';
 import { Transition } from '@mantine/core';
-import useAppStore from '@/stores/appStore.ts';
+import useAppStore from '@/stores/app-store.ts';
+import { WebSocketStatus } from '@/types/websocket/connection.ts';
 
 type Props = {
-  children?: React.ReactNode;
-} & React.HTMLAttributes<HTMLParagraphElement>
+  children?: ReactNode;
+} & HTMLAttributes<HTMLParagraphElement>
 
-const ConnectionStateLabel = ({ children, ...props }: Props) => {
+export const ConnectionStateLabel = ({ children, ...props }: Props) => {
   const { connectionStatus } = useAppStore();
 
   const statusMap: Record<WebSocketStatus, {
-    label?: string | React.ReactNode;
+    label?: string | ReactNode;
     color: string;
-    icon?: React.ReactNode;
+    icon?: ReactNode;
     hidden?: boolean;
     animDots?: boolean
   }> = useMemo(() => ({
@@ -118,4 +118,3 @@ const ConnectionStateLabel = ({ children, ...props }: Props) => {
     </Transition>
   );
 };
-export default ConnectionStateLabel;

@@ -18,19 +18,19 @@
  *
  */
 
-import { useAuthStore } from '@/stores/controller/authRouterStore.ts';
+import { useAuthStore } from '@/stores/router/auth-router-store.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import AuthLayout from '@/components/auth/AuthLayout.tsx';
-import AnimatedErrorMessage from '@/components/AnimatedErrorMessage.tsx';
-import AuthService from '@/websocket/services/AuthService.ts';
-import { RpcError } from '@/websocket/errors/RpcError.ts';
+import { AuthLayout } from '@/components/auth/AuthLayout.tsx';
+import { AnimatedErrorMessage } from '@/components/AnimatedErrorMessage.tsx';
+import AuthService from '@/websocket/services/auth.service.ts';
+import { RpcError } from '@/websocket/errors/rpc-error.ts';
 import { useForm } from '@mantine/form';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
 import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/rpc/auth/v1/auth_service_pb';
-import { useWebsocketLifecycleService } from '@/hooks/websocketLifecycleServiceHooks.ts';
+import { useWebsocketLifecycleService } from '@/hooks/websocket-lifecycle-service-hooks.ts';
 
-const LoginPage = () => {
+export const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useAuthStore((state) => state.navigate);
   const websocketLifecycleService = useWebsocketLifecycleService();
@@ -117,5 +117,3 @@ const LoginPage = () => {
     </AuthLayout>
   );
 };
-
-export default LoginPage;

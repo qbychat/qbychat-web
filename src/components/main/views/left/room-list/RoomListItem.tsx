@@ -17,15 +17,15 @@
  */
 
 import { Avatar, Badge, Box, Group, Paper, Text } from '@mantine/core';
-import { RoomModel } from '@/types/roomTypes.ts';
-import useRoomStore from '@/stores/room/roomStore.ts';
-import { useStackControls } from '@/hooks/mainRouterHooks.ts';
+import { RoomModel } from '@/types/room-types.ts';
+import useRoomStore from '@/stores/room-store.ts';
+import { useStackControls } from '@/hooks/main-router-hooks.ts';
 
 type Props = {
   room: RoomModel
 }
 
-const RoomListItem = ({ room }: Props) => {
+export const RoomListItem = ({ room }: Props) => {
   const selectedRoom = useRoomStore(s => s.selectedRoomId);
   const { pushView } = useStackControls();
 
@@ -101,5 +101,3 @@ const RoomListItem = ({ room }: Props) => {
 
   );
 };
-
-export default RoomListItem;
