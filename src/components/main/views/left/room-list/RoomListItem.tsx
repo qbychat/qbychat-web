@@ -19,8 +19,7 @@
 import { RoomModel } from '@/types/room-types.ts';
 import useRoomStore from '@/stores/room-store.ts';
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
-import { Avatar, Card, CardBody, cn } from '@heroui/react';
-import { Badge } from '@heroui/badge';
+import { Avatar, Badge, Card, CardBody, cn } from '@heroui/react';
 
 type Props = {
   room: RoomModel
@@ -68,7 +67,6 @@ export const RoomListItem = ({ room }: Props) => {
             className="w-16 h-16 text-xl flex items-center justify-center"
           />
 
-          {/* 在线状态小圆点 */}
           {/* {room.online && (
             <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 rounded-full" />
           )} */}

@@ -25,8 +25,7 @@ import useAppStore from '@/stores/app-store.ts';
 import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
 import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Input } from '@heroui/input';
-import { Button } from '@heroui/button';
+import { Input, Button } from '@heroui/react';
 
 export const SetupServerPage = () => {
   const { t } = useTranslation();

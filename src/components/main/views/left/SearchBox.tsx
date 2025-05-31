@@ -18,7 +18,7 @@
 
 import { SearchIcon, XIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Input } from '@heroui/input';
+import { Input } from '@heroui/react';
 
 type Props = {
   value: string;

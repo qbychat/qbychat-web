@@ -19,8 +19,7 @@
 
 import { KeyboardEvent, useRef, useState } from 'react';
 import { SendIcon } from 'lucide-react';
-import { Button } from '@heroui/button';
-import { Textarea } from '@heroui/input';
+import { Button, Textarea } from '@heroui/react';
 
 export const ChatInput = ({ onSend }: { onSend: (msg: string) => void }) => {
   const [value, setValue] = useState('');

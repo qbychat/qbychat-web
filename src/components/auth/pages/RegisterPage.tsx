@@ -26,11 +26,9 @@ import UserService from '@/websocket/services/user.service.ts';
 import { AuthLayout } from '@/components/auth/AuthLayout.tsx';
 import { RpcError } from '@/websocket/errors/rpc-error.ts';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
-import { Input } from '@heroui/input';
 import { Form } from '@heroui/form';
 import { Eye, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Spacer } from '@heroui/react';
-import { Button } from '@heroui/button';
+import { Spacer, Input, Button } from '@heroui/react';
 import { z } from 'zod';
 
 export const RegisterPage = () => {

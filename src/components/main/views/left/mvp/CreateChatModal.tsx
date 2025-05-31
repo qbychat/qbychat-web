@@ -25,9 +25,7 @@ import { QueryUserResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_servi
 import { parseProtobufLocalId } from '@/utils/proto-utils.ts';
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { convertPublicUserProfileV1 } from '@/mappers/user-mapper.ts';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
-import { Input } from '@heroui/input';
-import { Button } from '@heroui/button';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Input, Button } from '@heroui/react';
 
 export const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
   const [username, setUsername] = useState('');
