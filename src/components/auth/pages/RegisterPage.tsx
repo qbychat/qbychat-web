@@ -28,7 +28,7 @@ import { RpcError } from '@/websocket/errors/rpc-error.ts';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
 import { Form } from '@heroui/form';
 import { Eye, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { Spacer, Input, Button } from '@heroui/react';
+import { Button, Input, Spacer } from '@heroui/react';
 import { z } from 'zod';
 
 export const RegisterPage = () => {
@@ -38,8 +38,6 @@ export const RegisterPage = () => {
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordVerifyVisible, setIsPasswordVerifyVisible] = useState(false);
-
-  const [errors, setErrors] = useState({});
 
   const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
   const togglePasswordVerifyVisibility = () => setIsPasswordVerifyVisible(!isPasswordVerifyVisible);
@@ -111,27 +109,21 @@ export const RegisterPage = () => {
     };
   };
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const data = new FormData(e.currentTarget);
-    const result = await handleRequest(data);
-
-    setErrors(result ?? {});
-  };
-
   return (
     <AuthLayout title={t('auth.register.title')} subtitle={t('auth.register.tip')}>
-      <Form className="mt-6 w-full space-y-4" onSubmit={onSubmit} validationErrors={errors}>
+      <Form className="mt-6 w-full space-y-4" onSubmit={(e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        return handleRequest(new FormData(e.currentTarget));
+      }}>
         <Input
           name="username"
           label={t('auth.register.username')}
           variant="bordered"
           isRequired
-          // validate={(value) => {
-          //   const result = baseSchema.shape.username.safeParse(value);
-          //   return result.success ? true : result.error.essage;
-          // }}
+          validate={(value) => {
+            const result = baseSchema.shape.username.safeParse(value);
+            return result.success ? true : result.error.errors[0].message;
+          }}
           classNames={{
             input: 'text-sm',
             label: 'text-sm font-medium',
@@ -144,10 +136,10 @@ export const RegisterPage = () => {
           type={isPasswordVisible ? 'text' : 'password'}
           variant="bordered"
           isRequired
-          // validate={(value) => {
-          //   const result = baseSchema.shape.password.safeParse(value);
-          //   return result.success ? true : result.error.message;
-          // }}
+          validate={(value) => {
+            const result = baseSchema.shape.password.safeParse(value);
+            return result.success ? true : result.error.errors[0].message;
+          }}
           endContent={
             <button
               className="focus:outline-none"
@@ -216,5 +208,6 @@ export const RegisterPage = () => {
         </div>
       </Form>
     </AuthLayout>
-  );
+  )
+    ;
 };

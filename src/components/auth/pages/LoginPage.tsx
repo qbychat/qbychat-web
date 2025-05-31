@@ -28,7 +28,7 @@ import { useWebsocketLifecycleService } from '@/hooks/websocket-lifecycle-servic
 import { UsernamePasswordLoginResponse_Status } from '@/proto/qbychat/rpc/auth/v1/auth_service_pb';
 import AuthService from '@/websocket/services/auth.service.ts';
 import { RpcError } from '@/websocket/errors/rpc-error.ts';
-import { Spacer, Button, Input } from '@heroui/react';
+import { Button, Input, Spacer } from '@heroui/react';
 import { Form } from '@heroui/form';
 
 export const LoginPage = () => {
@@ -102,7 +102,11 @@ export const LoginPage = () => {
   return (
     <AuthLayout title={t('auth.login.title')} subtitle={t('auth.login.tip')}>
       <Form className="mt-6 w-full space-y-4"
-            onSubmit={(e: FormEvent<HTMLFormElement>) => handleRequest(new FormData(e.currentTarget))}>
+            onSubmit={(e: FormEvent<HTMLFormElement>) => {
+              e.preventDefault();
+              return handleRequest(new FormData(e.currentTarget));
+            }}
+      >
         <Input
           name="username"
           label={t('auth.login.username')}
@@ -110,7 +114,7 @@ export const LoginPage = () => {
           isRequired
           validate={(value) => {
             const result = loginSchema.shape.username.safeParse(value);
-            return result.success ? true : result.error.message;
+            return result.success ? true : result.error.errors[0].message;
           }}
           classNames={{
             input: 'text-sm',
@@ -126,7 +130,7 @@ export const LoginPage = () => {
           type={isPasswordVisible ? 'text' : 'password'}
           validate={(value) => {
             const result = loginSchema.shape.password.safeParse(value);
-            return result.success ? true : result.error.message;
+            return result.success ? true : result.error.errors[0].message;
           }}
           endContent={
             <button
