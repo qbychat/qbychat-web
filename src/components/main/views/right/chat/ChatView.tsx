@@ -22,8 +22,7 @@ import log from 'loglevel';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { ChatInput } from '@/components/main/views/right/chat/ChatInput.tsx';
 import { ChatStartPrompt } from '@/components/main/views/right/chat/ChatStartPrompt.tsx';
-import { Button } from '@heroui/button';
-import { Alert, Avatar } from '@heroui/react';
+import { Alert, Avatar, Button } from '@heroui/react';
 
 export const ChatView = () => {
   const { params } = useViewParams();

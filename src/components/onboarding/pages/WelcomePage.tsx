@@ -18,7 +18,7 @@
 
 import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/button';
+import { Button } from '@heroui/react';
 
 export const WelcomePage = () => {
   const { t } = useTranslation();

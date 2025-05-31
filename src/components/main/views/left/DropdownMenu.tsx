@@ -19,8 +19,7 @@
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { useTranslation } from 'react-i18next';
 import useAccountStore from '@/stores/account-store.ts';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from '@heroui/react';
-import { Button } from '@heroui/button';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Button } from '@heroui/react';
 import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 type Props = {
