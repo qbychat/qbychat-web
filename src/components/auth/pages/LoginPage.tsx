@@ -18,7 +18,7 @@
  *
  */
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthLayout } from '@/components/auth/AuthLayout.tsx';
 import { z } from 'zod';
@@ -103,7 +103,8 @@ export const LoginPage = () => {
 
   return (
     <AuthLayout title={t('auth.login.title')} subtitle={t('auth.login.tip')}>
-      <Form className="mt-6 w-full space-y-4" onSubmit={(e) => handleRequest(new FormData(e.currentTarget))}>
+      <Form className="mt-6 w-full space-y-4"
+            onSubmit={(e: FormEvent<HTMLFormElement>) => handleRequest(new FormData(e.currentTarget))}>
         <Input
           name="username"
           label={t('auth.login.username')}
