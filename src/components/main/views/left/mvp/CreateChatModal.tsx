@@ -16,8 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Button, Group, Modal, TextInput } from '@mantine/core';
-import { User2Icon } from 'lucide-react';
+import { User2 } from 'lucide-react';
 import { useState } from 'react';
 import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
 import UserService from '@/websocket/services/user.service.ts';
@@ -26,6 +25,9 @@ import { QueryUserResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_servi
 import { parseProtobufLocalId } from '@/utils/proto-utils.ts';
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { convertPublicUserProfileV1 } from '@/mappers/user-mapper.ts';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
+import { Input } from '@heroui/input';
+import { Button } from '@heroui/button';
 
 export const CreateChatModal = ({ opened, close }: { opened: boolean, close: () => void }) => {
   const [username, setUsername] = useState('');
@@ -44,14 +46,13 @@ export const CreateChatModal = ({ opened, close }: { opened: boolean, close: () 
       setError('Username cannot be empty');
       return;
     }
-    // TODO find user than open ChatView
+    // find user than open ChatView
     const userService = service?.getService(UserService);
     if (!userService) {
       setError('No userService available');
       return;
     }
 
-    // TODO parse domain from input
     const response = await userService.queryUserByUsername(mainAccountId!, username);
     switch (response.status) {
       case QueryUserResponse_Status.USER_NOT_FOUND:
@@ -77,27 +78,43 @@ export const CreateChatModal = ({ opened, close }: { opened: boolean, close: () 
   };
 
   return (
-    <Modal opened={opened} onClose={close} title="Create PM" centered>
-      <TextInput
-        leftSectionPointerEvents="none"
-        leftSection={<User2Icon size="15" />}
-        label="Peer Username"
-        description="Enter your friend's username to open the chat view"
-        placeholder="Username"
-        withAsterisk
-        error={error}
-        value={username}
-        onKeyDown={async (e) => {
-          if (e.key === 'Enter') {
-            await handleCreateChat();
-          }
-        }}
-        onChange={(event) => setUsername(event.currentTarget.value)}
-      />
-
-      <Group mt="md">
-        <Button onClick={handleCreateChat}>CREATE</Button>
-      </Group>
+    <Modal
+      isOpen={opened}
+      onOpenChange={close}
+      placement="center"
+    >
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">
+          Create PM
+        </ModalHeader>
+        <ModalBody>
+          <Input
+            startContent={<User2 size={15} className="text-default-400" />}
+            label="Peer Username"
+            description="Enter your friend's username to open the chat view"
+            placeholder="Username"
+            isRequired
+            isInvalid={!!error}
+            errorMessage={error}
+            value={username}
+            onKeyDown={async (e) => {
+              if (e.key === 'Enter') {
+                await handleCreateChat();
+              }
+            }}
+            onChange={(e) => setUsername(e.target.value)}
+            variant="bordered"
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onPress={handleCreateChat}
+          >
+            CREATE
+          </Button>
+        </ModalFooter>
+      </ModalContent>
     </Modal>
   );
 };

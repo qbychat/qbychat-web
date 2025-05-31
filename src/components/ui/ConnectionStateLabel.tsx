@@ -16,14 +16,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react';
-import { Transition } from '@mantine/core';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import useAppStore from '@/stores/app-store.ts';
 import { WebSocketStatus } from '@/types/websocket/connection.ts';
+import { AnimatePresence, HTMLMotionProps, motion } from 'framer-motion';
 
 type Props = {
   children?: ReactNode;
-} & HTMLAttributes<HTMLParagraphElement>
+} & Omit<HTMLMotionProps<'div'>, 'ref'>
 
 export const ConnectionStateLabel = ({ children, ...props }: Props) => {
   const { connectionStatus } = useAppStore();
@@ -102,19 +102,30 @@ export const ConnectionStateLabel = ({ children, ...props }: Props) => {
   const { style: pStyle, ...otherProps } = props;
 
   return (
-    <Transition mounted={mounted && !current.hidden} transition="fade" duration={200} timingFunction="ease">
-      {(styles) => (
-        <div
-          style={{ color: current.color, ...styles, display: 'flex', alignItems: 'center', gap: 6, ...pStyle }}
+    <AnimatePresence mode="wait">
+      {mounted && (
+        <motion.div
+          key="status"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            color: current.color,
+            ...pStyle,
+          }}
           {...otherProps}
         >
           {current.icon && <span>{current.icon}</span>}
-          <span className="w-full">
+            <span className="w-full">
             {current.label}
-            {current.animDots ? '.'.repeat(dots) : ''}
+              {current.animDots ? '.'.repeat(dots) : ''}
           </span>
-        </div>
+        </motion.div>
       )}
-    </Transition>
+    </AnimatePresence>
   );
 };

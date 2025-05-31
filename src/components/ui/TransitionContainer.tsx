@@ -18,8 +18,8 @@
 
 import { ViewEntry } from '@/stores/router/main-router-store.ts';
 import { HTMLAttributes, memo, ReactNode, useEffect, useState } from 'react';
-import { Transition } from '@mantine/core';
 import { useIsBackDirection } from '@/hooks/main-router-hooks.ts';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 
 type Props = {
   currentViewEntry: ViewEntry | null;
@@ -74,24 +74,41 @@ export const TransitionContainer = memo(({
     ...otherDivProps
   } = divProps;
 
+  const variants: Variants = {
+    initial: {
+      opacity: 0,
+      x: isBack ? -40 : 40,
+    },
+    animate: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: duration / 1000, ease: 'easeOut' },
+    },
+    exit: {
+      opacity: 0,
+      x: isBack ? 40 : -40,
+      transition: { duration: duration / 1000, ease: 'easeIn' },
+    },
+  };
+
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <Transition
-        mounted={!transitioning}
-        transition={isBack ? 'fade-right' : 'fade-left'}
-        duration={duration}
-        timingFunction="ease-out"
-      >
-        {styles =>
-          <div
-            className={`w-full h-full absolute ${divClassName}`}
-            style={{ ...divStyle, ...styles }}
-            {...otherDivProps}
+    <div className={`relative w-full h-full overflow-hidden ${divClassName}`} {...otherDivProps}>
+      <AnimatePresence mode="wait">
+        {!transitioning && (
+          <motion.div
+            key="page"
+            className="absolute w-full h-full"
+            style={divStyle}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+
           >
             {renderedElement}
-          </div>
-        }
-      </Transition>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }, (prevProps, nextProps) => {

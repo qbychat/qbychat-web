@@ -17,21 +17,21 @@
  */
 
 import { ReactNode, useEffect, useState } from 'react';
-import { MantineTransition, Transition } from '@mantine/core';
+import { AnimatePresence, motion } from 'framer-motion';
 
 type Props = {
   pageMap: Record<string, ReactNode>,
   activePage: string
-  transition?: MantineTransition;
+  transition?: 'slide-left' | 'slide-right' | 'fade';
   transitionDuration?: number
 }
 
 export const SimpleViewContainer = ({
-                            pageMap,
-                            activePage,
-                            transition = 'scale',
-                            transitionDuration = 200,
-                          }: Props) => {
+                                      pageMap,
+                                      activePage,
+                                      transition = 'fade',
+                                      transitionDuration = 200,
+                                    }: Props) => {
   const [activePageCache, setActivePageCache] = useState(activePage);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -49,20 +49,48 @@ export const SimpleViewContainer = ({
 
   const Page = pageMap[activePageCache];
 
+  const getVariants = () => {
+    switch (transition) {
+      case 'slide-left':
+        return {
+          initial: { opacity: 0, x: 30 },
+          animate: { opacity: 1, x: 0 },
+          exit: { opacity: 0, x: -30 },
+        };
+      case 'slide-right':
+        return {
+          initial: { opacity: 0, x: -30 },
+          animate: { opacity: 1, x: 0 },
+          exit: { opacity: 0, x: 30 },
+        };
+      default: // "fade"
+        return {
+          initial: { opacity: 0 },
+          animate: { opacity: 1 },
+          exit: { opacity: 0 },
+        };
+    }
+  };
+
+  const variants = getVariants();
+
   return (
-    <div className="relative h-full w-full">
-      <Transition
-        mounted={!isExiting && !!activePageCache}
-        transition={transition}
-        duration={transitionDuration}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <div style={{ ...styles, width: '100%', height: '100%' }}>
+    <div className="relative h-full w-full overflow-hidden">
+      <AnimatePresence mode="wait">
+        {!isExiting && activePageCache && (
+          <motion.div
+            key="page"
+            className="absolute w-full h-full"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+            transition={{ duration: transitionDuration / 1000, ease: 'easeInOut' }}
+          >
             {Page}
-          </div>
+          </motion.div>
         )}
-      </Transition>
+      </AnimatePresence>
     </div>
   );
 };

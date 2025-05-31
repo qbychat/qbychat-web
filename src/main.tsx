@@ -20,19 +20,20 @@
 import './index.css';
 import './logger.ts';
 import './i18n.ts';
-import '@mantine/core/styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './components/App.tsx';
-import { MantineProvider } from '@mantine/core';
 import { enableMapSet } from 'immer';
+import { HeroUIProvider } from '@heroui/react';
 
 enableMapSet();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MantineProvider defaultColorScheme="auto">
-      <App />
-    </MantineProvider>
+    <HeroUIProvider>
+      <main className="dark text-foreground bg-background">
+        <App />
+      </main>
+    </HeroUIProvider>
   </StrictMode>,
 );

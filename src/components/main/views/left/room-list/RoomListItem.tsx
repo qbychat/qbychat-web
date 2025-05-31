@@ -16,10 +16,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Avatar, Badge, Box, Group, Paper, Text } from '@mantine/core';
 import { RoomModel } from '@/types/room-types.ts';
 import useRoomStore from '@/stores/room-store.ts';
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
+import { Avatar, Card, CardBody, cn } from '@heroui/react';
+import { Badge } from '@heroui/badge';
 
 type Props = {
   room: RoomModel
@@ -48,56 +49,54 @@ export const RoomListItem = ({ room }: Props) => {
   };
 
   return (
-    <Paper
-      p="sm"
-      withBorder={isSelected}
-      onClick={navigateToChat}
-      className="w-full cursor-pointer"
+    <Card
+      shadow="sm"
+      isPressable
+      isHoverable
+      onPress={navigateToChat}
+      className={cn(
+        'w-full cursor-pointer transition-all',
+        isSelected && 'border border-primary',
+      )}
     >
-      <Group align="flex-start" className="w-full">
-        <Box className="relative w-16 flex-shrink-0">
-          <Avatar size="lg" radius="xl" className="w-16 h-16 text-xl flex items-center justify-center">
-            {getRoomName().slice(0, 2)}
-          </Avatar>
-          {/*{room.online && (*/}
-          {/*  <Box*/}
-          {/*    style={{*/}
-          {/*      position: 'absolute',*/}
-          {/*      bottom: 2,*/}
-          {/*      right: 2,*/}
-          {/*      width: 12,*/}
-          {/*      height: 12,*/}
-          {/*      backgroundColor: '#51cf66',*/}
-          {/*      borderRadius: '50%',*/}
-          {/*    }}*/}
-          {/*  />*/}
-          {/*)}*/}
-        </Box>
+      <CardBody className="flex gap-4 p-3">
+        <div className="relative w-16 h-16 flex-shrink-0">
+          <Avatar
+            name={getRoomName().slice(0, 2)}
+            size="lg"
+            radius="full"
+            className="w-16 h-16 text-xl flex items-center justify-center"
+          />
 
-        <Box className="flex flex-col flex-1 min-w-0">
-          <Group justify="space-between" mb={4}>
-            <Text fw={500} size="sm" truncate>
+          {/* 在线状态小圆点 */}
+          {/* {room.online && (
+            <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 rounded-full" />
+          )} */}
+        </div>
+
+        <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex justify-between mb-1">
+            <label className="font-semibold truncate">
               {getRoomName()}
-            </Text>
-            <Text size="xs" c="dimmed" className="flex-shrink-0">
+            </label>
+            <label className="flex-shrink-0">
               TIME PLACEHOLDER
-            </Text>
-          </Group>
+            </label>
+          </div>
 
-          <Group justify="space-between" align="center">
-            <Text size="sm" c="dimmed" truncate className="flex-1">
+          <div className="flex justify-between items-center">
+            <label className="truncate flex-1 text-default-500">
               {getLastMessage()}
-            </Text>
+            </label>
 
             {room.unreadCount > 0 && (
-              <Badge size="sm" variant="filled" color="red" style={{ minWidth: 20 }}>
-                {room.unreadCount > 999 ? '999+' : room.unreadCount}
+              <Badge color="danger" variant="solid" className="min-w-[20px] ml-2">
+                999+
               </Badge>
             )}
-          </Group>
-        </Box>
-      </Group>
-    </Paper>
-
+          </div>
+        </div>
+      </CardBody>
+    </Card>
   );
 };

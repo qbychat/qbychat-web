@@ -17,13 +17,12 @@
  */
 
 
-import { DropdownMenu } from '@/components/main/views/left/DropdownMenu.tsx';
+import { DropdownMenu1 } from '@/components/main/views/left/DropdownMenu.tsx';
 import { ConnectionStateLabel } from '@/components/ui/ConnectionStateLabel.tsx';
 import { SearchBox } from '@/components/main/views/left/SearchBox.tsx';
 import { ReactNode, useMemo, useState } from 'react';
 import { SimpleViewContainer } from '@/components/SimpleViewContainer.tsx';
 import { RoomList } from './room-list/RoomList.tsx';
-import { useDisclosure } from '@mantine/hooks';
 import { CreateChatModal } from '@/components/main/views/left/mvp/CreateChatModal.tsx';
 
 type LeftPage = 'roomList' | 'search';
@@ -31,11 +30,9 @@ type LeftPage = 'roomList' | 'search';
 export const LeftPanel = () => {
   const [searchBoxContent, setSearchBoxContent] = useState('');
   const [searchBoxFocused, setSearchBoxFocused] = useState(false);
-  // const [currentPage, setCurrentPage] = useState<LeftPage>('roomList');
   const [currentPage] = useState<LeftPage>('roomList');
 
-  const [opened, { close, open }] = useDisclosure(false);
-
+  const [createChatModalState, setCreateChatModalState] = useState(false);
 
   const pageMap: Record<LeftPage, ReactNode> = useMemo(() => ({
     roomList: <RoomList />,
@@ -44,11 +41,11 @@ export const LeftPanel = () => {
 
   return (
     <>
-      <CreateChatModal opened={opened} close={close} />
+      <CreateChatModal opened={createChatModalState} close={() => setCreateChatModalState(false)} />
 
       <div className="flex flex-col h-full" id="leftPanel">
         <div className="flex flex-row p-2 items-center">
-          <DropdownMenu openPMModel={open} />
+          <DropdownMenu1 openPMModel={() => setCreateChatModalState(true)} />
           <ConnectionStateLabel className="flex-1">
             <SearchBox value={searchBoxContent} onContentChange={setSearchBoxContent}
                        onFocusChange={(state) => setSearchBoxFocused(state)} />

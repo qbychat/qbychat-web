@@ -27,7 +27,7 @@ function createWindow() {
     preloadPath = path.resolve(app.getAppPath(), '.tmp/dist-electron/preload.js');
     iconPath = path.resolve(app.getAppPath(), 'resources/icon.png');
   } else {
-    preloadPath = path.resolve(app.getAppPath(), 'preload.js');
+    preloadPath = path.resolve(app.getAppPath(), 'preload.mjs');
     iconPath = path.resolve(app.getAppPath(), 'icon.png');
   }
 

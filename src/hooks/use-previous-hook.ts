@@ -16,27 +16,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useOnboardingStore } from '@/stores/router/onboarding-router-store.ts';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/button';
+import { useEffect, useRef } from 'react';
 
-export const WelcomePage = () => {
-  const { t } = useTranslation();
-  const navigate = useOnboardingStore(state => state.navigate);
+export function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>(undefined);
 
-  return (
-    <div className="h-full w-full flex flex-col gap-6 items-center justify-center px-4 text-center">
-      <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold">
-        {t('onboarding.welcome.title')}
-      </h1>
-      <Button
-        color="primary"
-        radius="full"
-        size="lg"
-        onClick={() => navigate('setupServer')}
-      >
-        {t('onboarding.welcome.go')}
-      </Button>
-    </div>
-  );
-};
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
+}

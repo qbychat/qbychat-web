@@ -19,109 +19,204 @@
  */
 
 import { useAuthStore } from '@/stores/router/auth-router-store.ts';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
 import UserService from '@/websocket/services/user.service.ts';
-import { AnimatedErrorMessage } from '@/components/AnimatedErrorMessage.tsx';
 import { AuthLayout } from '@/components/auth/AuthLayout.tsx';
 import { RpcError } from '@/websocket/errors/rpc-error.ts';
-import { useForm } from '@mantine/form';
-import { Button, PasswordInput, TextInput } from '@mantine/core';
 import { RegisterAccountResponse_Status } from '@/proto/qbychat/rpc/user/v1/user_service_pb';
+import { Input } from '@heroui/input';
+import { Form } from '@heroui/form';
+import { Eye, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { Spacer } from '@heroui/react';
+import { Button } from '@heroui/button';
+import { z } from 'zod';
 
 export const RegisterPage = () => {
   const { t } = useTranslation();
   const navigate = useAuthStore((state) => state.navigate);
   const websocketLifecycleService = useWebsocketLifecycleServiceStore((state) => state.service);
 
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVerifyVisible, setIsPasswordVerifyVisible] = useState(false);
 
-  const form = useForm({
-    initialValues: {
-      username: '',
-      password: '',
-      passwordVerify: '',
-    },
-    validate: {
-      username: (value) => {
-        const regex = /^[a-zA-Z0-9]{5,16}$/;
-        if (!regex.test(value)) {
-          return t('auth.error.username-invalid');
-        }
-        return null;
-      },
-      password: (value) => (value.length === 0 ? t('auth.error.password-required') : null),
-      passwordVerify: (value, values) =>
-        value !== values.password ? t('auth.error.password-mismatch') : null,
-    },
+  const [errors, setErrors] = useState({});
+
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+  const togglePasswordVerifyVisibility = () => setIsPasswordVerifyVisible(!isPasswordVerifyVisible);
+
+  const baseSchema = z.object({
+    username: z
+      .string()
+      .min(5, t('auth.error.username-length'))
+      .max(16, t('auth.error.username-length'))
+      .regex(/^[a-zA-Z0-9]+$/, t('auth.error.username-invalid')),
+    password: z.string().min(1, t('auth.error.password-required')),
+    passwordVerify: z.string().min(1, t('auth.error.password-required')),
   });
 
-  async function onSubmit(values: { username: string, password: string }) {
-    if (!websocketLifecycleService) return;
+  const schema = baseSchema.refine((data) => data.password === data.passwordVerify, {
+    message: t('auth.error.password-mismatch'),
+    path: ['passwordVerify'],
+  });
 
-    setLoading(true);
-    setError('');
+
+  const handleRequest = async (data: FormData) => {
+    if (!websocketLifecycleService) return {
+      errors: ['Internal error'],
+    };
+
+    const result = schema.safeParse(Object.fromEntries(data));
+    if (!result.success) {
+      return {
+        errors: result.error.flatten().fieldErrors,
+      };
+    }
+
+    const { username, password } = result.data;
+    const userService = websocketLifecycleService.getService(UserService);
 
     try {
-      const userService = websocketLifecycleService.getService(UserService);
-      const response = await userService.registerAccount(values.username, values.password);
+      const response = await userService.registerAccount(username, password);
 
       switch (response.status) {
         case RegisterAccountResponse_Status.BAD_USERNAME:
-          setError(t('auth.error.bad-username'));
-          break;
+          return {
+            errors: {
+              username: [t('auth.error.bad-username')],
+            },
+          };
         case RegisterAccountResponse_Status.USERNAME_EXISTS:
-          setError(t('auth.error.username-taken'));
-          break;
+          return {
+            errors: {
+              username: [t('auth.error.username-taken')],
+            },
+          };
       }
     } catch (e) {
       if (e instanceof RpcError) {
-        setError(t('auth.error.rpc', { error: e.message }));
-      } else {
-        setError(t('auth.error.unknown'));
+        return {
+          errors: {
+            password: [t('auth.error.rpc', { error: e.message })],
+          },
+        };
       }
-    } finally {
-      setLoading(false);
+      return {
+        errors: {
+          password: [t('auth.error.unknown')],
+        },
+      };
     }
-  }
+    return {
+      errors: {},
+    };
+  };
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const data = new FormData(e.currentTarget);
+    const result = await handleRequest(data);
+
+    setErrors(result ?? {});
+  };
 
   return (
     <AuthLayout title={t('auth.register.title')} subtitle={t('auth.register.tip')}>
-      <form onSubmit={form.onSubmit(onSubmit)} className="mt-6 w-full space-y-3">
-        <AnimatedErrorMessage error={error} />
-
-        <TextInput
+      <Form className="mt-6 w-full space-y-4" onSubmit={onSubmit} validationErrors={errors}>
+        <Input
+          name="username"
           label={t('auth.register.username')}
-          {...form.getInputProps('username')}
+          variant="bordered"
+          isRequired
+          // validate={(value) => {
+          //   const result = baseSchema.shape.username.safeParse(value);
+          //   return result.success ? true : result.error.essage;
+          // }}
+          classNames={{
+            input: 'text-sm',
+            label: 'text-sm font-medium',
+          }}
         />
 
-        <PasswordInput
+        <Input
+          name="password"
           label={t('auth.register.password')}
-          {...form.getInputProps('password')}
+          type={isPasswordVisible ? 'text' : 'password'}
+          variant="bordered"
+          isRequired
+          // validate={(value) => {
+          //   const result = baseSchema.shape.password.safeParse(value);
+          //   return result.success ? true : result.error.message;
+          // }}
+          endContent={
+            <button
+              className="focus:outline-none"
+              type="button"
+              onClick={togglePasswordVisibility}
+              aria-label="toggle password visibility"
+            >
+              {isPasswordVisible ? (
+                <EyeOffIcon className="text-2xl text-default-400 pointer-events-none" size={20} />
+              ) : (
+                <EyeIcon className="text-2xl text-default-400 pointer-events-none" size={20} />
+              )}
+            </button>
+          }
+          classNames={{
+            input: 'text-sm',
+            label: 'text-sm font-medium',
+          }}
         />
 
-        <PasswordInput
+        <Input
+          name="passwordVerify"
           label={t('auth.register.password.verify')}
-          {...form.getInputProps('passwordVerify')}
+          type={isPasswordVerifyVisible ? 'text' : 'password'}
+          variant="bordered"
+          isRequired
+          // validate={(value) => {
+          //   const result = baseSchema.shape.passwordVerify.safeParse(value);
+          //   return result.success ? true : result.error.message;
+          // }}
+          endContent={
+            <button
+              className="focus:outline-none"
+              type="button"
+              onClick={togglePasswordVerifyVisibility}
+              aria-label="toggle password verify visibility"
+            >
+              {isPasswordVerifyVisible ? (
+                <EyeOffIcon className="text-2xl text-default-400 pointer-events-none" size={20} />
+              ) : (
+                <Eye className="text-2xl text-default-400 pointer-events-none" size={20} />
+              )}
+            </button>
+          }
+          classNames={{
+            input: 'text-sm',
+            label: 'text-sm font-medium',
+          }}
         />
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4">
+        <Spacer y={2} />
+
+        <div className="flex flex-row justify-between gap-4">
           <Button
             type="button"
-            variant="outline"
-            onClick={() => navigate('login')}
-            disabled={loading}
-            className="w-full sm:w-auto"
+            variant="bordered"
+            onPress={() => navigate('login')}
+            className="flex-1"
           >
             {t('auth.register.go-to-login')}
           </Button>
-          <Button type="submit" loading={loading} className="w-full sm:w-auto">
+
+          <Button type="submit" color="primary" className="flex-1">
             {t('auth.continue')}
           </Button>
         </div>
-      </form>
+      </Form>
     </AuthLayout>
   );
 };

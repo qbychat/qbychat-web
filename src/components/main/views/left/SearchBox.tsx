@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { SearchIcon } from 'lucide-react';
-import { CloseButton, TextInput, Transition } from '@mantine/core';
+import { SearchIcon, XIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Input } from '@heroui/input';
 
 type Props = {
   value: string;
@@ -27,31 +28,33 @@ type Props = {
 
 export const SearchBox = ({ value, onContentChange, onFocusChange }: Props) => {
   return (
-    <TextInput
-      radius="xl" className="mx-2"
+    <Input
+      radius="full"
       placeholder="Search"
+      size="sm"
+      className="mx-2 pr-3"
       value={value}
       onFocus={() => onFocusChange?.(true)}
       onBlur={() => onFocusChange?.(false)}
       onChange={(e) => onContentChange(e.target.value)}
-      rightSectionPointerEvents="all"
-      leftSection={<SearchIcon size={20} />}
-      rightSection={
-        <Transition
-          mounted={!!value}
-          transition="slide-left"
-          duration={200}
-          timingFunction="ease"
-        >
-          {(styles) =>
-            <CloseButton
+      startContent={<SearchIcon size={18} className="text-default-400" />}
+      endContent={
+        <AnimatePresence>
+          {value && (
+            <motion.button
+              key="clear-button"
               aria-label="Clear search box"
-              variant="transparent"
               onClick={() => onContentChange('')}
-              style={styles}
-            />
-          }
-        </Transition>
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="text-default-400 hover:text-default-600"
+            >
+              <XIcon size={18} />
+            </motion.button>
+          )}
+        </AnimatePresence>
       }
     />
   );

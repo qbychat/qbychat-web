@@ -16,17 +16,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Center, Stack, Text, Title } from '@mantine/core';
-
 export const IntroView = () => {
   return (
-    <Center style={{ height: '100%', width: '100%' }}>
-      <Stack align="center">
-        <Title order={2}>Welcome to QbyChat</Title>
-        <Text c="dimmed" ta="center" maw={360}>
+    <div className="flex items-center justify-center h-full w-full">
+      <div className="flex flex-col items-center space-y-3 max-w-[360px] px-4 text-center">
+        <h2 className="text-2xl font-semibold">Welcome to QbyChat</h2>
+        <p className="text-gray-500">
           Select a chat to start messaging
-        </Text>
-      </Stack>
-    </Center>
+        </p>
+      </div>
+    </div>
   );
 };

@@ -16,58 +16,103 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ActionIcon, Menu } from '@mantine/core';
-import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { useTranslation } from 'react-i18next';
 import useAccountStore from '@/stores/account-store.ts';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from '@heroui/react';
+import { Button } from '@heroui/button';
+import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 type Props = {
   openPMModel: () => void;
 }
 
-export const DropdownMenu = ({ openPMModel }: Props) => {
+export const DropdownMenu1 = ({ openPMModel }: Props) => {
   const { t } = useTranslation();
   const { pushView } = useStackControls();
 
   const accounts = useAccountStore(s => s.accounts);
 
   return (
-    <Menu shadow="md" width={280} trapFocus transitionProps={{ transition: 'pop-top-left', duration: 200 }}>
-      <Menu.Target>
-        <ActionIcon variant="transparent">
+    <Dropdown
+      placement="bottom-start"
+      classNames={{
+        content: 'min-w-[280px]',
+      }}
+    >
+      <DropdownTrigger>
+        <Button
+          isIconOnly
+          variant="light"
+          aria-label="Menu"
+        >
           <MenuIcon size={20} />
-        </ActionIcon>
-      </Menu.Target>
+        </Button>
+      </DropdownTrigger>
 
-      <Menu.Dropdown>
-        {Array.from(accounts.entries()).map(account => (
-          <Menu.Item key={account[0]} leftSection={<UserIcon size={14} />}>
-            {account[1].nickname}
-          </Menu.Item>
-        ))}
-        <Menu.Divider />
-        <Menu.Item leftSection={<PlusIcon size={14} />}>
-          {t('menu.login')}
-        </Menu.Item>
-        <Menu.Divider />
-        {/*TODO move create PM to search*/}
-        <Menu.Item leftSection={<MailIcon size={14} />} onClick={openPMModel}>
-          Start PM
-        </Menu.Item>
-        <Menu.Item leftSection={<ArchiveIcon size={14} />}>
-          {t('menu.saved-messages')}
-        </Menu.Item>
-        <Menu.Item leftSection={<Contact2Icon size={14} />}>
-          {t('menu.contacts')}
-        </Menu.Item>
-        <Menu.Item leftSection={<SettingsIcon size={14} />}
-                   onClick={() => pushView({ side: 'left', view: 'settings' })}>
-          {t('menu.settings')}
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Label>QbyChat Web {__APP_VERSION__}</Menu.Label>
-      </Menu.Dropdown>
-    </Menu>
+      <DropdownMenu
+        aria-label="User menu"
+        variant="bordered"
+      >
+        <DropdownSection title="Accounts" showDivider>
+          {Array.from(accounts.entries()).map(account => (
+            <DropdownItem
+              key={account[0].toString()}
+              startContent={<UserIcon size={14} />}
+            >
+              {account[1].nickname}
+            </DropdownItem>
+          ))}
+        </DropdownSection>
+
+        <DropdownSection showDivider>
+          <DropdownItem
+            key="login"
+            startContent={<PlusIcon size={14} />}
+          >
+            {t('menu.login')}
+          </DropdownItem>
+        </DropdownSection>
+
+        <DropdownSection showDivider>
+          <DropdownItem
+            key="start-pm"
+            startContent={<MailIcon size={14} />}
+            onPress={openPMModel}
+          >
+            Start PM
+          </DropdownItem>
+          <DropdownItem
+            key="saved-messages"
+            startContent={<ArchiveIcon size={14} />}
+          >
+            {t('menu.saved-messages')}
+          </DropdownItem>
+          <DropdownItem
+            key="contacts"
+            startContent={<Contact2Icon size={14} />}
+          >
+            {t('menu.contacts')}
+          </DropdownItem>
+          <DropdownItem
+            key="settings"
+            startContent={<SettingsIcon size={14} />}
+            onPress={() => pushView({ side: 'left', view: 'settings' })}
+          >
+            {t('menu.settings')}
+          </DropdownItem>
+        </DropdownSection>
+
+        <DropdownSection>
+          <DropdownItem
+            key="version"
+            isReadOnly
+            className="opacity-50"
+          >
+            QbyChat Web {__APP_VERSION__}
+          </DropdownItem>
+        </DropdownSection>
+      </DropdownMenu>
+    </Dropdown>
   );
 };

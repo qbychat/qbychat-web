@@ -22,9 +22,11 @@
   "dependencies": {
     "@bufbuild/buf": "^1.54.0",
     "@bufbuild/protobuf": "^2.4.0",
-    "@mantine/core": "^8.0.1",
-    "@mantine/form": "^8.0.1",
-    "@mantine/hooks": "^8.0.1",
+    "@heroui/badge": "^2.2.12",
+    "@heroui/button": "^2.2.19",
+    "@heroui/input": "^2.4.19",
+    "@heroui/react": "2.8.0-beta.6",
+    "@hookform/resolvers": "^5.0.1",
     "@tailwindcss/vite": "^4.1.5",
     "@use-gesture/react": "^10.3.1",
     "axios": "^1.9.0",
@@ -48,6 +50,7 @@
     "queue": "^7.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.56.4",
     "react-i18next": "^15.5.1",
     "react-resizable-panels": "^3.0.2",
     "react-responsive": "^10.0.1",
@@ -56,6 +59,7 @@
     "tailwindcss": "^4.1.5",
     "ua-parser-js": "^2.0.3",
     "uuid": "^11.1.0",
+    "zod": "^3.25.42",
     "zustand": "^5.0.4"
   },
   "devDependencies": {
@@ -74,19 +78,16 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "glob": "^11.0.2",
     "globals": "^16.0.0",
-    "postcss": "^8.5.3",
-    "postcss-preset-mantine": "^1.17.0",
-    "postcss-simple-vars": "^7.0.1",
-    "tw-animate-css": "^1.2.9",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "electron",
-      "electron-winstaller",
-      "esbuild"
+      "@bufbuild/buf",
+      "@heroui/shared-utils",
+      "esbuild",
+      "protobufjs"
     ]
   }
 }

@@ -23,9 +23,18 @@ import { useWebSocketLifecycleManager } from '@/hooks/websocket-lifecycle-servic
 import { AuthController } from '@/components/auth/AuthController.tsx';
 import { OnboardingView } from '@/components/onboarding/OnboardingView.tsx';
 import { MainLayout } from '@/components/main/MainLayout.tsx';
+import { useEffect } from 'react';
 
 export const App = () => {
   const screen = useAppStore(state => state.screen);
+
+  useEffect(() => {
+    document.body.classList.add('dark', 'text-foreground', 'bg-background');
+
+    return () => {
+      document.body.classList.remove('dark', 'text-foreground', 'bg-background');
+    };
+  }, []);
 
   useWebSocketLifecycleManager();
 

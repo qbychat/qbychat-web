@@ -24,8 +24,9 @@ import useSettings from '@/stores/settings-store.ts';
 import useAppStore from '@/stores/app-store.ts';
 import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-service-store.ts';
 import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
-import { AnimatedErrorMessage } from '@/components/AnimatedErrorMessage.tsx';
-import { Button, Input } from '@mantine/core';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Input } from '@heroui/input';
+import { Button } from '@heroui/button';
 
 export const SetupServerPage = () => {
   const { t } = useTranslation();
@@ -64,18 +65,50 @@ export const SetupServerPage = () => {
     }
   };
 
-  return (<div className="h-full w-full flex flex-col gap-1 items-center justify-center">
-    <h1 className="text-3xl md:text-4xl lg:text-5xl">{t('onboarding.server')}</h1>
-    <AnimatedErrorMessage error={error} />
-    <form className="mt-5 flex mx-auto items-center space-x-2" onSubmit={onSubmit}>
-      <Input type="url"
-             value={address}
-             onChange={(e) => setAddress(e.target.value)}
-             placeholder="https://cubewhy.org"
-             required />
-      <Button type="submit" loading={loading}>
-        {t('onboarding.server.connect')}
-      </Button>
-    </form>
-  </div>);
+  return (
+    <div className="h-full w-full flex flex-col gap-4 items-center justify-center px-4">
+      <h1 className="text-3xl md:text-4xl lg:text-5xl text-center font-semibold">
+        {t('onboarding.server')}
+      </h1>
+
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            key="error-message"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="text-sm text-red-500 mt-2"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <form
+        className="mt-5 flex flex-col sm:flex-row items-center gap-3 w-full max-w-md"
+        onSubmit={onSubmit}
+      >
+        <Input
+          type="url"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="https://cubewhy.org"
+          isRequired
+          className="flex-1"
+          radius="full"
+        />
+
+        <Button
+          type="submit"
+          color="primary"
+          isLoading={loading}
+          radius="full"
+          className="w-full sm:w-auto"
+        >
+          {t('onboarding.server.connect')}
+        </Button>
+      </form>
+    </div>
+  );
 };

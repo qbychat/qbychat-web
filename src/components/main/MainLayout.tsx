@@ -28,11 +28,11 @@ import {
 } from '@/hooks/main-router-hooks.ts';
 import { TransitionContainer } from '@/components/ui/TransitionContainer.tsx';
 import { LeftPanel } from '@/components/main/views/left/LeftPanel.tsx';
-import { usePrevious } from '@mantine/hooks';
-import { ChatView } from '@/components/main/views/right/ChatView.tsx';
+import { ChatView } from '@/components/main/views/right/chat/ChatView.tsx';
 import { ViewProvider } from '@/components/router/ViewProvider.tsx';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { IntroView } from '@/components/main/views/right/IntroView.tsx';
+import { usePrevious } from '@/hooks/use-previous-hook.ts';
 
 export const MainLayout = () => {
   // Detects if the current screen width is mobile-sized (≤768px)
