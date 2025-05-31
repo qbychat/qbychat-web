@@ -19,7 +19,7 @@ RUN pnpm build
 
 FROM caddy:alpine
 
-COPY --from=builder /app/dist /srv@heroui/badg
+COPY --from=builder /app/dist /srv
 
 RUN echo ':80' > /etc/caddy/Caddyfile && \
     echo 'root * /srv' >> /etc/caddy/Caddyfile && \
