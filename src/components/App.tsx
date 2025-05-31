@@ -24,17 +24,25 @@ import { AuthController } from '@/components/auth/AuthController.tsx';
 import { OnboardingView } from '@/components/onboarding/OnboardingView.tsx';
 import { MainLayout } from '@/components/main/MainLayout.tsx';
 import { useEffect } from 'react';
+import { useMediaQuery } from 'react-responsive';
 
 export const App = () => {
   const screen = useAppStore(state => state.screen);
+  const isDarkMode = useMediaQuery({ query: '(prefers-color-scheme: dark)' });
 
   useEffect(() => {
-    document.body.classList.add('dark', 'text-foreground', 'bg-background');
+    const classList = document.documentElement.classList;
+
+    if (isDarkMode) {
+      classList.add('dark', 'text-foreground', 'bg-background');
+    } else {
+      classList.remove('dark', 'text-foreground', 'bg-background');
+    }
 
     return () => {
-      document.body.classList.remove('dark', 'text-foreground', 'bg-background');
+      classList.remove('dark', 'text-foreground', 'bg-background');
     };
-  }, []);
+  }, [isDarkMode]);
 
   useWebSocketLifecycleManager();
 

@@ -31,9 +31,7 @@ enableMapSet();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HeroUIProvider>
-      <main className="dark text-foreground bg-background">
-        <App />
-      </main>
+      <App />
     </HeroUIProvider>
   </StrictMode>,
 );
