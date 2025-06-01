@@ -17,13 +17,19 @@
  */
 
 import IWebsocketService from '@/websocket/IWebsocketService.ts';
-import { SyncRequestSchema, SyncResponseSchema } from '@/proto/qbychat/rpc/room/v1/room_service_pb';
+import {
+  CreatePrivateRoomRequestSchema,
+  CreatePrivateRoomResponseSchema,
+  SyncRequestSchema,
+  SyncResponseSchema,
+} from '@/proto/qbychat/rpc/room/v1/room_service_pb';
 import { RpcRequestMethod } from '@/proto/qbychat/rpc/protocol/v1/rpc_messages_pb';
 import { create, toBinary } from '@bufbuild/protobuf';
 import WebsocketEventEmitter from '@/websocket/websocket-event-emitter.ts';
 import { convertRoomV1 } from '@/mappers/room-mapper.ts';
-import { IdType } from '@/types/id-types.ts';
+import { FederationIdModel, IdType } from '@/types/id-types.ts';
 import { IPacketService } from '@/types/websocket/packet.ts';
+import { federationIdOf } from '@/mappers/id-mapper.ts';
 
 class RoomService implements IWebsocketService {
   private readonly packetService: IPacketService;
@@ -41,6 +47,15 @@ class RoomService implements IWebsocketService {
     this.eventEmitter.sendEvent('syncRoom', {
       joinedRooms: response.joinedRooms.map(room => convertRoomV1(room)),
     });
+  }
+
+  async createPrivateRoom(userId: IdType, federationId: FederationIdModel, initialMessage: string) {
+    const request = create(CreatePrivateRoomRequestSchema, {
+      peerId: federationIdOf(federationId),
+      initialMessage: initialMessage,
+    });
+    // note: add room in sse, do not add room to room list after request createPrivateRoom
+    return await this.packetService.request(CreatePrivateRoomResponseSchema, userId, RpcRequestMethod.CREATE_PRIVATE_ROOM_V1, toBinary(CreatePrivateRoomRequestSchema, request));
   }
 }
 

@@ -16,9 +16,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FederationId } from '@/proto/qbychat/rpc/federation/v1/federation_model_pb';
-import { FederationIdModel } from '@/types/id-types.ts';
-import { parseProtobufLocalId } from '@/utils/proto-utils.ts';
+import { FederationId, FederationIdSchema } from '@/proto/qbychat/rpc/federation/v1/federation_model_pb';
+import { FederationIdModel, IdType } from '@/types/id-types.ts';
+import { parseProtobufLocalId, protobufLocalIdOf } from '@/utils/proto-utils.ts';
+import { create } from '@bufbuild/protobuf';
 
 export const convertFederationIdV1 = (federationId: FederationId): FederationIdModel => {
   return {
@@ -26,3 +27,25 @@ export const convertFederationIdV1 = (federationId: FederationId): FederationIdM
     localId: parseProtobufLocalId(federationId.localId!),
   };
 };
+
+export function federationIdOf(model: FederationIdModel): FederationId;
+export function federationIdOf(localId: IdType, domain?: string): FederationId;
+
+export function federationIdOf(
+  arg1: IdType | FederationIdModel,
+  domain?: string
+): FederationId {
+  if (typeof arg1 === 'object' && arg1 !== null && 'localId' in arg1) {
+    // 传入的是 FederationIdModel
+    return create(FederationIdSchema, {
+      localId: protobufLocalIdOf(arg1.localId),
+      domain: arg1.domain,
+    });
+  }
+
+  // 传入的是 localId + domain
+  return create(FederationIdSchema, {
+    localId: protobufLocalIdOf(arg1 as IdType),
+    domain: domain,
+  });
+}

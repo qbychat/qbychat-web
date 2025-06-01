@@ -112,11 +112,12 @@ export function useWebSocketLifecycleManager() {
 
     service.registerEvent('sse', async (data: SSEPayload<Uint8Array>) => {
       switch (data.eventType) {
-        case SwitchMainSessionEventSchema.typeName:
+        case SwitchMainSessionEventSchema.typeName: {
           // parse payload
-          { const payload = fromBinary(SwitchMainSessionEventSchema, data.payload);
+          const payload = fromBinary(SwitchMainSessionEventSchema, data.payload);
           selectMainAccount(parseProtobufLocalId(payload.mainAccountId));
-          break; }
+          break;
+        }
       }
     });
 

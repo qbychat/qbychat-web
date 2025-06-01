@@ -19,7 +19,7 @@
 import { useStackControls } from '@/hooks/main-router-hooks.ts';
 import { useTranslation } from 'react-i18next';
 import useAccountStore from '@/stores/account-store.ts';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Button } from '@heroui/react';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from '@heroui/react';
 import { ArchiveIcon, Contact2Icon, MailIcon, MenuIcon, PlusIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 type Props = {
@@ -58,6 +58,7 @@ export const DropdownMenu1 = ({ openPMModel }: Props) => {
             <DropdownItem
               key={account[0].toString()}
               startContent={<UserIcon size={14} />}
+              textValue={account[1].nickname}
             >
               {account[1].nickname}
             </DropdownItem>
@@ -68,6 +69,7 @@ export const DropdownMenu1 = ({ openPMModel }: Props) => {
           <DropdownItem
             key="login"
             startContent={<PlusIcon size={14} />}
+            textValue={t('menu.login')}
           >
             {t('menu.login')}
           </DropdownItem>
@@ -84,6 +86,7 @@ export const DropdownMenu1 = ({ openPMModel }: Props) => {
           <DropdownItem
             key="saved-messages"
             startContent={<ArchiveIcon size={14} />}
+            textValue={t('menu.saved-messages')}
           >
             {t('menu.saved-messages')}
           </DropdownItem>
@@ -97,6 +100,7 @@ export const DropdownMenu1 = ({ openPMModel }: Props) => {
             key="settings"
             startContent={<SettingsIcon size={14} />}
             onPress={() => pushView({ side: 'left', view: 'settings' })}
+            textValue={t('menu.settings')}
           >
             {t('menu.settings')}
           </DropdownItem>
@@ -107,6 +111,7 @@ export const DropdownMenu1 = ({ openPMModel }: Props) => {
             key="version"
             isReadOnly
             className="opacity-50"
+            textValue={`QbyChat Web ${__APP_VERSION__}`}
           >
             QbyChat Web {__APP_VERSION__}
           </DropdownItem>
