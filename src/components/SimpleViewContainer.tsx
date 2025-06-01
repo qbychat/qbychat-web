@@ -75,7 +75,7 @@ export const SimpleViewContainer = ({
   const variants = getVariants();
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full">
       <AnimatePresence mode="wait">
         {!isExiting && activePageCache && (
           <motion.div

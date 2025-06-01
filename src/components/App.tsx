@@ -58,7 +58,7 @@ export const App = () => {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden m-0">
+    <div className="w-full h-screen m-0">
       {renderScreen()}
     </div>
   );

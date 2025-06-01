@@ -20,7 +20,7 @@ import useWebsocketLifecycleServiceStore from '@/stores/websocket-lifecycle-serv
 import useAppStore from '@/stores/app-store.ts';
 import useAccountStore from '@/stores/account-store.ts';
 import useSettings from '@/stores/settings-store.ts';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
 import { WebsocketEvents } from '@/types/websocket/events.ts';
@@ -34,6 +34,7 @@ export function useWebSocketLifecycleManager() {
   const selectMainAccount = useAccountStore(s => s.selectMainAccount);
 
   const setService = useWebsocketLifecycleServiceStore(state => state.setService);
+  const service = useWebsocketLifecycleServiceStore(state => state.service);
   const currentServerId = useSettings((state) => state.currentServerId);
 
   const [websocketAddress, setWebsocketAddress] = useState<{ url: string; authToken: string | null } | null>(null);
@@ -59,16 +60,10 @@ export function useWebSocketLifecycleManager() {
     })();
   }, [currentServerId, setScreen]);
 
-  const service = useMemo(() => {
-    if (!websocketAddress) return null;
-    return new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken);
-  }, [websocketAddress]);
-
   useEffect(() => {
-    if (service) {
-      setService(service);
-    }
-  }, [service, setService]);
+    if (!websocketAddress) return;
+    setService(new WebsocketLifecycleService(websocketAddress.url, websocketAddress.authToken));
+  }, [websocketAddress, setService]);
 
   useEffect(() => {
     screenRef.current = screen;
