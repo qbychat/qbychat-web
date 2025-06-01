@@ -36,7 +36,7 @@ interface AccountState {
   removeAccount: (userId: IdType) => void;
   updateAccount: (userId: IdType, data: Partial<Account>) => void;
 
-  selectMainAccount: (accountId: IdType) => void;
+  selectMainAccount: (accountId?: IdType) => void;
 }
 
 const useAccountStore = create<AccountState>()(
@@ -64,9 +64,9 @@ const useAccountStore = create<AccountState>()(
         }
       }),
 
-    selectMainAccount: (userId: IdType) =>
+    selectMainAccount: (userId?: IdType) =>
       set((state) => {
-        state.mainAccountId = userId;
+        state.mainAccountId = userId ?? null;
       }),
   })),
 );

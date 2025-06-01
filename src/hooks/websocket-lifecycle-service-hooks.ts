@@ -24,6 +24,10 @@ import { useEffect, useRef, useState } from 'react';
 import { db } from '@/db.ts';
 import WebsocketLifecycleService from '@/websocket/websocket-lifecycle-service.ts';
 import { WebsocketEvents } from '@/types/websocket/events.ts';
+import { SwitchMainSessionEventSchema } from '@/proto/qbychat/rpc/session/v1/session_events_pb';
+import { fromBinary } from '@bufbuild/protobuf';
+import { SSEPayload } from '@/types/websocket/sse.ts';
+import { parseProtobufLocalId } from '@/utils/proto-utils.ts';
 
 export function useWebSocketLifecycleManager() {
   const setScreen = useAppStore(s => s.setScreen);
@@ -104,6 +108,16 @@ export function useWebSocketLifecycleManager() {
         nickname: data.nickname,
         bio: data.bio,
       });
+    });
+
+    service.registerEvent('sse', async (data: SSEPayload<Uint8Array>) => {
+      switch (data.eventType) {
+        case SwitchMainSessionEventSchema.typeName:
+          // parse payload
+          { const payload = fromBinary(SwitchMainSessionEventSchema, data.payload);
+          selectMainAccount(parseProtobufLocalId(payload.mainAccountId));
+          break; }
+      }
     });
 
 

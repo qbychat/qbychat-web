@@ -58,8 +58,8 @@ export class WebsocketEventEmitter {
   /**
    * Send an SSE event
    */
-  sendSseEvent<T>(userId: IdType | null | undefined, eventType: string, payload: T): void {
-    const ssePayload: SSEPayload<T> = {
+  sendSseEvent(userId: IdType | null | undefined, eventType: string, payload: Uint8Array): void {
+    const ssePayload: SSEPayload<Uint8Array> = {
       userId,
       eventType,
       payload,

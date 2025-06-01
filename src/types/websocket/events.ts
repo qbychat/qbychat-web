@@ -24,7 +24,7 @@ import { RoomServiceEvents } from '@/types/websocket/events/room-service-events.
 
 export type WebsocketEvents = {
   /* Internal Events */
-  sse: SSEPayload<unknown>;
+  sse: SSEPayload<Uint8Array>;
 
   updateStatus: WebSocketStatus;
   updateToken: { token: string };
