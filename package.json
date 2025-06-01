@@ -82,8 +82,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@bufbuild/buf",
-      "@heroui/shared-utils",
+      "electron",
+      "electron-winstaller",
       "esbuild",
       "protobufjs"
     ]

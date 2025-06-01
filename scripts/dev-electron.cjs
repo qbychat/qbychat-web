@@ -16,33 +16,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-const { spawn, execSync } = require('child_process');
+const { spawn } = require('child_process');
 const { createServer } = require('vite');
 const path = require('path');
 
 (async () => {
   // Start Vite server
-  console.log("Starting vite...");
+  console.log('Starting vite...');
   const viteServer = await createServer({
     configFile: path.resolve(__dirname, '../vite.config.ts'),
   });
   await viteServer.listen();
 
-  // Build typescript
-  console.log('Building typescript for electron');
-  execSync('pnpm run transpile:electron')
-  console.log('Build finished');
-
-  // Launch Electron
-  console.log('Starting Electron...');
-  const electronProcess = spawn('electron', ['.'], {
-    stdio: 'inherit',
+  // Build TypeScript
+  console.log('Building TypeScript for Electron...');
+  const transpileProcess = spawn('pnpm', ['run', 'transpile:electron'], {
+    stdio: 'inherit', // 输出日志
+    shell: true,
     env: process.env,
   });
 
-  electronProcess.on('close', () => {
-    viteServer.close();
-    process.exit();
+  transpileProcess.on('exit', (code) => {
+    if (code !== 0) {
+      console.error(`transpile:electron exited with code ${code}`);
+      viteServer.close();
+      process.exit(code);
+    }
+
+    console.log('Build finished');
+
+    // Launch Electron
+    console.log('Starting Electron...');
+    const electronProcess = spawn('electron', ['.'], {
+      stdio: 'inherit',
+      shell: true,
+      env: process.env,
+    });
+
+    electronProcess.on('close', () => {
+      viteServer.close();
+      process.exit();
+    });
   });
 })();
